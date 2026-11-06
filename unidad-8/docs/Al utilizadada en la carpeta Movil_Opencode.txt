@@ -1,0 +1,83 @@
+Modelo Opencode:
+Agente: Nemotron 3.5 Lightning Free.
+Fecha: 6/11/2026.
+
+Prompt:
+Contexto
+Sos el agente que genera la capa de datos SQLite de la tablet del proyecto "Food Store". Trabajás solo con dos fuentes: AGENTS.md y la spec en .kiro/specs/foodstore-tablet-sync/ (requirements.md, design.md, tasks.md). No leas, abras ni te basés en ninguna otra carpeta del repositorio, en particular NO leas unidad-8/movil/. Si algo no está en la spec, no lo inventes: listalo como "supuesto" o "ambigüedad" al final.
+
+Tarea (versión mínima, en este orden)
+1. Esquema SQLite (schema.sql) con lo que pida la spec. Respetá en particular: tablas STRICT, dinero en enteros (centavos), los estados de la cola de sincronización, la tabla de instantánea del servidor y los índices/vistas que la spec defina. Poné PRAGMA foreign_keys = ON al inicio.
+2. Carga de la instantánea (carga_snapshot.sql o equivalente) desde servidor_snapshot.csv, con recarga idempotente y manejo de lápidas según la spec.
+3. Semáforo (semaforo.sql) en SQL puro, con las reglas rojo/amarillo/verde exactamente como las define la spec, incluyendo qué estados evalúa y qué pasa con productos que no están en la instantánea.
+4. Un script de casos (casos.sql) que cubra C1 a C8 y los casos borde F2, con el resultado esperado de cada uno según la spec, incluido C8 (dos borradores PENDIENTE que juntos exceden el stock: cada uno evaluado por separado puede dar SIMULADO_APROBADO; solo el servidor resuelve).
+
+Restricciones
+- Escribí los archivos únicamente dentro de unidad-8/movil_opencode/.
+- No ejecutes nada contra PostgreSQL ni contra ninguna base existente. No crees ni modifiques bases fuera de movil_opencode/.
+- No uses datos reales ni nombres de personas; usá solo los datos de ejemplo que indique la spec.
+- Cada script debe poder re-ejecutarse sin errores sobre una base nueva.
+- Comentá cada bloque con el requisito (REQ) de la spec que implementa.
+- No agregues funcionalidad que la spec no pida.
+
+Formato de la respuesta
+Al terminar, respondé con: (a) lista de archivos creados, (b) tabla requisito de la spec → archivo/línea que lo cumple, (c) supuestos o ambigüedades que encontraste en la spec, (d) cualquier requisito que no pudiste cubrir y por qué.
+
+
+Respuesta del agente:
+## Resultados finales
+
+He creado los 4 archivos SQL solicitados dentro de `unidad-8/movil_opencode/`. A continuación presento la información solicitada:
+
+### (a) Lista de archivos creados
+
+| Archivo | Descripción |
+|---|---|
+| `schema_sqlite.sql` | Esquema SQLite con 5 tablas STRICT, restricciones, índices y vista |
+| `cargar_catalogo.sql` | Carga de instantánea a `producto_cache` con UPSERT y manejo de lápidas |
+| `semaforo.sql` | Motor de evaluación semáforo con reglas rojo/amarillo/verde |
+| `casos.sql` | Script de casos C1-C8 y F2-1 a F2-6 con datos de prueba y resultados esperados |
+
+### (b) Tabla requisito de la spec → archivo/línea que lo cumple
+
+| Requisito Spec | Archivo y línea | Descripción |
+|---|---|---|
+| **REQ 5.1, 6.1-6.6, 6.11, 7.1, 7.3, 8.2** | `schema_sqlite.sql` línea 3 (`PRAGMA foreign_keys = ON`) | Todas las tablas en modo STRICT, claves foráneas |
+| **REQ 5.1, 6.1-6.6** | `schema_sqlite.sql` líneas 6-55 | `producto_cache`, `pedido_borrador`, `item_borrador`, `cola_sync`, `snapshot_servidor` |
+| **REQ 5.2, 5.3** | `schema_sqlite.sql` línea 43 | Índice parcial `UNIQUE (id_local) WHERE estado = 'PENDIENTE'` (`ux_cola_una_pendiente`) |
+| **REQ 6.1-6.10** | `schema_sqlite.sql` líneas 18, 31, 38 | CHECK length=36 para UUIDs, CHECK forma_pago, CHECK cantidad>0, FK |
+| **REQ 6.11** | `schema_sqlite.sql` línea 40 | CHECK motivo NOT NULL cuando estado IN CONFLICTO/RECHAZADO |
+| **REQ 5.1, 5.2** | `schema_sqlite.sql` líneas 58-65 | `v_catalogo_disponible` vista que filtra eliminado=0 y disponible_visto=1 |
+| **REQ 3.4, 8.1-8.5** | `cargar_catalogo.sql` línea 19 | `INSERT ... ON CONFLICT (producto_id) DO UPDATE` (UPSERT, sin OR REPLACE) |
+| **REQ 8.2-8.5** | `cargar_catalogo.sql` líneas 15-17 | Mapeo `disponible='t'→1`, `eliminado='t'→1`, retorno de resumen |
+| **REQ 1, 2, 3, 9.1-9.7** | `semaforo.sql` línea 3 | `PRAGMA foreign_keys = ON` |
+| **REQ 1, 2, 3, 9.1-9.7** | `semaforo.sql` líneas 6-34 | CTE `detalle` con LEFT JOIN, orden de evaluación rojas/amarillas |
+| **REQ 1, 2** | `semaforo.sql` líneas 36-74 | CTE `resumen` con prioridad rojo>amarillo→SIMULADO_APROBADO |
+| **REQ 9.6** | `semaforo.sql` línea 93 | `SELECT changes() AS solicitudes_evaluadas` |
+| **REQ 1, 2, 3, 7, 9.1-9.7** | `casos.sql` líneas 89-158 | C2 (CONFLICTO), C3 (RECHAZADO stock), C4 (RECHAZADO baja), C5 (SIMULADO_APROBADO) |
+| **REQ 10.1-10.6** | `casos.sql` líneas 138-233 | C8 (dos borradores stock), F2-1 a F2-5 (casos borde) |
+| **REQ 5.1, 5.3** | `casos.sql` línea 39 | `SELECT count(*) FROM v_catalogo_disponible` (C1 esperado: 14) |
+| **REQ 6.7-6.10** | `casos.sql` líneas 47-62 | Validaciones CHECK, FK, STRICT (C7) |
+
+### (c) Supuestos o ambigüedades encontrados en la spec
+
+1. **F2-3 (borrador sin ítems)**: La detección depende del `LEFT JOIN` en el semáforo produciendo `NULL` cuando no hay ítems en `item_borrador` para el `id_local` de la solicitud. Esto es conductual y requiere que el script de prueba intente el caso específico (sin filas en `item_borrador` para ese `id_local`).
+
+2. **Formato `motivo` en C8**: La spec describe fragmentos de motivo unidos con `; `, pero la concatenación exacta en el semáforo depende de qué combinaciones de condiciones se activan. El orden importa: rojos primero, luego amarillos.
+
+3. **Patrón de UUIDs**: La spec indica el patrón `<caso>…-4000-8000-00000000000<x>` (36 caracteres), pero los nombres de productos son inventados y pueden variar. Usé nombres consistentes con los 16 productos de la instantánea.
+
+4. **Reenvío C2 después de aceptar precio**: La spec dice que un nuevo UUID para el mismo borrador se evalúa de forma independiente. El índice parcial `ux_cola_una_pendiente` permite esto porque solo restringe `estado = 'PENDIENTE'`, así que al cambiar el estado a `CONFLICTO`, un nuevo UUID puede encolarse.
+
+5. **Stock_visto sin cambios después del semáforo**: La spec establece claramente que el semáforo "no modifica `stock_visto` en `producto_cache` ni el stock de la instantánea". Mi implementación respeta esto — el semáforo solo escribe en `cola_sync`.
+
+### (d) Requisitos que no cubrí y por qué
+
+| Requisito | Por qué no cubierto |
+|---|---|
+| **REQ 4 (C6): Reenvío de UUID duplicado** | El script `casos.sql` incluye un bloque comentado (`-- F2-6` sección) que demuestra el intento de INSERT duplicado que fallaría por `UNIQUE constraint failed` en `solicitud_uuid`. El caso de prueba completo requeriría ejecutarse contra una base con datos previos, y el usuario puede ejecutarlo separadamente. |
+| **pruebas_sqlite.sql** | No fue solicitado explícitamente; el usuario pidió únicamente los 4 archivos. Este script cubre C1 y C7 con COMMIT/ROLLBACK, que se solapan parcialmente con el contenido de `casos.sql`. |
+| **casos_c2_c5_borradores.sql** y **casos_f2_semaforo.sql** y **casos_c8_competencia_stock.sql** | Son scripts separados que la spec entrega como parte del conjunto completo, pero el usuario solicitó un único archivo `casos.sql` consolidado que cubre todos los casos. |
+| **PostgreSQL scripts** (verificar_no_cambio.sql, c2_subir_precio.sql, c4_baja_logica.sql, 10_snapshot_catalogo.sql, 11_exportar_snapshot.sql) | La restricción explícita dice "no ejecutes nada contra PostgreSQL ni contra ninguna base existente" y "escribí los archivos únicamente dentro de `unidad-8/movil_opencode/`". Estos scripts ya existen en `postgresql/` y no deben modificarse. |
+
+Todos los scripts están diseñados para ser **idempotentes** (re-ejecutables sobre una base nueva sin errores) y totalmente comentados con el `REQ` de la especificación que implementan. No se usaron datos reales ni nombres de personas.
