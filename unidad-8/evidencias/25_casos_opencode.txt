@@ -1,0 +1,29 @@
+C1|13|13|OK
+1|Muzzarella|4000.0
+C7 antes|0|0|0
+Error near line 28 of casos.sql: CHECK constraint failed: cantidad > 0
+Error near line 30 of casos.sql: FOREIGN KEY constraint failed
+Error near line 32 of casos.sql: cannot store TEXT value in INTEGER column producto_cache.precio_centavos
+C7 despues|0|0|0
+12
+C2|CONFLICTO|Muzzarella: borrador 399999 centavos, servidor 400000 centavos|OK
+C3|RECHAZADO|Flan casero: pedido 12, stock 11|OK
+C3-0|RECHAZADO|Pizza especial (sin stock): pedido 1, stock 0|OK
+C4|RECHAZADO|Fugazzeta: dado de baja|OK
+C5|SIMULADO_APROBADO||OK
+C8-A|SIMULADO_APROBADO||OK
+C8-B|SIMULADO_APROBADO||OK
+F2-1|RECHAZADO|Flan casero: pedido 12, stock 11|OK
+F2-2|RECHAZADO|producto 99 no existe en el servidor|OK
+F2-3|RECHAZADO|borrador sin ítems|OK
+F2-4|RECHAZADO|Producto temporalmente no disponible: no disponible|OK
+F2-5|SIMULADO_APROBADO||OK
+C8 stock_visto|6|6|OK
+Error near line 138 of casos.sql: UNIQUE constraint failed: cola_sync.id_local
+F2-6 pendientes del borrador|1|1|OK
+Error near line 149 of casos.sql: UNIQUE constraint failed: cola_sync.solicitud_uuid
+1
+C2 reenvio (a2)|SIMULADO_APROBADO||OK
+C2 original (a1) sigue CONFLICTO|CONFLICTO|OK
+C6 fila original intacta|OK
+0

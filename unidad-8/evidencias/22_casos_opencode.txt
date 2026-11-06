@@ -1,0 +1,51 @@
+﻿--- C1: Cat├ílogo disponible ---
+sqlite3 : Parse error near line 40 of casos.sql: no such table: main.producto_cache
+En línea: 1 Carácter: 1
++ sqlite3 prueba.db ".read casos.sql" 2>&1 | Out-File -Encoding utf8 .. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Parse error nea....producto_cache:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Error near line 54 of casos.sql: cannot rollback - no transaction is active
+Parse error near line 76 of casos.sql: no such table: pedido_borrador
+Parse error near line 79 of casos.sql: no such table: item_borrador
+Parse error near line 82 of casos.sql: no such table: cola_sync
+Parse error near line 89 of casos.sql: no such table: pedido_borrador
+Parse error near line 92 of casos.sql: no such table: item_borrador
+Parse error near line 95 of casos.sql: no such table: cola_sync
+Parse error near line 102 of casos.sql: no such table: pedido_borrador
+Parse error near line 105 of casos.sql: no such table: item_borrador
+Parse error near line 108 of casos.sql: no such table: cola_sync
+Parse error near line 115 of casos.sql: no such table: pedido_borrador
+Parse error near line 118 of casos.sql: no such table: item_borrador
+Parse error near line 121 of casos.sql: no such table: cola_sync
+Parse error near line 129 of casos.sql: no such table: pedido_borrador
+Parse error near line 132 of casos.sql: no such table: item_borrador
+Parse error near line 135 of casos.sql: no such table: cola_sync
+Parse error near line 138 of casos.sql: no such table: pedido_borrador
+Parse error near line 141 of casos.sql: no such table: item_borrador
+Parse error near line 144 of casos.sql: no such table: cola_sync
+Parse error near line 160 of casos.sql: no such table: pedido_borrador
+Parse error near line 163 of casos.sql: no such table: item_borrador
+Parse error near line 166 of casos.sql: no such table: item_borrador
+Parse error near line 181 of casos.sql: no such table: pedido_borrador
+Parse error near line 184 of casos.sql: no such table: item_borrador
+Parse error near line 187 of casos.sql: no such table: cola_sync
+Parse error near line 193 of casos.sql: no such table: pedido_borrador
+Parse error near line 197 of casos.sql: no such table: cola_sync
+Parse error near line 202 of casos.sql: no such table: pedido_borrador
+Parse error near line 205 of casos.sql: no such table: item_borrador
+Parse error near line 208 of casos.sql: no such table: cola_sync
+Parse error near line 213 of casos.sql: no such table: pedido_borrador
+Parse error near line 216 of casos.sql: no such table: item_borrador
+Parse error near line 219 of casos.sql: no such table: cola_sync
+--- C2 resultado ---
+Parse error near line 234 of casos.sql: no such table: cola_sync
+--- C3 resultado ---
+Parse error near line 239 of casos.sql: no such table: cola_sync
+--- C4 resultado ---
+Parse error near line 244 of casos.sql: no such table: cola_sync
+--- C5 resultado ---
+Parse error near line 249 of casos.sql: no such table: cola_sync
+--- C8 resultado ---
+Parse error near line 254 of casos.sql: no such table: cola_sync

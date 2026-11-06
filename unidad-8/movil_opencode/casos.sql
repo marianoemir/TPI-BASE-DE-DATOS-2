@@ -1,259 +1,170 @@
--- REQ 5.1, 5.2, 5.3, 6.7-6.10, 1, 2, 3, 7, 9.1-9.7, 10.1-10.6
--- Script de casos de prueba: C1 a C8 y F2-1 a F2-6
--- Ejecutar después de schema_sqlite.sql y cargar_catalogo.sql
+-- REQ 5, 6.7-6.10, 1, 2, 3, 4, 7, 9, 10 | Casos C1 a C8 y F2-1 a F2-6
+-- Reescrito a mano sobre la version de OpenCode (UUID de 36 caracteres, datos reales de
+-- servidor_snapshot.csv, C6/F2-6 ejecutables, C7 con BEGIN...ROLLBACK).
+-- Orden (base nueva, desde la carpeta de trabajo):
+--   .read schema_sqlite.sql
+--   .import --csv --skip 1 ..\movil\servidor_snapshot.csv snapshot_servidor
+--   .read cargar_catalogo.sql
+--   .read casos.sql          (este script ejecuta semaforo.sql dos veces)
+-- Los "Error: ..." de C6, C7 y F2-6 son ESPERADOS: son los rechazos que se prueban.
 PRAGMA foreign_keys = ON;
 
--- ============================================================
--- DATA INIT: 16 productos de la instantánea 1 (estado inicial)
--- Productos 1-10: activos y disponibles
--- Producto 11: Tiramisú, stock 6 (caso C8)
--- Producto 12: Leche, disponible = 'f' (caso F2-4)
--- Productos 13-14: dados de baja (caso C4)
--- Productos 15-16: control (C5/F2-5)
--- ============================================================
--- Note: snapshot_servidor ya debería estar cargado desde schema.sql
--- Si la base está nueva, descomentar la siguiente línea:
--- INSERT OR REPLACE INTO snapshot_servidor (producto_id, nombre, precio_centavos, stock, disponible, eliminado, capturado_en) VALUES
---(1, 'Empanada', 1200, 10, 't', 'f', '2026-11-06'),
---(2, 'Factura', 850, 5, 't', 'f', '2026-11-06'),
---(3, 'Torta', 1500, 8, 't', 'f', '2026-11-06'),
---(4, 'Pan', 300, 20, 't', 'f', '2026-11-06'),
---(5, ' medialuna', 400, 15, 't', 'f', '2026-11-06'),
---(6, 'Croissant', 600, 7, 't', 'f', '2026-11-06'),
---(7, 'Bizcocho', 900, 3, 't', 'f', '2026-11-06'),
---(8, 'Cucharon', 250, 25, 't', 'f', '2026-11-06'),
---(9, 'Taza', 350, 12, 't', 'f', '2026-11-06'),
---(10, 'Plato', 500, 18, 't', 'f', '2026-11-06'),
---(11, 'Tiramisú', 2200, 6, 't', 'f', '2026-11-06'),
---(12, 'Leche', 1000, 10, 'f', 'f', '2026-11-06'),
---(13, 'Alfajor', 750, 4, 't', 't', '2026-11-06'),
---(14, 'Dulce de leche', 900, 3, 't', 't', '2026-11-06'),
---(15, 'Muffin', 350, 8, 't', 'f', '2026-11-06'),
---(16, 'Galletita', 200, 15, 't', 'f', '2026-11-06');
+-- ============================================================ C1 (REQ 5)
+-- NOTA: el REQ 5.3 dice 14, pero el CSV real oculta 3 productos (3 baja, 15 no disponible,
+-- 16 ambos), asi que el valor correcto con este CSV es 13.
+SELECT 'C1' AS caso, count(*) AS obtenido, 13 AS esperado,
+       CASE WHEN count(*) = 13 THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM v_catalogo_disponible;
+SELECT producto_id, nombre, precio FROM v_catalogo_disponible WHERE producto_id = 1;
 
--- ============================================================
--- C1: Catálogo disponible sin conexión
--- Esperado: v_catalogo_disponible devuelve 14 productos
--- (16 totales - productos 13, 14 (eliminado) - producto 12 (no disponible))
--- ============================================================
-SELECT '--- C1: Catálogo disponible ---' AS label;
-SELECT count(*) AS productos_disponibles FROM v_catalogo_disponible;
--- Esperado: 14
-
--- ============================================================
--- C7: Validaciones del esquema (CHECK, FK, STRICT)
--- ============================================================
-
--- Prueba 1: INSERT de ítem con cantidad 0 → debe fallar CHECK
--- (Ejecutar este INSERT y verificar error de constraint; luego hacer rollback)
--- INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
--- VALUES ('c7item001-0000-4000-8000-00000000001', 1, 0, 100);
--- Expected: CHECK constraint failed, no rows inserted
-
--- Si la anterior no falla (modo sin STRICT estricto), hacer rollback:
+-- ============================================================ C7 (REQ 6.7-6.10)
+SELECT 'C7 antes' AS momento,
+       (SELECT count(*) FROM pedido_borrador) AS borradores,
+       (SELECT count(*) FROM item_borrador)   AS items,
+       (SELECT count(*) FROM cola_sync)       AS cola;
+BEGIN;
+INSERT INTO pedido_borrador VALUES ('c7000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+-- 6.7: cantidad 0 -> debe fallar por CHECK
+INSERT INTO item_borrador VALUES ('c7000000-0000-4000-8000-0000000000b1', 1, 0, 400000);
+-- 6.8: producto inexistente en producto_cache -> debe fallar por FOREIGN KEY
+INSERT INTO item_borrador VALUES ('c7000000-0000-4000-8000-0000000000b1', 9999, 1, 100);
+-- 6.9: texto en columna INTEGER de tabla STRICT -> debe fallar
+INSERT INTO producto_cache VALUES (500, 'x', 'no_numero', 1, 1, 0, '2026-11-06');
 ROLLBACK;
+SELECT 'C7 despues' AS momento,
+       (SELECT count(*) FROM pedido_borrador) AS borradores,
+       (SELECT count(*) FROM item_borrador)   AS items,
+       (SELECT count(*) FROM cola_sync)       AS cola;
 
--- Prueba 2: INSERT de ítem con producto_id inexistente → debe fallar FK
--- (Ejecutar este INSERT y verificar error de constraint FK; luego hacer rollback)
--- INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
--- VALUES ('c7item002-0000-4000-8000-00000000002', 999, 1, 100);
--- Expected: FK constraint failed, no rows inserted
+-- ============================================================ Preparacion de borradores
+-- Producto 99: la tablet lo conocia pero ya no esta en la instantanea (para F2-2).
+INSERT INTO producto_cache VALUES (99, 'Producto retirado', 100, 5, 1, 0, '2026-11-01 00:00:00');
 
--- ROLLBACK;
+-- Cada caso: borrador (b1), items y solicitud PENDIENTE (a1)
+-- C2: precio visto 399999 vs servidor 400000 (producto 1, Muzzarella)
+INSERT INTO pedido_borrador VALUES ('c2000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c2000000-0000-4000-8000-0000000000b1', 1, 2, 399999);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c2000000-0000-4000-8000-0000000000a1', 'c2000000-0000-4000-8000-0000000000b1');
 
--- Prueba 3: INSERT con tipo inválido en columna STRICT de producto_cache
--- (Ejecutar este INSERT y verificar error de STRICT table; luego hacer rollback)
--- INSERT INTO producto_cache (producto_id, nombre, precio_centavos, stock_visto, disponible_visto, eliminado, capturado_en)
--- VALUES ('no_entero', 'Test', 'no_es_numero', 10, 1, 0, '2026-11-06');
--- Expected: STRICT table rejects: expected error
+-- C3: pedir 12 de Flan casero (stock 11)
+INSERT INTO pedido_borrador VALUES ('c3000000-0000-4000-8000-0000000000b1', 1, 'TARJETA', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c3000000-0000-4000-8000-0000000000b1', 10, 12, 150000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c3000000-0000-4000-8000-0000000000a1', 'c3000000-0000-4000-8000-0000000000b1');
 
--- ROLLBACK;
+-- C3 (REQ 2.4): producto con stock 0 (14, Pizza especial)
+INSERT INTO pedido_borrador VALUES ('c3000001-0000-4000-8000-0000000000b1', 1, 'TARJETA', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c3000001-0000-4000-8000-0000000000b1', 14, 1, 500000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c3000001-0000-4000-8000-0000000000a1', 'c3000001-0000-4000-8000-0000000000b1');
 
--- ============================================================
--- C2: Precio visto difiere del servidor → CONFLICTO
--- Usando producto 1 con precio visto artificialmente distinto
--- ============================================================
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('c2000000-0000-4000-8000-00000000000b', 1, 'EFECTIVO', '2026-11-06');
+-- C4: producto dado de baja (3, Fugazzeta)
+INSERT INTO pedido_borrador VALUES ('c4000000-0000-4000-8000-0000000000b1', 1, 'TRANSFERENCIA', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c4000000-0000-4000-8000-0000000000b1', 3, 1, 450000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c4000000-0000-4000-8000-0000000000a1', 'c4000000-0000-4000-8000-0000000000b1');
 
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('c2000000-0000-4000-8000-00000000000b', 1, 2, 1500); -- visto 1500, servidor 1200
+-- C5 control: 3 empanadas de carne, precio vigente
+INSERT INTO pedido_borrador VALUES ('c5000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c5000000-0000-4000-8000-0000000000b1', 4, 3, 90000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c5000000-0000-4000-8000-0000000000a1', 'c5000000-0000-4000-8000-0000000000b1');
 
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('c2000000-0000-4000-8000-00000000000b', 'c2000000-0000-4000-8000-00000000000b', 'PENDIENTE', NULL, '2026-11-06');
+-- C8: dos borradores piden 4 + 4 de Tiramisu (11), stock 6
+INSERT INTO pedido_borrador VALUES ('c8000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c8000000-0000-4000-8000-0000000000b1', 11, 4, 220000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c8000000-0000-4000-8000-0000000000a1', 'c8000000-0000-4000-8000-0000000000b1');
+INSERT INTO pedido_borrador VALUES ('c8000000-0000-4000-8000-0000000000b2', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('c8000000-0000-4000-8000-0000000000b2', 11, 4, 220000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c8000000-0000-4000-8000-0000000000a2', 'c8000000-0000-4000-8000-0000000000b2');
 
--- ============================================================
--- C3: Cantidad mayor que stock → RECHAZADO
--- Producto 2: stock 5 en la instantánea, pedir 8
--- ============================================================
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('c3000000-0000-4000-8000-00000000000b', 1, 'TARJETA', '2026-11-06');
+-- F2-1: rojo (stock) y amarillo (precio) juntos -> RECHAZADO, sin mencionar el precio
+INSERT INTO pedido_borrador VALUES ('f1000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('f1000000-0000-4000-8000-0000000000b1', 1, 1, 399999);
+INSERT INTO item_borrador   VALUES ('f1000000-0000-4000-8000-0000000000b1', 10, 12, 150000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('f1000000-0000-4000-8000-0000000000a1', 'f1000000-0000-4000-8000-0000000000b1');
 
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('c3000000-0000-4000-8000-00000000000b', 2, 8, 850);
+-- F2-2: producto fuera de la instantanea (99)
+INSERT INTO pedido_borrador VALUES ('f2000000-0000-4000-8000-0000000000b1', 1, 'TARJETA', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('f2000000-0000-4000-8000-0000000000b1', 99, 1, 100);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('f2000000-0000-4000-8000-0000000000a1', 'f2000000-0000-4000-8000-0000000000b1');
 
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('c3000000-0000-4000-8000-00000000000b', 'c3000000-0000-4000-8000-00000000000b', 'PENDIENTE', NULL, '2026-11-06');
+-- F2-3: borrador sin items
+INSERT INTO pedido_borrador VALUES ('f3000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('f3000000-0000-4000-8000-0000000000a1', 'f3000000-0000-4000-8000-0000000000b1');
 
--- ============================================================
--- C4: Producto dado de baja → RECHAZADO
--- Producto 13: Alfajor, eliminado = 't' en la instantánea
--- ============================================================
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('c4000000-0000-4000-8000-00000000000b', 1, 'TRANSFERENCIA', '2026-11-06');
+-- F2-4: producto no disponible (15)
+INSERT INTO pedido_borrador VALUES ('f4000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('f4000000-0000-4000-8000-0000000000b1', 15, 1, 200000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('f4000000-0000-4000-8000-0000000000a1', 'f4000000-0000-4000-8000-0000000000b1');
 
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('c4000000-0000-4000-8000-00000000000b', 13, 1, 750);
+-- F2-5: control, todo OK (Coca-Cola x2 a precio vigente)
+INSERT INTO pedido_borrador VALUES ('f5000000-0000-4000-8000-0000000000b1', 1, 'EFECTIVO', '2026-11-06 10:00:00');
+INSERT INTO item_borrador   VALUES ('f5000000-0000-4000-8000-0000000000b1', 7, 2, 120000);
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('f5000000-0000-4000-8000-0000000000a1', 'f5000000-0000-4000-8000-0000000000b1');
 
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('c4000000-0000-4000-8000-00000000000b', 'c4000000-0000-4000-8000-00000000000b', 'PENDIENTE', NULL, '2026-11-06');
+-- Resultados esperados (se cargan en una tabla temporal para comparar automaticamente)
+CREATE TEMP TABLE esperado (caso TEXT, solicitud_uuid TEXT, estado TEXT, motivo TEXT);
+INSERT INTO esperado VALUES
+ ('C2',   'c2000000-0000-4000-8000-0000000000a1', 'CONFLICTO',         'Muzzarella: borrador 399999 centavos, servidor 400000 centavos'),
+ ('C3',   'c3000000-0000-4000-8000-0000000000a1', 'RECHAZADO',         'Flan casero: pedido 12, stock 11'),
+ ('C3-0', 'c3000001-0000-4000-8000-0000000000a1', 'RECHAZADO',         'Pizza especial (sin stock): pedido 1, stock 0'),
+ ('C4',   'c4000000-0000-4000-8000-0000000000a1', 'RECHAZADO',         'Fugazzeta: dado de baja'),
+ ('C5',   'c5000000-0000-4000-8000-0000000000a1', 'SIMULADO_APROBADO', NULL),
+ ('C8-A', 'c8000000-0000-4000-8000-0000000000a1', 'SIMULADO_APROBADO', NULL),
+ ('C8-B', 'c8000000-0000-4000-8000-0000000000a2', 'SIMULADO_APROBADO', NULL),
+ ('F2-1', 'f1000000-0000-4000-8000-0000000000a1', 'RECHAZADO',         'Flan casero: pedido 12, stock 11'),
+ ('F2-2', 'f2000000-0000-4000-8000-0000000000a1', 'RECHAZADO',         'producto 99 no existe en el servidor'),
+ ('F2-3', 'f3000000-0000-4000-8000-0000000000a1', 'RECHAZADO',         'borrador sin ítems'),
+ ('F2-4', 'f4000000-0000-4000-8000-0000000000a1', 'RECHAZADO',         'Producto temporalmente no disponible: no disponible'),
+ ('F2-5', 'f5000000-0000-4000-8000-0000000000a1', 'SIMULADO_APROBADO', NULL);
 
--- ============================================================
--- C5: Control, sin diferencias → SIMULADO_APROBADO
--- Producto 4: Pan, stock 20, cantidad 3, precio igual
--- ============================================================
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('c5000000-0000-4000-8000-00000000000b', 1, 'EFECTIVO', '2026-11-06');
+-- ============================================================ Semaforo, 1.a ejecucion
+.read semaforo.sql
 
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('c5000000-0000-4000-8000-00000000000b', 4, 3, 300);
+SELECT e.caso, c.estado, c.motivo,
+       CASE WHEN c.estado = e.estado AND c.motivo IS e.motivo THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM esperado e JOIN cola_sync c USING (solicitud_uuid)
+ORDER BY e.caso;
 
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('c5000000-0000-4000-8000-00000000000b', 'c5000000-0000-4000-8000-00000000000b', 'PENDIENTE', NULL, '2026-11-06');
+-- C8 (REQ 10.3): el semaforo no toco stock_visto del Tiramisu (sigue 6)
+SELECT 'C8 stock_visto' AS caso, stock_visto AS obtenido, 6 AS esperado,
+       CASE WHEN stock_visto = 6 THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM producto_cache WHERE producto_id = 11;
 
--- ============================================================
--- C8: Dos borradores compiten por el mismo stock
--- Producto 11 (Tiramisú): stock 6, pedir 4 + pedir 4
--- Cada uno evaluado por separado da SIMULADO_APROBADO
--- ============================================================
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('c8000000-0000-4000-8000-00000000000a', 1, 'EFECTIVO', '2026-11-06');
+-- ============================================================ F2-6 y reenvio tras CONFLICTO (REQ 7, 1.3)
+-- El cliente confirma el nuevo precio: se corrige el item y se reenvia con UUID distinto.
+UPDATE item_borrador SET precio_centavos_visto = 400000
+ WHERE id_local = 'c2000000-0000-4000-8000-0000000000b1' AND producto_id = 1;
+-- 7.2: la anterior ya no esta PENDIENTE, se permite una nueva
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c2000000-0000-4000-8000-0000000000a2', 'c2000000-0000-4000-8000-0000000000b1');
+-- 7.1: una segunda PENDIENTE del mismo borrador debe fallar (ux_cola_una_pendiente)
+INSERT INTO cola_sync(solicitud_uuid, id_local) VALUES ('c2000000-0000-4000-8000-0000000000a3', 'c2000000-0000-4000-8000-0000000000b1');
+SELECT 'F2-6 pendientes del borrador' AS caso, count(*) AS obtenido, 1 AS esperado,
+       CASE WHEN count(*) = 1 THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM cola_sync WHERE id_local = 'c2000000-0000-4000-8000-0000000000b1' AND estado = 'PENDIENTE';
 
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('c8000000-0000-4000-8000-00000000000a', 11, 4, 2200);
+-- Guardar fila de C5 para comprobar C6
+CREATE TEMP TABLE c5_antes AS
+SELECT estado, motivo, evaluada_en FROM cola_sync WHERE solicitud_uuid = 'c5000000-0000-4000-8000-0000000000a1';
 
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('c8000000-0000-4000-8000-00000000000a', 'c8000000-0000-4000-8000-00000000000a', 'PENDIENTE', NULL, '2026-11-06');
+-- ============================================================ C6 (REQ 4): reenvio de UUID duplicado
+-- 4.1: debe fallar por clave primaria
+INSERT INTO cola_sync(solicitud_uuid, id_local, estado, motivo)
+VALUES ('c5000000-0000-4000-8000-0000000000a1', 'c5000000-0000-4000-8000-0000000000b1', 'RECHAZADO', 'reenvio');
 
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('c8000000-0000-4000-8000-00000000000b', 1, 'EFECTIVO', '2026-11-06');
+-- ============================================================ Semaforo, 2.a ejecucion
+-- Solo evalua la nueva (a2): 1 solicitud. El resto ya no esta PENDIENTE (REQ 9.1).
+.read semaforo.sql
 
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('c8000000-0000-4000-8000-00000000000b', 11, 4, 2200);
+SELECT 'C2 reenvio (a2)' AS caso, estado, motivo,
+       CASE WHEN estado = 'SIMULADO_APROBADO' AND motivo IS NULL THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM cola_sync WHERE solicitud_uuid = 'c2000000-0000-4000-8000-0000000000a2';
+SELECT 'C2 original (a1) sigue CONFLICTO' AS caso, estado,
+       CASE WHEN estado = 'CONFLICTO' THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM cola_sync WHERE solicitud_uuid = 'c2000000-0000-4000-8000-0000000000a1';
 
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('c8000000-0000-4000-8000-00000000000b', 'c8000000-0000-4000-8000-00000000000b', 'PENDIENTE', NULL, '2026-11-06');
+-- C6 4.2: la fila original de C5 quedo intacta
+SELECT 'C6 fila original intacta' AS caso,
+       CASE WHEN c.estado IS a.estado AND c.motivo IS a.motivo AND c.evaluada_en IS a.evaluada_en
+            THEN 'OK' ELSE 'FALLA' END AS resultado
+FROM cola_sync c, c5_antes a WHERE c.solicitud_uuid = 'c5000000-0000-4000-8000-0000000000a1';
 
--- F2-6: Dos solicitudes PENDIENTE del mismo borrador fallan por ux_cola_una_pendiente
--- (Esto se probaría intentando un INSERT duplicado de id_local con estado PENDIENTE)
--- INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
--- VALUES ('dup0000k-0000-4000-8000-00000000000b', 'c8000000-0000-4000-8000-00000000000a', 'PENDIENTE', NULL, '2026-11-06');
--- Expected: UNIQUE constraint failed en el índice parcial ux_cola_una_pendiente
-
--- ============================================================
--- F2: Casos borde del semáforo
--- ============================================================
-
--- F2-1: Rojo y amarillo juntos → RECHAZADO (rojo gana)
--- Un ítem con conflicto de precio Y otro ítem con stock insuficiente en la misma solicitud
--- Insertar una nueva solicitud con un ítem que tenga conflicto de precio Y otro ítem que exceda stock
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('f2000001-0000-4000-8000-00000000001', 1, 'EFECTIVO', '2026-11-06');
-
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('f2000001-0000-4000-8000-00000000001', 1, 2, 1500); -- producto 1: conflicto de precio (1500 vs 1200)
-
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('f2000001-0000-4000-8000-00000000001', 2, 8, 850); -- producto 2: stock insuficiente (8 > 5)
-
--- Cada borrador necesita su propia entrada en cola_sync, pero F2-1 prueba un solo borrador
--- con múltiples ítems que desencadenan ambas condiciones. Como hay rojo (stock insuficiente),
--- el resultado debe ser RECHAZADO a pesar de tener también conflicto (amarillo).
--- Nota: El índice parcial ux_cola_una_pendiente permite esto porque solo restringe dos PENDIENTE
--- para el MISMO id_local. Podemos usar un UUID distinto para probar, o encolar solo una vez.
--- Para F2-1, probaremos con un solo UUID y múltiples ítems en el mismo borrador.
--- Pero item_borrador con misma PK (id_local, producto_id) solo puede tener una fila por producto.
--- Para probar F2-1 realmente, necesitamos dos ítems distintos en el mismo borrador con diferentes productos.
--- El diseño permite múltiplos ítems por borrador (misma PK pero distinto producto_id).
-
--- F2-2: Producto fuera de la instantánea → rojo con "producto N no existe en el servidor"
--- Referenciar un producto_id que NO existe en snapshot_servidor en absoluto
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('f2000002-0000-4000-8000-00000000002', 1, 'TARJETA', '2026-11-06');
-
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('f2000002-0000-4000-8000-00000000002', 9999, 1, 100); -- producto 9999 no existe en la instantánea
-
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('f2000002-0000-4000-8000-00000000002', 'f2000002-0000-4000-8000-00000000002', 'PENDIENTE', NULL, '2026-11-06');
-
--- F2-3: Borrador sin ítems → RECHAZADO con motivo "borrador sin ítems"
--- Solicitud en cola_sync sin ítems asociados en item_borrador para ese id_local
--- El LEFT JOIN i.producto_id produce NULL al no haber filas en item_borrador
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('f2000003-0000-4000-8000-00000000003', 1, 'EFECTIVO', '2026-11-06');
--- INTENTENAMENTE sin INSERTAR filas en item_borrador para este id_local
-
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('f2000003-0000-4000-8000-00000000003', 'f2000003-0000-4000-8000-00000000003', 'PENDIENTE', NULL, '2026-11-06');
-
--- F2-4: disponible = 'f' → RECHAZADO con "no disponible"
--- Producto 12 (Leche) ya está cargado con disponible = 'f' en la instantánea
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('f2000004-0000-4000-8000-00000000004', 1, 'EFECTIVO', '2026-11-06');
-
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('f2000004-0000-4000-8000-00000000004', 12, 1, 1000); -- producto Leche, disponible_visto debería ser 0
-
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('f2000004-0000-4000-8000-00000000004', 'f2000004-0000-4000-8000-00000000004', 'PENDIENTE', NULL, '2026-11-06');
-
--- F2-5: Control SIMULADO_APROBADO (todos los ítems OK)
--- Ya probado con C5, pero podemos agregar una solicitud adicional de control
-INSERT INTO pedido_borrador (id_local, usuario_id_servidor, forma_pago, creado_en)
-VALUES ('f2000005-0000-4000-8000-00000000005', 1, 'EFECTIVO', '2026-11-06');
-
-INSERT INTO item_borrador (id_local, producto_id, cantidad, precio_centavos_visto)
-VALUES ('f2000005-0000-4000-8000-00000000005', 4, 3, 300); -- Producto Pan, stock 20, precio OK
-
-INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, creada_en)
-VALUES ('f2000005-0000-4000-8000-00000000005', 'f2000005-0000-4000-8000-00000000005', 'PENDIENTE', NULL, '2026-11-06');
-
--- ============================================================
--- Ejecutar semáforo
--- ============================================================
--- Ejecutar: . semaforo.sql
--- Esto evaluará todas las solicitudes PENDIENTE y actualizará sus estados.
-
--- ============================================================
--- Verificar resultados DESPUÉS de ejecutar semáforo
--- ============================================================
-
--- C2: Debería ser CONFLICTO (precio visto 1500 vs servidor 1200)
-SELECT '--- C2 resultado ---' AS label;
-SELECT solicitud_uuid, estado, motivo FROM cola_sync WHERE solicitud_uuid = 'c2000000-0000-4000-8000-00000000000b';
--- Esperado: CONFLICTO, motivo incluye nombre del producto y precios
-
--- C3: Debería ser RECHAZADO por stock insuficiente
-SELECT '--- C3 resultado ---' AS label;
-SELECT solicitud_uuid, estado, motivo FROM cola_sync WHERE solicitud_uuid = 'c3000000-0000-4000-8000-00000000000b';
--- Esperado: RECHAZADO, motivo: producto Factura: pedido 8, stock 5
-
--- C4: Debería ser RECHAZADO por producto dado de baja
-SELECT '--- C4 resultado ---' AS label;
-SELECT solicitud_uuid, estado, motivo FROM cola_sync WHERE solicitud_uuid = 'c4000000-0000-4000-8000-00000000000b';
--- Esperado: RECHAZADO, motivo: producto Alfajor: dado de baja
-
--- C5: Debería ser SIMULADO_APROBADO
-SELECT '--- C5 resultado ---' AS label;
-SELECT solicitud_uuid, estado, motivo FROM cola_sync WHERE solicitud_uuid = 'c5000000-0000-4000-8000-00000000000b';
--- Esperado: SIMULADO_APROBADO, motivo NULL
-
--- C8: Ambas solicitudes deberían ser SIMULADO_APROBADO (evaluadas independently)
-SELECT '--- C8 resultado ---' AS label;
-SELECT solicitud_uuid, estado, motivo FROM cola_sync WHERE solicitud_uuid IN ('c8000000-0000-4000-8000-00000000000a', 'c8000000-0000-4000-8000-00000000000b');
--- Esperado: ambas SIMULADO_APROBADO, motivo NULL
--- Nota: el stock_visto en producto_cache no debe cambiar
-
--- F2-1 a F2-5: Verificar estados después del semáforo
--- Estos serían verificados después de correr semaforo.sql con diferentes escenarios
+-- C6 4.3: 3.a ejecucion sin PENDIENTES -> solicitudes_evaluadas = 0
+.read semaforo.sql
