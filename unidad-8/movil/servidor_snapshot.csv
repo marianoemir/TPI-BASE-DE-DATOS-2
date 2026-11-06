@@ -1,0 +1,17 @@
+producto_id,nombre,precio_centavos,stock,disponible,eliminado,capturado_en
+1,Muzzarella,400000,18,t,f,2026-11-03 08:50:45.308699-03
+2,Napolitana,420000,14,t,f,2026-11-03 08:50:45.308699-03
+3,Fugazzeta,450000,9,t,t,2026-11-03 08:50:45.308699-03
+4,Empanada de carne,90000,44,t,f,2026-11-03 08:50:45.308699-03
+5,Empanada de pollo,85000,44,t,f,2026-11-03 08:50:45.308699-03
+6,Empanada de jamón y queso,80000,36,t,f,2026-11-03 08:50:45.308699-03
+7,Coca-Cola 500ml,120000,98,t,f,2026-11-03 08:50:45.308699-03
+8,Agua mineral 500ml,70000,98,t,f,2026-11-03 08:50:45.308699-03
+9,Jugo de naranja 500ml,100000,29,t,f,2026-11-03 08:50:45.308699-03
+10,Flan casero,150000,11,t,f,2026-11-03 08:50:45.308699-03
+11,Tiramisú,220000,6,t,f,2026-11-03 08:50:45.308699-03
+12,Hamburguesa clásica,380000,24,t,f,2026-11-03 08:50:45.308699-03
+13,Hamburguesa doble,490000,13,t,f,2026-11-03 08:50:45.308699-03
+14,Pizza especial (sin stock),500000,0,t,f,2026-11-03 08:50:45.308699-03
+15,Producto temporalmente no disponible,200000,10,f,f,2026-11-03 08:50:45.308699-03
+16,Producto descontinuado,100000,0,f,t,2026-11-03 08:50:45.308699-03

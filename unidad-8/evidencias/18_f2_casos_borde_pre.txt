@@ -1,0 +1,1 @@
+﻿Error near line 63 of movil/casos_f2_semaforo.sql: UNIQUE constraint failed: cola_sync.id_local

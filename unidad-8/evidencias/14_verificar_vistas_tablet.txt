@@ -1,0 +1,10 @@
+﻿en_snapshot  en_cache
+-----------  --------
+         16        16
+problema  producto_id  nombre  precio_centavos  stock  (disponible = 't')  (eliminado = 't')
+--------  -----------  ------  ---------------  -----  ------------------  -----------------
+en_vista  manual
+--------  ------
+      13      13
+problema  producto_id  nombre  precio_centavos / 100.0  stock_visto
+--------  -----------  ------  -----------------------  -----------

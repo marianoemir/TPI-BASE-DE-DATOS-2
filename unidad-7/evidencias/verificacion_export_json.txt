@@ -1,0 +1,7 @@
+Verificacion sobre modelo/pedidos_export.json (python3, ejecutada el 2026-11-01). No es una salida de MongoDB.
+Documentos: 7 (ids [1, 2, 3, 5, 6, 7, 8])
+
+Regla 1 - pedidos con total distinto de la suma de subtotales: []
+Regla 1b - lineas con subtotal distinto de cantidad x precio_unitario: []
+Regla 2 - lineas con cantidad <= 0: []
+Lineas revisadas: 15

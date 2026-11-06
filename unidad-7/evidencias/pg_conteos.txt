@@ -1,0 +1,5 @@
+﻿ usuarios | productos | pedidos 
+----------+-----------+---------
+        6 |        16 |       8
+(1 fila)
+

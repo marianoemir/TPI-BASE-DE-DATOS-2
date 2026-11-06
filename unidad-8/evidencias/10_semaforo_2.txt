@@ -1,0 +1,11 @@
+﻿solicitudes_evaluadas
+---------------------
+                    1
+           solicitud_uuid                  estado                                motivo                               evaluada_en
+------------------------------------  -----------------  -------------------------------------------------------  --------------------
+a0000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-03T11:50:45Z
+c2000000-0000-4000-8000-00000000000b  CONFLICTO          precio de Muzzarella cambió de 350000 a 400000 centavos  2026-11-03T11:50:45Z
+c2000000-0000-4000-8000-00000000000c  SIMULADO_APROBADO                                                           2026-11-03T11:50:45Z
+c3000000-0000-4000-8000-00000000000b  RECHAZADO          stock insuficiente de Tiramisú (pide 10, hay 6)          2026-11-03T11:50:45Z
+c4000000-0000-4000-8000-00000000000b  RECHAZADO          producto 3 (Fugazzeta) dado de baja                      2026-11-03T11:50:45Z
+c5000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-03T11:50:45Z

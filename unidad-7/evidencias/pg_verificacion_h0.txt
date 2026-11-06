@@ -1,0 +1,10 @@
+﻿ id |   estado   | eliminado 
+----+------------+-----------
+  1 | CONFIRMADO | f
+  2 | TERMINADO  | f
+  3 | PENDIENTE  | f
+  4 | PENDIENTE  | t
+  5 | PENDIENTE  | f
+  6 | CANCELADO  | f
+(6 filas)
+

@@ -1,0 +1,20 @@
+﻿ count 
+-------
+    13
+(1 fila)
+
+                           QUERY PLAN                           
+----------------------------------------------------------------
+ Seq Scan on detalle_pedido  (cost=0.00..20.50 rows=4 width=69)
+   Filter: (producto_id = 1)
+(2 filas)
+
+SET
+                                               QUERY PLAN                                               
+--------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on detalle_pedido  (cost=14.45..22.91 rows=4 width=69)
+   Recheck Cond: (producto_id = 1)
+   ->  Bitmap Index Scan on detalle_pedido_pedido_id_producto_id_key  (cost=0.00..14.45 rows=4 width=0)
+         Index Cond: (producto_id = 1)
+(4 filas)
+

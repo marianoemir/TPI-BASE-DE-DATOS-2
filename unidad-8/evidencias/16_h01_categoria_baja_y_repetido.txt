@@ -1,0 +1,35 @@
+﻿=== H01 ===
+UPDATE 1
+ filas | con_baja 
+-------+----------
+    16 |        4
+(1 fila)
+
+ stock_antes 
+-------------
+          24
+(1 fila)
+
+psql.exe : psql:C:/Users/MARIAN~1/AppData/Local/Temp/h01.sql:11: NOTICE:  H01: el servidor ACEPTO un pedido de un 
+producto de categoria eliminada
+En línea: 1 Carácter: 1
++ & $psql -U postgres -d foodstore_u8_rev -f $env:TEMP\h01.sql 2>&1 | O ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (psql:C:/Users/M...goria eliminada:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+DO
+ stock_despues 
+---------------
+            23
+(1 fila)
+
+ pedido_id | producto_id | cantidad 
+-----------+-------------+----------
+         7 |          12 |        1
+(1 fila)
+
+=== PRODUCTO REPETIDO ===
+psql:C:/Users/MARIAN~1/AppData/Local/Temp/h01.sql:22: NOTICE:  SQLSTATE=23505 | MENSAJE=llave duplicada viola 
+restricción de unicidad «detalle_pedido_pedido_id_producto_id_key»
+DO

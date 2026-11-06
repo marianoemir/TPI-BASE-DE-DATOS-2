@@ -1,0 +1,43 @@
+﻿version_sqlite
+--------------
+3.54.1
+foreign_keys
+------------
+           1
+integrity_check
+---------------
+ok
+  momento    borradores  items  solicitudes
+-----------  ----------  -----  -----------
+tras COMMIT           1      2            1
+         momento            borradores  items  solicitudes
+--------------------------  ----------  -----  -----------
+dentro, antes del ROLLBACK           2      3            2
+   momento     borradores  items  solicitudes
+-------------  ----------  -----  -----------
+tras ROLLBACK           1      2            1
+producto_id            nombre            precio  stock_visto          capturado_en
+-----------  --------------------------  ------  -----------  -----------------------------
+          1  Muzzarella                  3500.0           18  2026-11-03 08:48:12.510387-03
+          2  Napolitana                  4200.0           14  2026-11-03 08:48:12.510387-03
+          3  Fugazzeta                   4500.0            9  2026-11-03 08:48:12.510387-03
+          4  Empanada de carne            900.0           44  2026-11-03 08:48:12.510387-03
+          5  Empanada de pollo            850.0           44  2026-11-03 08:48:12.510387-03
+          6  Empanada de jamón y queso    800.0           36  2026-11-03 08:48:12.510387-03
+          7  Coca-Cola 500ml             1200.0           98  2026-11-03 08:48:12.510387-03
+          8  Agua mineral 500ml           700.0           98  2026-11-03 08:48:12.510387-03
+          9  Jugo de naranja 500ml       1000.0           29  2026-11-03 08:48:12.510387-03
+         10  Flan casero                 1500.0           11  2026-11-03 08:48:12.510387-03
+         11  Tiramisú                    2200.0            6  2026-11-03 08:48:12.510387-03
+         12  Hamburguesa clásica         3800.0           24  2026-11-03 08:48:12.510387-03
+         13  Hamburguesa doble           4900.0           13  2026-11-03 08:48:12.510387-03
+         14  Pizza especial (sin stock)  5000.0            0  2026-11-03 08:48:12.510387-03
+  momento    borradores  items
+-----------  ----------  -----
+antes de C7           1      2
+Error near line 76 of movil/pruebas_sqlite.sql: CHECK constraint failed: cantidad > 0
+Error near line 84 of movil/pruebas_sqlite.sql: FOREIGN KEY constraint failed
+Error near line 93 of movil/pruebas_sqlite.sql: cannot store TEXT value in INTEGER column item_borrador.cantidad
+   momento     borradores  items
+-------------  ----------  -----
+después de C7           1      2

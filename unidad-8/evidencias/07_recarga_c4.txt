@@ -1,0 +1,9 @@
+﻿      fecha_de_la_copia        productos
+-----------------------------  ---------
+2026-11-03 08:50:45.308699-03         16
+fugazzeta_en_catalogo
+---------------------
+                    0
+producto_id   nombre    eliminado
+-----------  ---------  ---------
+          3  Fugazzeta          1

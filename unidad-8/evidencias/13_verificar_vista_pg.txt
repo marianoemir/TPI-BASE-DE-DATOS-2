@@ -1,0 +1,25 @@
+﻿ filas_producto | filas_vista 
+----------------+-------------
+             16 |          16
+(1 fila)
+
+ problema | producto_id | nombre | precio_centavos | stock | disponible | eliminado 
+----------+-------------+--------+-----------------+-------+------------+-----------
+(0 filas)
+
+ precios_con_fraccion_de_centavo 
+---------------------------------
+                               0
+(1 fila)
+
+   column_name   
+-----------------
+ producto_id
+ nombre
+ precio_centavos
+ stock
+ disponible
+ eliminado
+ capturado_en
+(7 filas)
+

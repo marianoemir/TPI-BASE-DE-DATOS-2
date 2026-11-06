@@ -1,0 +1,140 @@
+﻿H0 conteos: 6|16|6
+
+=== pruebas_sqlite.sql ===
+version_sqlite
+--------------
+3.54.1
+foreign_keys
+------------
+           1
+integrity_check
+---------------
+ok
+  momento    borradores  items  solicitudes
+-----------  ----------  -----  -----------
+tras COMMIT           1      2            1
+         momento            borradores  items  solicitudes
+--------------------------  ----------  -----  -----------
+dentro, antes del ROLLBACK           2      3            2
+   momento     borradores  items  solicitudes
+-------------  ----------  -----  -----------
+tras ROLLBACK           1      2            1
+producto_id            nombre            precio  stock_visto          capturado_en
+-----------  --------------------------  ------  -----------  -----------------------------
+          1  Muzzarella                  3500.0           18  2026-11-05 07:39:30.756375-03
+          2  Napolitana                  4200.0           14  2026-11-05 07:39:30.756375-03
+          3  Fugazzeta                   4500.0            9  2026-11-05 07:39:30.756375-03
+          4  Empanada de carne            900.0           44  2026-11-05 07:39:30.756375-03
+          5  Empanada de pollo            850.0           44  2026-11-05 07:39:30.756375-03
+          6  Empanada de jam├│n y queso    800.0           36  2026-11-05 07:39:30.756375-03
+          7  Coca-Cola 500ml             1200.0           98  2026-11-05 07:39:30.756375-03
+          8  Agua mineral 500ml           700.0           98  2026-11-05 07:39:30.756375-03
+          9  Jugo de naranja 500ml       1000.0           29  2026-11-05 07:39:30.756375-03
+         10  Flan casero                 1500.0           11  2026-11-05 07:39:30.756375-03
+         11  Tiramis├║                    2200.0            6  2026-11-05 07:39:30.756375-03
+         12  Hamburguesa cl├ísica         3800.0           24  2026-11-05 07:39:30.756375-03
+         13  Hamburguesa doble           4900.0           13  2026-11-05 07:39:30.756375-03
+         14  Pizza especial (sin stock)  5000.0            0  2026-11-05 07:39:30.756375-03
+  momento    borradores  items
+-----------  ----------  -----
+antes de C7           1      2
+sqlite3 : Error near line 76 of C:/Users/andre/Documents/GitHub/TP-Unidad8-BD2/movil/pruebas_sqlite.sql: CHECK 
+constraint failed: cantidad > 0
+En línea: 12 Carácter: 13
++ $pruebas = (sqlite3 -header -column $sqliteDb ".read $root/movil/prue ...
++             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error near line...d: cantidad > 0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Error near line 84 of C:/Users/andre/Documents/GitHub/TP-Unidad8-BD2/movil/pruebas_sqlite.sql: FOREIGN KEY constraint 
+failed
+Error near line 93 of C:/Users/andre/Documents/GitHub/TP-Unidad8-BD2/movil/pruebas_sqlite.sql: cannot store TEXT value 
+in INTEGER column item_borrador.cantidad
+   momento     borradores  items
+-------------  ----------  -----
+despu├®s de C7           1      2
+
+
+=== borradores C2-C5 ===
+           solicitud_uuid              estado
+------------------------------------  ---------
+c2000000-0000-4000-8000-00000000000b  PENDIENTE
+c3000000-0000-4000-8000-00000000000b  PENDIENTE
+c4000000-0000-4000-8000-00000000000b  PENDIENTE
+c5000000-0000-4000-8000-00000000000b  PENDIENTE
+
+
+=== semaforo primera corrida ===
+solicitudes_evaluadas
+---------------------
+                    5
+           solicitud_uuid                  estado                                motivo                               evaluada_en
+------------------------------------  -----------------  -------------------------------------------------------  --------------------
+a0000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+c2000000-0000-4000-8000-00000000000b  CONFLICTO          precio de Muzzarella cambi├│ de 350000 a 400000 centavos  2026-11-05T10:40:05Z
+c3000000-0000-4000-8000-00000000000b  RECHAZADO          stock insuficiente de Tiramis├║ (pide 10, hay 6)          2026-11-05T10:40:05Z
+c4000000-0000-4000-8000-00000000000b  RECHAZADO          producto 3 (Fugazzeta) dado de baja                      2026-11-05T10:40:05Z
+c5000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+
+
+=== resolucion C2 y C6 ===
+           solicitud_uuid              estado
+------------------------------------  ---------
+c2000000-0000-4000-8000-00000000000b  CONFLICTO
+c2000000-0000-4000-8000-00000000000c  PENDIENTE
+sqlite3 : Error near line 28 of C:/Users/andre/Documents/GitHub/TP-Unidad8-BD2/movil/casos_c2_c6_resolucion.sql: 
+UNIQUE constraint failed: cola_sync.solicitud_uuid
+En línea: 22 Carácter: 16
++ ... solucion = (sqlite3 -header -column $sqliteDb ".read $root/movil/caso ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error near line....solicitud_uuid:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+           solicitud_uuid                  estado            evaluada_en
+------------------------------------  -----------------  --------------------
+c5000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO  2026-11-05T10:40:05Z
+
+
+=== semaforo segunda corrida ===
+solicitudes_evaluadas
+---------------------
+                    1
+           solicitud_uuid                  estado                                motivo                               evaluada_en
+------------------------------------  -----------------  -------------------------------------------------------  --------------------
+a0000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+c2000000-0000-4000-8000-00000000000b  CONFLICTO          precio de Muzzarella cambi├│ de 350000 a 400000 centavos  2026-11-05T10:40:05Z
+c2000000-0000-4000-8000-00000000000c  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+c3000000-0000-4000-8000-00000000000b  RECHAZADO          stock insuficiente de Tiramis├║ (pide 10, hay 6)          2026-11-05T10:40:05Z
+c4000000-0000-4000-8000-00000000000b  RECHAZADO          producto 3 (Fugazzeta) dado de baja                      2026-11-05T10:40:05Z
+c5000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+
+
+=== semaforo repetido ===
+solicitudes_evaluadas
+---------------------
+                    0
+           solicitud_uuid                  estado                                motivo                               evaluada_en
+------------------------------------  -----------------  -------------------------------------------------------  --------------------
+a0000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+c2000000-0000-4000-8000-00000000000b  CONFLICTO          precio de Muzzarella cambi├│ de 350000 a 400000 centavos  2026-11-05T10:40:05Z
+c2000000-0000-4000-8000-00000000000c  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+c3000000-0000-4000-8000-00000000000b  RECHAZADO          stock insuficiente de Tiramis├║ (pide 10, hay 6)          2026-11-05T10:40:05Z
+c4000000-0000-4000-8000-00000000000b  RECHAZADO          producto 3 (Fugazzeta) dado de baja                      2026-11-05T10:40:05Z
+c5000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO                                                           2026-11-05T10:40:05Z
+
+
+=== verificar_vistas_tablet.sql ===
+en_snapshot  en_cache
+-----------  --------
+         16        16
+problema  producto_id  nombre  precio_centavos  stock  (disponible = 't')  (eliminado = 't')
+--------  -----------  ------  ---------------  -----  ------------------  -----------------
+en_vista  manual
+--------  ------
+      13      13
+problema  producto_id  nombre  precio_centavos / 100.0  stock_visto
+--------  -----------  ------  -----------------------  -----------
+
+
+=== verificar_no_cambio final ===
+6|13|454|89f8351d0162e23ef1473f32b05ce221

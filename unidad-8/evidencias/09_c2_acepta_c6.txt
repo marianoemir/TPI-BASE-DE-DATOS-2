@@ -1,0 +1,8 @@
+﻿           solicitud_uuid              estado
+------------------------------------  ---------
+c2000000-0000-4000-8000-00000000000b  CONFLICTO
+c2000000-0000-4000-8000-00000000000c  PENDIENTE
+Error near line 28 of movil/casos_c2_c6_resolucion.sql: UNIQUE constraint failed: cola_sync.solicitud_uuid
+           solicitud_uuid                  estado            evaluada_en
+------------------------------------  -----------------  --------------------
+c5000000-0000-4000-8000-00000000000b  SIMULADO_APROBADO  2026-11-03T11:50:45Z

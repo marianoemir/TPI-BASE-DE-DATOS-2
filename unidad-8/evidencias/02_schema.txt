@@ -1,0 +1,10 @@
+﻿schema          name           type   ncol  wr  strict
+------  ---------------------  -----  ----  --  ------
+main    snapshot_servidor      table     7   0       1
+main    cola_sync              table     6   0       1
+main    v_catalogo_disponible  view      5   0       0
+main    sqlite_schema          table     5   0       0
+main    producto_cache         table     7   0       1
+main    pedido_borrador        table     4   0       1
+main    item_borrador          table     4   0       1
+temp    sqlite_temp_schema     table     5   0       0

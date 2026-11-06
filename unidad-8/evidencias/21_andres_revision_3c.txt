@@ -1,0 +1,63 @@
+﻿=== Revisión de Andrés: H36 ===
+La corrida limpia A4 registrada en evidencias/20 produjo los tres errores esperados de C7 y conservó 1 borrador y 2 ítems.
+
+=== Revisión de Andrés: H04 ===
+ filas_detalle 
+---------------
+            13
+(1 fila)
+
+                           QUERY PLAN                           
+----------------------------------------------------------------
+ Seq Scan on detalle_pedido  (cost=0.00..20.50 rows=4 width=69)
+   Filter: (producto_id = 1)
+(2 filas)
+
+SET
+                                               QUERY PLAN                                               
+--------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on detalle_pedido  (cost=14.45..22.91 rows=4 width=69)
+   Recheck Cond: (producto_id = 1)
+   ->  Bitmap Index Scan on detalle_pedido_pedido_id_producto_id_key  (cost=0.00..14.45 rows=4 width=0)
+         Index Cond: (producto_id = 1)
+(4 filas)
+
+RESET
+
+=== Revisión de Andrés: H01 y R1 (copia descartable) ===
+=== H01 ===
+UPDATE 1
+ filas | con_baja 
+-------+----------
+    16 |        3
+(1 fila)
+
+ stock_antes 
+-------------
+          24
+(1 fila)
+
+psql.exe : psql:postgresql/verificar_hallazgos_3c.sql:24: NOTICE:  H01: el servidor ACEPTO un pedido de un producto de 
+categoria eliminada
+En línea: 5 Carácter: 9
++ $h01 = (& psql -U postgres -d $dbName -v ON_ERROR_STOP=1 -f postgresq ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (psql:postgresql...goria eliminada:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+DO
+ stock_despues 
+---------------
+            23
+(1 fila)
+
+ pedido_id | producto_id | cantidad 
+-----------+-------------+----------
+         7 |          12 |        1
+(1 fila)
+
+=== PRODUCTO REPETIDO ===
+psql:postgresql/verificar_hallazgos_3c.sql:37: NOTICE:  SQLSTATE=23505 | MENSAJE=llave duplicada viola restricci├│n de 
+unicidad ┬½detalle_pedido_pedido_id_producto_id_key┬╗
+DO
+
