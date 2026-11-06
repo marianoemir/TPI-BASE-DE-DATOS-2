@@ -1,0 +1,34 @@
+﻿--- C1: Cat├ílogo disponible ---
+13
+sqlite3 : Error near line 54 of casos.sql: cannot rollback - no transaction is active
+En línea: 1 Carácter: 1
++ sqlite3 prueba.db ".read casos.sql" 2>&1 | Out-File -Encoding utf8 .. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error near line...ction is active:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Error near line 160 of casos.sql: CHECK constraint failed: length(id_local) = 36
+Error near line 163 of casos.sql: FOREIGN KEY constraint failed
+Error near line 166 of casos.sql: FOREIGN KEY constraint failed
+Error near line 181 of casos.sql: CHECK constraint failed: length(id_local) = 36
+Error near line 184 of casos.sql: FOREIGN KEY constraint failed
+Error near line 187 of casos.sql: CHECK constraint failed: length(solicitud_uuid) = 36
+Error near line 193 of casos.sql: CHECK constraint failed: length(id_local) = 36
+Error near line 197 of casos.sql: CHECK constraint failed: length(solicitud_uuid) = 36
+Error near line 202 of casos.sql: CHECK constraint failed: length(id_local) = 36
+Error near line 205 of casos.sql: FOREIGN KEY constraint failed
+Error near line 208 of casos.sql: CHECK constraint failed: length(solicitud_uuid) = 36
+Error near line 213 of casos.sql: CHECK constraint failed: length(id_local) = 36
+Error near line 216 of casos.sql: FOREIGN KEY constraint failed
+Error near line 219 of casos.sql: CHECK constraint failed: length(solicitud_uuid) = 36
+--- C2 resultado ---
+c2000000-0000-4000-8000-00000000000b|PENDIENTE|
+--- C3 resultado ---
+c3000000-0000-4000-8000-00000000000b|PENDIENTE|
+--- C4 resultado ---
+c4000000-0000-4000-8000-00000000000b|PENDIENTE|
+--- C5 resultado ---
+c5000000-0000-4000-8000-00000000000b|PENDIENTE|
+--- C8 resultado ---
+c8000000-0000-4000-8000-00000000000a|PENDIENTE|
+c8000000-0000-4000-8000-00000000000b|PENDIENTE|
