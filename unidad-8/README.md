@@ -7,7 +7,7 @@
 
 > 📦 **Repositorio del trabajo:** [github.com/marianoemir/TP-Unidad8-BD2](https://github.com/marianoemir/TP-Unidad8-BD2) · etiqueta de entrega: `tp8`
 
-**Grupo:** Lobos Solitarios
+**Grupo:** Grupo 10 (Lobos Solitarios)
 
 | Integrante | Usuario de GitHub |
 |---|---|
