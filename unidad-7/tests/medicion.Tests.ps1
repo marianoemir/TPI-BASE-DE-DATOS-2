@@ -4,6 +4,8 @@ $unidad7 = Split-Path -Parent $PSScriptRoot
 $exportador = Join-Path $unidad7 'modelo\exportar_pedidos_benchmark.sql'
 $mongo = Join-Path $unidad7 'carga_benchmark_mongodb.js'
 $postgres = Join-Path $unidad7 'consultas_benchmark_postgresql.sql'
+$verificacionMongo = Join-Path $unidad7 'verificar_benchmark_mongodb.js'
+$verificacionPostgres = Join-Path $unidad7 'verificar_benchmark_postgresql.sql'
 
 Describe 'Medicion U7 - benchmark aislado' {
     It 'exporta una muestra parametrizada sin datos sensibles' {
@@ -29,5 +31,12 @@ Describe 'Medicion U7 - benchmark aislado' {
         $contenido | Should Match ':limite'
         $contenido | Should Match 'EXPLAIN \(ANALYZE, BUFFERS, FORMAT JSON\)'
         $contenido | Should Match 'categoria'
+    }
+
+    It 'verifica conteos, importes y categorias en ambos motores' {
+        Test-Path -LiteralPath $verificacionMongo | Should Be $true
+        Test-Path -LiteralPath $verificacionPostgres | Should Be $true
+        (Get-Content -LiteralPath $verificacionMongo -Raw) | Should Match 'total'
+        (Get-Content -LiteralPath $verificacionPostgres -Raw) | Should Match 'categoria'
     }
 }

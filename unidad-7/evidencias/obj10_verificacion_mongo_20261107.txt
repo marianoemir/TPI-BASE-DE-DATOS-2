@@ -1,0 +1,30 @@
+﻿RESUMEN_MONGO
+[
+  {
+    documentos: 5000,
+    total: Decimal128('68818099.92')
+  }
+]
+VENTAS_POR_CATEGORIA_MONGO
+[
+  {
+    ventas: Decimal128('13703741.60'),
+    categoria: 'Bebidas'
+  },
+  {
+    ventas: Decimal128('13539880.52'),
+    categoria: 'Empanadas'
+  },
+  {
+    ventas: Decimal128('13815749.62'),
+    categoria: 'Hamburguesas'
+  },
+  {
+    ventas: Decimal128('13976191.88'),
+    categoria: 'Pizzas'
+  },
+  {
+    ventas: Decimal128('13782536.30'),
+    categoria: 'Postres'
+  }
+]
