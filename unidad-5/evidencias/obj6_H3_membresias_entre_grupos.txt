@@ -1,0 +1,101 @@
+﻿# H3 (medio): membresia heredada rol_app_escritura -> rol_soporte sobrevive a roles.sql
+# fecha: 2026-11-07 17:51:18
+# base: copia_u5, PostgreSQL 17.10
+
+GRANT rol_app_escritura TO rol_soporte;
+GRANT ROLE
+(codigo de salida psql: 0)
+
+--- re-ejecuto roles.sql ---
+BEGIN
+DO
+psql:unidad-5/sql/roles.sql:29: NOTICE:  la extensión «pgcrypto» ya existe, omitiendo
+CREATE EXTENSION
+DO
+GRANT
+DO
+ALTER ROLE
+ALTER ROLE
+GRANT
+REVOKE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER VIEW
+ALTER VIEW
+ALTER VIEW
+ALTER VIEW
+ALTER VIEW
+ALTER MATERIALIZED VIEW
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER PROCEDURE
+ALTER TYPE
+ALTER TYPE
+ALTER TYPE
+ALTER PROCEDURE
+REVOKE
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+psql:unidad-5/sql/roles.sql:203: WARNING:  al rol «app_web» no se le ha otorgado membresía en el rol «admin_datos» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:203: WARNING:  al rol «rol_app_lectura» no se le ha otorgado membresía en el rol «admin_datos» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:203: WARNING:  al rol «rol_app_escritura» no se le ha otorgado membresía en el rol «admin_datos» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:203: WARNING:  al rol «rol_app_auth» no se le ha otorgado membresía en el rol «admin_datos» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:203: WARNING:  al rol «rol_soporte» no se le ha otorgado membresía en el rol «admin_datos» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:203: WARNING:  al rol «rol_reportes» no se le ha otorgado membresía en el rol «admin_datos» por parte del rol «postgres»
+REVOKE ROLE
+psql:unidad-5/sql/roles.sql:204: WARNING:  al rol «app_web» no se le ha otorgado membresía en el rol «rol_soporte» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:204: WARNING:  al rol «app_web» no se le ha otorgado membresía en el rol «rol_reportes» por parte del rol «postgres»
+REVOKE ROLE
+psql:unidad-5/sql/roles.sql:206: NOTICE:  el rol «app_web» ya recibió membresía en el rol «rol_app_lectura» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:206: NOTICE:  el rol «app_web» ya recibió membresía en el rol «rol_app_escritura» por parte del rol «postgres»
+psql:unidad-5/sql/roles.sql:206: NOTICE:  el rol «app_web» ya recibió membresía en el rol «rol_app_auth» por parte del rol «postgres»
+GRANT ROLE
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+COMMIT
+(codigo de salida psql: 0)
+
+--- estado despues de roles.sql ---
+SELECT g.rolname AS grupo, m.rolname AS miembro
+FROM pg_auth_members am JOIN pg_roles g ON g.oid = am.roleid JOIN pg_roles m ON m.oid = am.member
+WHERE m.rolname LIKE 'rol_%' OR m.rolname IN ('app_web','admin_datos') ORDER BY 1,2;
+       grupo       |   miembro   
+-------------------+-------------
+ rol_app_auth      | app_web
+ rol_app_escritura | app_web
+ rol_app_escritura | rol_soporte
+ rol_app_lectura   | app_web
+(4 filas)
+
+SELECT p.oid::regprocedure AS rutina, has_function_privilege('rol_soporte', p.oid, 'EXECUTE') AS soporte_puede_ejecutar
+FROM pg_proc p WHERE p.proname = 'sp_crear_pedido';
+                  rutina                  | soporte_puede_ejecutar 
+------------------------------------------+------------------------
+ sp_crear_pedido(bigint,forma_pago,jsonb) | t
+(1 fila)
+
+(codigo de salida psql: 0)
+
+--- limpieza: quito la membresia de prueba ---
+REVOKE rol_app_escritura FROM rol_soporte;
+REVOKE ROLE
+(codigo de salida psql: 0)
