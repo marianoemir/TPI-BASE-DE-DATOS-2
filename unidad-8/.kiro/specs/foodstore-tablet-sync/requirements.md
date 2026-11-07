@@ -183,6 +183,11 @@ para que la tablet nunca guarde un borrador inconsistente.
 11. THE Sistema SHALL definir `cola_sync.estado` con los valores `PENDIENTE`, `CONFLICTO`, `RECHAZADO`
     y `SIMULADO_APROBADO`, con `PENDIENTE` por defecto, y exigir `motivo` no nulo cuando el estado
     sea `CONFLICTO` o `RECHAZADO`.
+12. THE Sistema SHALL definir `pedido_borrador.creado_en` con un valor por defecto igual a la fecha y
+    hora UTC actual en formato `YYYY-MM-DDTHH:MM:SSZ`, de modo que un borrador pueda crearse sin
+    informar ese campo.
+13. THE Sistema SHALL definir `cola_sync.id_local` como clave foránea a `pedido_borrador(id_local)`,
+    de modo que no se pueda encolar una solicitud de un borrador inexistente.
 
 *Se prueba con:* **C7** (`pruebas_sqlite.sql`)
 
