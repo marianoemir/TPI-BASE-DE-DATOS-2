@@ -1,4 +1,4 @@
-psql:C:/Users/Mariano_Chirino/Documents/GitHub/TPI-BASE-DE-DATOS-2/unidad-5/sql/verificacion_roles.sql:21: NOTICE:  el esquema «pg_temp» no existe, omitiendo
+psql:unidad-5/sql/verificacion_roles.sql:21: NOTICE:  el esquema «pg_temp» no existe, omitiendo
 DROP TABLE
 CREATE TABLE
 CREATE FUNCTION

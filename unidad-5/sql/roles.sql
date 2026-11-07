@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- roles.sql — Roles y permisos de minimo privilegio (Food Store, Parte A)
 -- TP Unidad 5 — Base de Datos II
 --
@@ -202,6 +202,24 @@ GRANT SELECT ON mv_facturacion_categoria_mes TO rol_reportes;
 REVOKE admin_datos
     FROM app_web, rol_app_lectura, rol_app_escritura, rol_app_auth, rol_soporte, rol_reportes;
 REVOKE rol_soporte, rol_reportes FROM app_web;
+
+-- H3 (auditoria U5, 2026-11-07): se quitan las membresias entre roles de grupo
+-- (p. ej. rol_app_escritura -> rol_soporte), que escalarian privilegios.
+-- Prueba: unidad-5/evidencias/obj6_H3_membresias_entre_grupos.txt
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN
+    SELECT g.rolname AS grupo, m.rolname AS miembro
+    FROM pg_auth_members am
+    JOIN pg_roles g ON g.oid = am.roleid
+    JOIN pg_roles m ON m.oid = am.member
+    WHERE g.rolname IN ('rol_app_lectura','rol_app_escritura','rol_app_auth','rol_soporte','rol_reportes')
+      AND m.rolname IN ('rol_app_lectura','rol_app_escritura','rol_app_auth','rol_soporte','rol_reportes')
+  LOOP
+    EXECUTE format('REVOKE %I FROM %I', r.grupo, r.miembro);
+  END LOOP;
+END $$;
 
 GRANT rol_app_lectura, rol_app_escritura, rol_app_auth TO app_web;
 
