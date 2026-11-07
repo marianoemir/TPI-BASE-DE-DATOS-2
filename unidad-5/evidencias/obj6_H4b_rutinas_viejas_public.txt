@@ -1,0 +1,47 @@
+﻿# H4b (hallazgo nuevo, origen: revision con Claude, no OpenCode): rutinas con EXECUTE para PUBLIC
+# fecha: 2026-11-07 17:52:51
+
+                    rutina                    | security_definer |                   proacl                   
+----------------------------------------------+------------------+--------------------------------------------
+ calcular_total_pedido(bigint)                | f                | {=X/admin_datos,admin_datos=X/admin_datos}
+ fn_set_subtotal()                            | f                | {=X/admin_datos,admin_datos=X/admin_datos}
+ fn_recalcular_total()                        | f                | {=X/admin_datos,admin_datos=X/admin_datos}
+ fn_validar_estado_pedido()                   | f                | {=X/admin_datos,admin_datos=X/admin_datos}
+ digest(text,text)                            | f                | {=X/postgres,postgres=X/postgres}
+ digest(bytea,text)                           | f                | {=X/postgres,postgres=X/postgres}
+ hmac(text,text,text)                         | f                | {=X/postgres,postgres=X/postgres}
+ hmac(bytea,bytea,text)                       | f                | {=X/postgres,postgres=X/postgres}
+ crypt(text,text)                             | f                | {=X/postgres,postgres=X/postgres}
+ gen_salt(text)                               | f                | {=X/postgres,postgres=X/postgres}
+ gen_salt(text,integer)                       | f                | {=X/postgres,postgres=X/postgres}
+ encrypt(bytea,bytea,text)                    | f                | {=X/postgres,postgres=X/postgres}
+ decrypt(bytea,bytea,text)                    | f                | {=X/postgres,postgres=X/postgres}
+ encrypt_iv(bytea,bytea,bytea,text)           | f                | {=X/postgres,postgres=X/postgres}
+ decrypt_iv(bytea,bytea,bytea,text)           | f                | {=X/postgres,postgres=X/postgres}
+ gen_random_bytes(integer)                    | f                | {=X/postgres,postgres=X/postgres}
+ public.gen_random_uuid()                     | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_encrypt(text,text)                   | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_encrypt_bytea(bytea,text)            | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_encrypt(text,text,text)              | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_encrypt_bytea(bytea,text,text)       | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_decrypt(bytea,text)                  | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_decrypt_bytea(bytea,text)            | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_decrypt(bytea,text,text)             | f                | {=X/postgres,postgres=X/postgres}
+ pgp_sym_decrypt_bytea(bytea,text,text)       | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_encrypt(text,bytea)                  | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_encrypt_bytea(bytea,bytea)           | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_encrypt(text,bytea,text)             | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_encrypt_bytea(bytea,bytea,text)      | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_decrypt(bytea,bytea)                 | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_decrypt_bytea(bytea,bytea)           | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_decrypt(bytea,bytea,text)            | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_decrypt_bytea(bytea,bytea,text)      | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_decrypt(bytea,bytea,text,text)       | f                | {=X/postgres,postgres=X/postgres}
+ pgp_pub_decrypt_bytea(bytea,bytea,text,text) | f                | {=X/postgres,postgres=X/postgres}
+ pgp_key_id(bytea)                            | f                | {=X/postgres,postgres=X/postgres}
+ armor(bytea)                                 | f                | {=X/postgres,postgres=X/postgres}
+ armor(bytea,text[],text[])                   | f                | {=X/postgres,postgres=X/postgres}
+ dearmor(text)                                | f                | {=X/postgres,postgres=X/postgres}
+ pgp_armor_headers(text)                      | f                | {=X/postgres,postgres=X/postgres}
+(40 filas)
+

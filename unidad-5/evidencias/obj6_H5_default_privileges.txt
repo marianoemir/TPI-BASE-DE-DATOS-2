@@ -1,0 +1,34 @@
+﻿# H5 (bajo): funcion nueva creada por admin_datos (control: creada por postgres)
+# fecha: 2026-11-07 17:51:18
+# base: copia_u5, PostgreSQL 17.10
+
+BEGIN;
+BEGIN
+CREATE SCHEMA tmp_h5 AUTHORIZATION admin_datos;
+CREATE SCHEMA
+SET LOCAL ROLE admin_datos;
+SET
+CREATE FUNCTION tmp_h5.f_prueba() RETURNS int LANGUAGE sql AS 'SELECT 1';
+CREATE FUNCTION
+RESET ROLE;
+RESET
+CREATE FUNCTION tmp_h5.f_control_postgres() RETURNS int LANGUAGE sql AS 'SELECT 1';
+CREATE FUNCTION
+SELECT 'creada por admin_datos' AS caso, has_function_privilege('app_web', 'tmp_h5.f_prueba()', 'EXECUTE') AS app_web_puede_ejecutar
+UNION ALL
+SELECT 'control (creada por postgres)', has_function_privilege('app_web', 'tmp_h5.f_control_postgres()', 'EXECUTE');
+             caso              | app_web_puede_ejecutar 
+-------------------------------+------------------------
+ creada por admin_datos        | f
+ control (creada por postgres) | t
+(2 filas)
+
+ROLLBACK;
+ROLLBACK
+SELECT to_regnamespace('tmp_h5') AS esquema_quedo;
+ esquema_quedo 
+---------------
+ 
+(1 fila)
+
+(codigo de salida psql: 0)

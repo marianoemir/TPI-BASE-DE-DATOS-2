@@ -1,0 +1,28 @@
+﻿# H4 (medio): EXECUTE para PUBLIC en rutinas
+# fecha: 2026-11-07 17:51:18
+# base: copia_u5, PostgreSQL 17.10
+
+SELECT grantee, routine_name FROM information_schema.role_routine_grants
+WHERE routine_schema = 'public' AND routine_name IN ('sp_crear_pedido','fn_autenticar','fn_resetear_password') AND grantee = 'PUBLIC';
+ grantee | routine_name 
+---------+--------------
+(0 filas)
+
+SELECT p.oid::regprocedure AS rutina, p.proowner::regrole AS dueno, p.proacl,
+       has_function_privilege('app_web', p.oid, 'EXECUTE') AS app_web_puede_ejecutar
+FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public'
+  AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.objid = p.oid AND d.deptype = 'e')
+ORDER BY 1;
+                  rutina                  |    dueno    |                           proacl                            | app_web_puede_ejecutar 
+------------------------------------------+-------------+-------------------------------------------------------------+------------------------
+ calcular_total_pedido(bigint)            | admin_datos | {=X/admin_datos,admin_datos=X/admin_datos}                  | t
+ fn_set_subtotal()                        | admin_datos | {=X/admin_datos,admin_datos=X/admin_datos}                  | t
+ fn_recalcular_total()                    | admin_datos | {=X/admin_datos,admin_datos=X/admin_datos}                  | t
+ fn_validar_estado_pedido()               | admin_datos | {=X/admin_datos,admin_datos=X/admin_datos}                  | t
+ sp_crear_pedido(bigint,forma_pago,jsonb) | admin_datos | {admin_datos=X/admin_datos,rol_app_escritura=X/admin_datos} | t
+ fn_autenticar(text,text)                 | admin_datos | {admin_datos=X/admin_datos,rol_app_auth=X/admin_datos}      | t
+ fn_resetear_password(bigint,text)        | admin_datos | {admin_datos=X/admin_datos,rol_soporte=X/admin_datos}       | f
+(7 filas)
+
+(codigo de salida psql: 0)

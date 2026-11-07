@@ -1,0 +1,20 @@
+# H2b: hash de la clave de app_web antes y despues de re-ejecutar roles.sql
+# fecha: 2026-11-07 18:04:35
+# base: copia_u5, 17.10
+
+clave de partida: 'clave_historica_prueba' (distinta del marcador)
+roles.sql codigo de salida: 0
+tipo de hash antes: SCRAM-SHA-256$
+hash igual antes y despues: True
+(igual = roles.sql NO restablecio la clave; distinto = si la restablecio)
+(SCRAM usa sal aleatoria: un ALTER ROLE ... PASSWORD cambiaria el hash aunque la clave fuera la misma)
+
+--- reglas de autenticacion (pg_hba_file_rules) ---
+113|local|{all}|{all}||trust
+115|host|{all}|{all}|127.0.0.1|trust
+117|host|{all}|{all}|::1|trust
+120|local|{replication}|{all}||trust
+121|host|{replication}|{all}|127.0.0.1|trust
+122|host|{replication}|{all}|::1|trust
+
+--- limpieza: app_web queda con el marcador cambiar_en_produccion ---

@@ -1,0 +1,5 @@
+ calc | subt | recalc | valid 
+------+------+--------+-------
+ f    | f    | f      | f
+(1 fila)
+
