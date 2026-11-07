@@ -18,6 +18,13 @@ Reglas de uso:
 | Claude (claude.ai) | Mariano | Armar `SPEC_U6.md`, `AGENTS.md` y `health_check.sql`; preparar los prompts para OpenCode; revisar scripts con la lista de ocho preguntas; corregir `maintenance.sql`; armar `informe_u6.pdf` y esta bitácora; guiar los comandos paso a paso |
 | pgAdmin 4, `psql`, `pg_dump`, `pg_restore` | Mariano, Andrés | Armar las bases, ejecutar los scripts y consultar |
 
+## Ampliación del objetivo 7 (Andrés, 2026-11-07)
+
+| Prompt o pedido | Respuesta relevante recibida (resumida) | Validación o corrección humana aplicada |
+|---|---|---|
+| **Andrés · OpenCode (GPT-5.6 Terra):** completar solamente la parte asignada de U6 a partir de la división del equipo, `SPEC_U6.md` y `AGENTS.md`; primero escribir `SPEC_U6_ampliacion.md`, comprometerla y recién después generar código | Propuso especificar respaldo de globales sin hashes de contraseña, rol de respaldo limitado, SHA-256 previo a restaurar, `pg_amcheck`, controles de huérfanos, comparación automática de conteos y tres tareas de Windows | Se revisó la spec y se confirmó el commit `cfb6f0a` antes de crear scripts. Se separó deliberadamente la restauración de roles de la tarea automática: `pg_dumpall --globals-only --no-role-passwords` se conserva y verifica, pero no se ejecuta automáticamente porque altera el clúster completo. |
+| **Andrés · OpenCode (GPT-5.6 Terra):** generar scripts y pruebas desde la spec, sin ejecutar PostgreSQL ni registrar tareas todavía | Agregó pruebas Pester y los scripts `crear_rol_respaldo.sql`, `validar_integridad.sql`, `programar_tareas.ps1`, y cambios a respaldo/restauración | Primero se ejecutaron las pruebas Pester sin la implementación: 0 aprobadas y 6 fallidas por funcionalidades ausentes. Después de la implementación, el análisis sintáctico de los cuatro `.ps1` y Pester dieron 6/6. `programar_tareas.ps1 -WhatIf` mostró las tres acciones sin registrar tareas. Falta lectura línea por línea de Andrés y las pruebas reales U6-A02 a U6-A09 antes de declarar los scripts aptos. |
+
 ## H0 — Entorno (cada integrante)
 
 | Quién | Servidor y versión | Conteos de `usuario`, `producto`, `pedido` | Problemas y cómo se resolvieron |
