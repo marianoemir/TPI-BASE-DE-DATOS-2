@@ -1,0 +1,6 @@
+RESULTADO: OK - FoodStore-Respaldo-Diario registrada
+RESULTADO: OK - FoodStore-Mantenimiento-Semanal registrada
+RESULTADO: OK - FoodStore-Restauracion-Semanal registrada
+Disparado: 2026-11-07 19:58:36
+FoodStore-Mantenimiento-Semanal: Estado=Ready LastRunTime=2026-11-07 19:58:36 LastTaskResult=0
+Tareas FoodStore-* que quedan: 0
