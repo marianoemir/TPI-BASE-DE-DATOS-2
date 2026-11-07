@@ -1,6 +1,6 @@
 # SPEC_U7_medicion — Comparación medida MongoDB vs PostgreSQL
 
-**Estado:** preparada para ejecución; MongoDB/mongosh no está disponible todavía en el equipo de Andrés.
+**Estado:** ejecutada el 2026-11-07 (resultados en `evidencias/comparacion_medida.md`); repetida el mismo día sobre una base propia con 5 corridas por consulta (sección «Repetición del 07/11»).
 
 ## Objetivo
 
@@ -52,4 +52,4 @@ La ejecución queda lista solo si se guardan:
 6. una tabla de métricas con fecha, equipo, tamaño e índices;
 7. una conclusión que no extrapole los resultados del equipo local a producción.
 
-No se ejecuta la carga ni se afirma una métrica mientras `mongosh` no esté disponible.
+No se afirma ninguna métrica que no esté respaldada por una salida cruda guardada en `evidencias/`.
