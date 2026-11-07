@@ -6,6 +6,7 @@ $mongo = Join-Path $unidad7 'carga_benchmark_mongodb.js'
 $postgres = Join-Path $unidad7 'consultas_benchmark_postgresql.sql'
 $verificacionMongo = Join-Path $unidad7 'verificar_benchmark_mongodb.js'
 $verificacionPostgres = Join-Path $unidad7 'verificar_benchmark_postgresql.sql'
+$exportadorOriginal = Join-Path $unidad7 'modelo\exportar_pedidos.sql'
 
 Describe 'Medicion U7 - benchmark aislado' {
     It 'exporta una muestra parametrizada sin datos sensibles' {
@@ -38,5 +39,19 @@ Describe 'Medicion U7 - benchmark aislado' {
         Test-Path -LiteralPath $verificacionPostgres | Should Be $true
         (Get-Content -LiteralPath $verificacionMongo -Raw) | Should Match 'total'
         (Get-Content -LiteralPath $verificacionPostgres -Raw) | Should Match 'categoria'
+    }
+
+    It 'contrasta ventas por categoria con lookup y categoria embebida' {
+        $contenido = Get-Content -LiteralPath $mongo -Raw
+        $contenido | Should Match '\$lookup'
+        $contenido | Should Match 'productos_benchmark'
+        $contenido | Should Match 'CATEGORIAS_LOOKUP'
+    }
+
+    It 'permite parametrizar los ids y el origen del exportador original' {
+        $contenido = Get-Content -LiteralPath $exportadorOriginal -Raw
+        $contenido | Should Match ":'ids'"
+        $contenido | Should Match ":'origen'"
+        $contenido | Should Not Match 'p\.id IN \(1, 2, 3, 5, 6, 7 ,8\)'
     }
 }
