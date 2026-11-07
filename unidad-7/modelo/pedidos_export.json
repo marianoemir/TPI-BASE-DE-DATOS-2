@@ -1,7 +1,7 @@
 [
     {
         "_id": 1,
-        "fecha": "2026-10-30",
+        "fecha": "2026-11-07",
         "total": "9400.00",
         "estado": "CONFIRMADO",
         "lineas": [
@@ -33,7 +33,7 @@
     },
     {
         "_id": 2,
-        "fecha": "2026-10-30",
+        "fecha": "2026-11-07",
         "total": "11900.00",
         "estado": "TERMINADO",
         "lineas": [
@@ -73,7 +73,7 @@
     },
     {
         "_id": 3,
-        "fecha": "2026-10-30",
+        "fecha": "2026-11-07",
         "total": "5300.00",
         "estado": "PENDIENTE",
         "lineas": [
@@ -105,7 +105,7 @@
     },
     {
         "_id": 5,
-        "fecha": "2026-10-30",
+        "fecha": "2026-11-07",
         "total": "18700.00",
         "estado": "PENDIENTE",
         "lineas": [
@@ -136,16 +136,16 @@
         ],
         "origen": "data.sql",
         "cliente": {
-            "mail": "mariano.chirino@mail.com",
-            "nombre": "Mariano",
-            "apellido": "Chirino",
+            "mail": "carlos.rivas@mail.com",
+            "nombre": "Carlos",
+            "apellido": "Rivas",
             "usuario_id": 4
         },
         "forma_pago": "EFECTIVO"
     },
     {
         "_id": 6,
-        "fecha": "2026-10-30",
+        "fecha": "2026-11-07",
         "total": "3200.00",
         "estado": "CANCELADO",
         "lineas": [
@@ -169,7 +169,7 @@
     },
     {
         "_id": 7,
-        "fecha": "2026-10-31",
+        "fecha": "2026-11-07",
         "total": "4200.00",
         "estado": "PENDIENTE",
         "lineas": [
@@ -201,7 +201,7 @@
     },
     {
         "_id": 8,
-        "fecha": "2026-10-31",
+        "fecha": "2026-11-07",
         "total": "11700.00",
         "estado": "PENDIENTE",
         "lineas": [

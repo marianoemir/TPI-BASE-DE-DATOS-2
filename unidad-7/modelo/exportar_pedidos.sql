@@ -16,7 +16,7 @@
 \endif
 \if :{?origen}
 \else
-  \set origen migracion_u7
+  \set origen ''
 \endif
 
 SELECT jsonb_pretty(jsonb_agg(doc ORDER BY id)) FROM (
@@ -40,7 +40,7 @@ SELECT jsonb_pretty(jsonb_agg(doc ORDER BY id)) FROM (
                  FROM detalle_pedido d
                  JOIN producto pr ON pr.id = d.producto_id
                  WHERE d.pedido_id = p.id AND d.eliminado = FALSE),
-      'origen', :'origen'
+      'origen', COALESCE(NULLIF(:'origen', ''), CASE WHEN p.id <= 6 THEN 'data.sql' ELSE 'prueba' END)
     ) AS doc
   FROM pedido p
   JOIN usuario u ON u.id = p.usuario_id
