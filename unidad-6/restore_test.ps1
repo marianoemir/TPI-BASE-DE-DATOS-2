@@ -339,12 +339,25 @@ if (-not $fallo) {
         $fallo = $true
     }
     else {
+        $controles = 0
         foreach ($linea in $salidaIntegridad) {
             $texto = ([string]$linea).Trim()
-            if ($texto -and $texto -notmatch '^[^|]+\|0$') {
+            if (-not $texto) { continue }
+            $controles++
+            if ($texto -notmatch '^[^|]+\|0$') {
                 Escribir-Log "ERROR - Control de integridad distinto de cero: $texto"
                 $fallo = $true
             }
+            else {
+                Escribir-Log "OK - Control de integridad: $texto"
+            }
+        }
+        if ($controles -ne 6) {
+            Escribir-Log "ERROR - Se esperaban 6 controles de integridad y hubo $controles"
+            $fallo = $true
+        }
+        else {
+            Escribir-Log "OK - $controles controles de integridad en cero."
         }
     }
 }
