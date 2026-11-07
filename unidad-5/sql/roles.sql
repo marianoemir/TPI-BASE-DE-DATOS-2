@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- roles.sql — Roles y permisos de minimo privilegio (Food Store, Parte A)
 -- TP Unidad 5 — Base de Datos II
 --
@@ -217,6 +217,12 @@ ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos IN SCHEMA public
 ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos
     REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
+-- H4b (auditoria U5, 2026-11-07): las rutinas heredaban EXECUTE de PUBLIC,
+-- asi que app_web podia ejecutarlas sin que ningun GRANT lo autorizara.
+-- Prueba: unidad-5/evidencias/h3_h4b_prueba.txt
+REVOKE EXECUTE ON FUNCTION calcular_total_pedido(bigint), fn_set_subtotal(),
+  fn_recalcular_total(), fn_validar_estado_pedido() FROM PUBLIC;
+
 COMMIT;   -- cambiar por ROLLBACK; para un ensayo sin efectos
 
 -- ----------------------------------------------------------------------------
@@ -237,8 +243,3 @@ COMMIT;   -- cambiar por ROLLBACK; para un ensayo sin efectos
 --                     rol_soporte, rol_reportes, app_web, admin_datos;
 -- COMMIT;
 
--- H4b (auditoria U5, 2026-11-07): las rutinas heredaban EXECUTE de PUBLIC,
--- asi que app_web podia ejecutarlas sin que ningun GRANT lo autorizara.
--- Prueba: unidad-5/evidencias/h2b_h4b_prueba.txt
-REVOKE EXECUTE ON FUNCTION calcular_total_pedido(bigint), fn_set_subtotal(),
-  fn_recalcular_total(), fn_validar_estado_pedido() FROM PUBLIC;
