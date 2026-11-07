@@ -1,160 +1,143 @@
 <#
 .SYNOPSIS
-    Script de respaldo automatizado para la base de datos foodstore.
+    Respalda foodstore y sus objetos globales, con hashes y retencion segura.
 .DESCRIPTION
-    Realiza un respaldo en formato custom (pg_dump -Fc) utilizando pgpass.conf para autenticacion,
-    verifica el respaldo con pg_restore --list, calcula su hash SHA-256 y registra la ejecucion en un log ASCII.
+    El dump de datos usa operador_respaldo. El dump global requiere una cuenta
+    administrativa, porque los roles son objetos de todo el servidor.
 #>
 
 param (
     [string]$PgDump = "C:\Program Files\PostgreSQL\17\bin\pg_dump.exe",
+    [string]$PgDumpAll = "C:\Program Files\PostgreSQL\17\bin\pg_dumpall.exe",
     [string]$PgRestore = "C:\Program Files\PostgreSQL\17\bin\pg_restore.exe",
-    [string]$Servidor = "localhost",
+    [string]$Servidor = 'localhost',
     [int]$Puerto = 5432,
-    [string]$Usuario = "postgres",
-    [string]$Base = "foodstore",
+    [string]$UsuarioRespaldo = 'operador_respaldo',
+    [string]$UsuarioGlobales = 'postgres',
+    [string]$Base = 'foodstore',
+    [int]$DiasRetencion = 14,
     [string]$DirBackups = "$PSScriptRoot\backups",
     [string]$DirLogs = "$PSScriptRoot\logs"
 )
 
-# Asegurar que las carpetas de backups y logs existan
-if (-not (Test-Path -LiteralPath $DirBackups)) {
-    New-Item -ItemType Directory -Path $DirBackups -Force | Out-Null
+$ErrorActionPreference = 'Stop'
+
+if ($Base -ne 'foodstore') {
+    throw "Este script solo admite respaldar foodstore. Base recibida: $Base"
 }
-if (-not (Test-Path -LiteralPath $DirLogs)) {
-    New-Item -ItemType Directory -Path $DirLogs -Force | Out-Null
+if ($DiasRetencion -lt 1) {
+    throw 'DiasRetencion debe ser mayor o igual a 1.'
 }
 
-$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$nombreBase = "foodstore_$timestamp"
-$rutaParcial = Join-Path $DirBackups "$nombreBase.dump.parcial"
-$rutaDump = Join-Path $DirBackups "$nombreBase.dump"
-$rutaSha256 = Join-Path $DirBackups "$nombreBase.dump.sha256"
+New-Item -ItemType Directory -Path $DirBackups -Force | Out-Null
+New-Item -ItemType Directory -Path $DirLogs -Force | Out-Null
+
+$timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $rutaLog = Join-Path $DirLogs "backup_$timestamp.log"
 
-# Funcion auxiliar para escribir en el log con codificacion ASCII
 function Escribir-Log {
-    param ([string]$Mensaje)
-    $fechaHora = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $linea = "$fechaHora - $Mensaje"
-    Add-Content -Path $rutaLog -Value $linea -Encoding ASCII
+    param([string]$Mensaje)
+    Add-Content -LiteralPath $rutaLog -Encoding ASCII -Value "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') - $Mensaje"
 }
 
-Escribir-Log "INICIO - Iniciando proceso de respaldo para la base '$Base' en servidor '${Servidor}:${Puerto}'."
-
-# Validar que los ejecutables existan
-if (-not (Test-Path -LiteralPath $PgDump)) {
-    Escribir-Log "ERROR - No se encontro el ejecutable pg_dump en la ruta: $PgDump"
-    Write-Host "RESULTADO: ERROR - No se encontro el ejecutable pg_dump"
-    exit 1
-}
-if (-not (Test-Path -LiteralPath $PgRestore)) {
-    Escribir-Log "ERROR - No se encontro el ejecutable pg_restore en la ruta: $PgRestore"
-    Write-Host "RESULTADO: ERROR - No se encontro el ejecutable pg_restore"
-    exit 1
-}
-
-# Ejecucion de pg_dump escribiendo a archivo parcial
-Escribir-Log "INFO - Ejecutando pg_dump hacia archivo parcial: $rutaParcial"
-
-$oldPreference = $ErrorActionPreference
-$ErrorActionPreference = 'Continue'
-try {
-    $salidaPgDump = & $PgDump -h $Servidor -p $Puerto -U $Usuario -d $Base -Fc -w -v -f $rutaParcial 2>&1
-    $exitCodePgDump = $LASTEXITCODE
-    foreach ($lin in $salidaPgDump) {
-        Escribir-Log "PG_DUMP: $lin"
+function Ejecutar-Programa {
+    param([string]$Ejecutable, [string[]]$Argumentos, [string]$Etiqueta)
+    $anterior = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $salida = & $Ejecutable @Argumentos 2>&1
+        $codigo = $LASTEXITCODE
     }
-}
-catch {
-    $exitCodePgDump = 1
-    Escribir-Log "ERROR - Excepcion durante la ejecucion de pg_dump: $_"
-}
-finally {
-    $ErrorActionPreference = $oldPreference
-}
-
-# Verificar si pg_dump fallo
-if ($exitCodePgDump -ne 0) {
-    Escribir-Log "ERROR - pg_dump fallo con codigo de salida $exitCodePgDump."
-    if (Test-Path -LiteralPath $rutaParcial) {
-        Remove-Item -LiteralPath $rutaParcial -Force
-        Escribir-Log "INFO - Archivo parcial eliminado."
+    finally {
+        $ErrorActionPreference = $anterior
     }
-    Write-Host "RESULTADO: ERROR - pg_dump fallo con codigo $exitCodePgDump"
-    exit 1
+    if ($codigo -ne 0) {
+        Escribir-Log "ERROR - $Etiqueta fallo con codigo $codigo."
+        foreach ($linea in $salida) { Escribir-Log "$Etiqueta`: $linea" }
+        throw "$Etiqueta fallo con codigo $codigo."
+    }
+    Escribir-Log "OK - $Etiqueta finalizo correctamente."
+    return @($salida)
 }
 
-Escribir-Log "OK - pg_dump finalizo correctamente. Verificando archivo parcial con pg_restore --list."
+function Escribir-Hash {
+    param([string]$Archivo)
+    $hash = (Get-FileHash -LiteralPath $Archivo -Algorithm SHA256).Hash
+    $nombre = Split-Path -Leaf $Archivo
+    $archivoHash = "$Archivo.sha256"
+    Set-Content -LiteralPath $archivoHash -Encoding ASCII -Value "$hash  $nombre"
+    Escribir-Log "OK - SHA-256 generado para $nombre."
+    return $archivoHash
+}
 
-# Verificacion del archivo parcial con pg_restore --list
-$oldPreference = $ErrorActionPreference
-$ErrorActionPreference = 'Continue'
-try {
-    $salidaPgRestore = & $PgRestore --list $rutaParcial 2>&1
-    $exitCodePgRestore = $LASTEXITCODE
-    $numLineas = @($salidaPgRestore).Count
-    Escribir-Log "INFO - pg_restore --list genero $numLineas lineas de salida."
-    if ($exitCodePgRestore -ne 0) {
-        foreach ($lin in $salidaPgRestore) {
-            Escribir-Log "PG_RESTORE: $lin"
+function Test-Hash {
+    param([string]$Archivo)
+    $archivoHash = "$Archivo.sha256"
+    if (-not (Test-Path -LiteralPath $Archivo) -or -not (Test-Path -LiteralPath $archivoHash)) { return $false }
+    $esperado = (Get-Content -LiteralPath $archivoHash -Raw).Trim().Split()[0]
+    $actual = (Get-FileHash -LiteralPath $Archivo -Algorithm SHA256).Hash
+    return $esperado -eq $actual
+}
+
+function Aplicar-Retencion {
+    $patron = '^foodstore_(\d{8}_\d{6})\.dump$'
+    $conjuntos = @()
+    foreach ($dump in Get-ChildItem -LiteralPath $DirBackups -File -Filter 'foodstore_*.dump') {
+        if ($dump.Name -notmatch $patron) { continue }
+        $sello = $Matches[1]
+        $globales = Join-Path $DirBackups "foodstore_globals_$sello.sql"
+        if ((Test-Hash -Archivo $dump.FullName) -and (Test-Hash -Archivo $globales)) {
+            $conjuntos += [PSCustomObject]@{ Sello = $sello; Dump = $dump.FullName; Globales = $globales }
+        }
+    }
+
+    $ultimoValido = $conjuntos | Sort-Object Sello -Descending | Select-Object -First 1
+    $limite = (Get-Date).AddDays(-$DiasRetencion)
+    foreach ($conjunto in $conjuntos) {
+        $fecha = [datetime]::ParseExact($conjunto.Sello, 'yyyyMMdd_HHmmss', [Globalization.CultureInfo]::InvariantCulture)
+        if ($conjunto.Sello -ne $ultimoValido.Sello -and $fecha -lt $limite) {
+            foreach ($archivo in @($conjunto.Dump, "$($conjunto.Dump).sha256", $conjunto.Globales, "$($conjunto.Globales).sha256")) {
+                Remove-Item -LiteralPath $archivo -Force
+            }
+            Escribir-Log "OK - Retencion elimino el conjunto valido vencido $($conjunto.Sello)."
         }
     }
 }
-catch {
-    $exitCodePgRestore = 1
-    Escribir-Log "ERROR - Excepcion durante la verificacion con pg_restore: $_"
-}
-finally {
-    $ErrorActionPreference = $oldPreference
-}
 
-# Verificar si la validacion con pg_restore fallo
-if ($exitCodePgRestore -ne 0) {
-    Escribir-Log "ERROR - pg_restore --list fallo en el archivo parcial con codigo $exitCodePgRestore."
-    if (Test-Path -LiteralPath $rutaParcial) {
-        Remove-Item -LiteralPath $rutaParcial -Force
-        Escribir-Log "INFO - Archivo parcial eliminado tras fallo de verificacion."
+try {
+    foreach ($ejecutable in @($PgDump, $PgDumpAll, $PgRestore)) {
+        if (-not (Test-Path -LiteralPath $ejecutable)) { throw "No existe el ejecutable: $ejecutable" }
     }
-    Write-Host "RESULTADO: ERROR - pg_restore --list fallo con codigo $exitCodePgRestore"
-    exit 1
-}
 
-Escribir-Log "OK - Verificacion del respaldo exitosa. Renombrando archivo parcial a definitivo."
+    $nombreDatos = "foodstore_$timestamp.dump"
+    $datosParcial = Join-Path $DirBackups "$nombreDatos.parcial"
+    $datosFinal = Join-Path $DirBackups $nombreDatos
+    $nombreGlobales = "foodstore_globals_$timestamp.sql"
+    $globalesParcial = Join-Path $DirBackups "$nombreGlobales.parcial"
+    $globalesFinal = Join-Path $DirBackups $nombreGlobales
 
-# Renombrar .parcial a .dump
-try {
-    Move-Item -LiteralPath $rutaParcial -Destination $rutaDump -Force
+    Escribir-Log "INICIO - Respaldo de foodstore en ${Servidor}:${Puerto}."
+    Ejecutar-Programa -Ejecutable $PgDump -Etiqueta 'pg_dump' -Argumentos @('-w', '-h', $Servidor, '-p', $Puerto, '-U', $UsuarioRespaldo, '-d', $Base, '-Fc', '-f', $datosParcial) | Out-Null
+    Ejecutar-Programa -Ejecutable $PgRestore -Etiqueta 'pg_restore --list' -Argumentos @('--list', $datosParcial) | Out-Null
+    if ((Get-Item -LiteralPath $datosParcial).Length -le 0) { throw 'El dump parcial no tiene contenido.' }
+    Move-Item -LiteralPath $datosParcial -Destination $datosFinal
+    Escribir-Hash -Archivo $datosFinal | Out-Null
+
+    Ejecutar-Programa -Ejecutable $PgDumpAll -Etiqueta 'pg_dumpall --globals-only' -Argumentos @('-w', '-h', $Servidor, '-p', $Puerto, '-U', $UsuarioGlobales, '--globals-only', '--no-role-passwords', '-f', $globalesParcial) | Out-Null
+    if ((Get-Item -LiteralPath $globalesParcial).Length -le 0) { throw 'El dump global parcial no tiene contenido.' }
+    Move-Item -LiteralPath $globalesParcial -Destination $globalesFinal
+    Escribir-Hash -Archivo $globalesFinal | Out-Null
+
+    Aplicar-Retencion
+    Escribir-Log "RESULTADO: OK - Datos: $datosFinal | Globales: $globalesFinal"
+    Write-Host "RESULTADO: OK - $datosFinal"
+    exit 0
 }
 catch {
-    Escribir-Log "ERROR - No se pudo renombrar el archivo parcial a definitivo: $_"
-    Write-Host "RESULTADO: ERROR - No se pudo renombrar el archivo parcial"
+    foreach ($parcial in @($datosParcial, $globalesParcial)) {
+        if ($null -ne $parcial -and (Test-Path -LiteralPath $parcial)) { Remove-Item -LiteralPath $parcial -Force }
+    }
+    Escribir-Log "RESULTADO: ERROR - $_"
+    Write-Host "RESULTADO: ERROR - $_"
     exit 1
 }
-
-# Obtener tamano en bytes y verificar si es 0 o menor
-$tamanoBytes = (Get-Item -LiteralPath $rutaDump).Length
-if ($tamanoBytes -le 0) {
-    Escribir-Log "ERROR - El archivo de respaldo resultante tiene un tamano de $tamanoBytes bytes."
-    Write-Host "RESULTADO: ERROR - Tamano de respaldo invalido ($tamanoBytes bytes)"
-    exit 1
-}
-
-# Calcular hash SHA-256
-try {
-    $hashObj = Get-FileHash -LiteralPath $rutaDump -Algorithm SHA256
-    $hashSha256 = $hashObj.Hash
-    $nombreArchivoDump = Split-Path -Leaf $rutaDump
-    $contenidoSha256 = "$hashSha256  $nombreArchivoDump"
-    Set-Content -Path $rutaSha256 -Value $contenidoSha256 -Encoding ASCII
-    Escribir-Log "INFO - Hash SHA-256 generado y guardado en $rutaSha256."
-}
-catch {
-    Escribir-Log "ERROR - No se pudo calcular o guardar el hash SHA-256: $_"
-    Write-Host "RESULTADO: ERROR - Fallo al calcular o guardar hash SHA-256"
-    exit 1
-}
-
-Escribir-Log "OK - Respaldo completado satisfactoriamente. Ruta: $rutaDump | Tamano: $tamanoBytes bytes | SHA256: $hashSha256"
-Write-Host "RESULTADO: OK - $rutaDump"
-exit 0

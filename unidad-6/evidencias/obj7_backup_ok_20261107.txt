@@ -1,0 +1,7 @@
+2026-11-07 02:33:26 - INICIO - Respaldo de foodstore en localhost:5432.
+2026-11-07 02:33:28 - OK - pg_dump finalizo correctamente.
+2026-11-07 02:33:29 - OK - pg_restore --list finalizo correctamente.
+2026-11-07 02:33:29 - OK - SHA-256 generado para foodstore_20261107_023326.dump.
+2026-11-07 02:33:29 - OK - pg_dumpall --globals-only finalizo correctamente.
+2026-11-07 02:33:29 - OK - SHA-256 generado para foodstore_globals_20261107_023326.sql.
+2026-11-07 02:33:29 - RESULTADO: OK - Datos: <RAIZ_REPO>\unidad-6\backups\foodstore_20261107_023326.dump | Globales: <RAIZ_REPO>\unidad-6\backups\foodstore_globals_20261107_023326.sql
