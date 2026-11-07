@@ -3,8 +3,8 @@
 **Integrante:** Mariano Chirino (Grupo 10)
 **Materia:** Base de Datos II (UTN) — Unidad 8, TP N.º 8
 **Proyecto Integrador:** Food Store
-**Alcance:** consignas 1 y 2 (base de la tablet en SQLite, instantánea, semáforo, casos C2 a C6), spec en Kiro (4.a), armado del repositorio y revisión de los pull requests de Andrés y Facundo
-**Herramientas:** Claude (versión web, claude.ai), NotebookLM y Kiro. No usé OpenCode: el code review de la consigna 3.c con OpenCode lo hizo Facundo (`duia_facundo.md`).
+**Alcance:** consignas 1 y 2 (base de la tablet en SQLite, instantánea, semáforo, casos C2 a C6), spec en Kiro (4.a), regeneración de la base de la tablet con OpenCode a partir de la spec (objetivo 11), armado del repositorio y revisión de los pull requests de Andrés y Facundo
+**Herramientas:** Claude (versión web, claude.ai), NotebookLM, Kiro y OpenCode (agente Nemotron 3.5 Lightning Free, solo para regenerar la base de la tablet en el objetivo 11). El code review de la consigna 3.c con OpenCode lo hizo Facundo (`duia_facundo.md`).
 
 > Esta declaración cubre únicamente lo que hice y usé yo. Andrés Fabre y Facundo Quiroga
 > declaran su propio uso de IA en `duia_andres.md` y `duia_facundo.md`.
@@ -31,6 +31,16 @@
 
 **Carpeta `.kiro/steering/`** (`conventions.md`, `project-overview.md`, `objects-and-patterns.md`): entró al repo en el commit `66392be` del 02/11/2026 («Estructura preliminar»). **No consta** con qué herramienta se escribió ni quién la redactó; se usa como referencia de convenciones del proyecto (por ejemplo, en el hallazgo H04 de la 3.c).
 
+### Objetivo 11 — regeneración de la base de la tablet con OpenCode desde la spec
+
+| Herramienta | Para qué se usó | Se aceptó / se descartó — por qué |
+|---|---|---|
+| Claude (borrador) y Kiro (edición de la spec) | Ampliar la spec **antes** de generar: casos C1, C7, C8 y F2, esquema `STRICT`, recarga del catálogo y reglas del semáforo (Requisitos 5 a 10) | **Los Requisitos 5 a 10 los redactó Claude** como borrador y se pegaron en Kiro casi sin cambios (103 de 113 líneas idénticas); se leyeron y se aceptaron. El Requisito 11 (entregables, ejecución y evidencia) y el historial de revisiones no provienen de ese borrador [CONFIRMAR: con qué herramienta se redactaron]. Commit `be854e4` del 06/11/2026 15:38, anterior a la generación (`e9dd9f8`, 16:10). Después se corrigió el REQ 5.3 (13 productos visibles y no 14, tras ejecutar contra el CSV real, commit `a088c03`) y se agregaron el REQ 6.12 y el 6.13 el 07/11 (commit `772536a`). |
+| OpenCode (agente Nemotron 3.5 Lightning Free) | Generar `schema_sqlite.sql`, `cargar_catalogo.sql`, `semaforo.sql` y `casos.sql` en `movil_opencode/` dándole solo `AGENTS.md` y la spec | **La corrida 1 no produjo una base funcional**: el esquema no se creó y por eso fallaron en cascada la carga, el semáforo y los casos (`evidencias/22_corrida1_con_errores.txt`). Se conservan los originales sin editar en `movil_opencode/original_opencode/` y el registro en `docs/registro_opencode_corrida1.txt` (commit `e9dd9f8`). **No consta** si OpenCode leyó `movil/` durante la corrida, aunque el prompt lo prohibía. |
+| Claude (web) | Diagnosticar los errores de la corrida 1 y corregirlos; después comparar la versión corregida con los originales de `movil/` | **Aceptado, ejecutado y verificado por mí:** `STRICT` como opción de tabla, índice parcial fuera del `CREATE TABLE`, `motivo` nullable, `WHERE true` en el `UPSERT`, sin `DELETE` previo y semáforo reescrito con una CTE de causas; `casos.sql` reescrito con datos reales del CSV. **Descartado:** un cambio que Claude hizo en la vista (precio sin dividir por 100) por una suposición, contrario al REQ 5.2; se restauró. **Hallazgo de la comparación:** faltaban un valor por defecto en `pedido_borrador.creado_en` y la clave foránea de `cola_sync.id_local`; la spec no los pedía, así que se agregaron a la spec (REQ 6.12 y 6.13) y después al esquema. Evidencias `22` a `27` y `docs/comparacion_generado_vs_original.md`. |
+
+**Declaración honesta:** los scripts que funcionan hoy en `movil_opencode/` son en su mayor parte reescrituras hechas con Claude a partir de los errores de la corrida 1. De OpenCode quedan la estructura general y algunas ideas de casos.
+
 ### Revisión del trabajo de un compañero (PR #1 de Andrés Fabre)
 
 | Herramienta | Para qué se usó | Se aceptó / se descartó — por qué |
@@ -56,6 +66,7 @@ Todo se probó en mi máquina (Windows PowerShell 5.1): PostgreSQL 17.10 con la 
 4. Comprobación de los hallazgos de la 3.c de Facundo (H36, H01, H04 y R1) sobre una copia de la base: salidas en `evidencias/15` a `17` y script `postgresql/verificar_hallazgos_3c.sql`.
 
 5. Casos borde del semáforo (F2): `movil/casos_f2_semaforo.sql`, con las salidas en `evidencias/18` y `19`.
+6. Versión de OpenCode (objetivo 11): corrida 1 sin editar (`evidencias/22`), versión corregida (`23` a `25`), casos F2 originales contra la versión corregida (`26`) y `casos.sql` tras los REQ 6.12 y 6.13 (`27`).
 
 Ninguna propuesta de la IA se incorporó sin leerla y correrla.
 
@@ -67,4 +78,5 @@ Ninguna propuesta de la IA se incorporó sin leerla y correrla.
 | Recarga del catálogo | `INSERT … ON CONFLICT DO UPDATE`; la lápida conserva la fila |
 | Reenvío de una solicitud | `UUID` como clave primaria; índice parcial para permitir reenviar solo tras un `CONFLICTO` |
 | Código de la cátedra | No se usó: el `kit_u8_campus` no estaba disponible |
-| Spec de Kiro | Posterior al código; declarado |
+| Spec de Kiro | Primera versión (03/11): posterior al código; declarado. Objetivo 11: revisada y con commit antes de generar con OpenCode (06/11, `be854e4`) |
+| Regeneración con OpenCode | La corrida 1 no funcionó; la versión actual se corrigió con Claude y se declara; originales conservados |
