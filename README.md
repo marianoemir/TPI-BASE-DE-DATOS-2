@@ -41,7 +41,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 
 | Unidad | Base | Motor |
 |---|---|---|
-| U4 | `copia_trabajo` | PostgreSQL |
+| U4 | `copia_trabajo` (Parte 2) y `copia_fnbc` (Parte 1) | PostgreSQL 18 |
 | U5 | `copia_u5` | PostgreSQL 17.10 |
 | U6 | `foodstore`, `foodstore_restore_test` | PostgreSQL |
 | U7 | `foodstore_nosql` | MongoDB 9.0.4 (`mongosh` 2.14.0) |
