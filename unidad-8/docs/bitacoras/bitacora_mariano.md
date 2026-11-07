@@ -82,3 +82,51 @@ Según `DIVISION_DE_TRABAJO.md`:
 | No agregar requisitos por la corrida 2 | Agregar REQ por cada defecto | Los incumplimientos son contra REQ ya escritos (6.1, 6.3, 6.11) o errores de escritura; las dos lagunas reales ya se habían cerrado (6.12 y 6.13) |
 | `capturado_en` en `v_catalogo_disponible` y criterio `OK`/`FALLA` en el REQ 11 | Agregarlos a la spec y regenerar | No cambian ningún resultado de C1 a C8 ni de F2; se declaran como límites en `comparacion_generado_vs_original.md` |
 | Descartar el cambio de Kiro `Glosario` → `Glossary` | Commitearlo | Sin contenido nuevo; mantiene la spec igual a la usada en las corridas |
+
+## Declaraciones del 07/11/2026 (cierre de la segunda entrega)
+
+### 1. Merges a `main` sin revisión cruzada
+Todos los merges del 07/11 los hizo Mariano Chirino sin revisión cruzada (Facundo Quiroga no respondió y no hay ninguna rama suya). Se pide una lectura posterior a Andrés Fabre.
+
+| PR | Rama | Contenido | Hora |
+|---|---|---|---|
+| #6 | `m/obj-11` | Objetivo 11: SQLite con OpenCode, comparación y evidencias | 15:12 |
+| #7 | `m/informe-u8` | `docs/informe/u8.md` | 15:52 |
+| #8 | `m/obj-06` | Objetivo 6: auditoría de `roles.sql`, correcciones H1, H3 y H4b | 18:16 |
+| #9 | `m/docs-cierre` | README raíz, `u5.md`, introducción, bitácora unificada | 18:42 |
+| #10 | `m/bitacora-cierre` | Parte F de la bitácora de la U5 | 18:51 |
+| #5 | `a/obj-10` | Objetivo 10, de Andrés Fabre; lo mergeó Mariano | 19:00 |
+| #11 | `m/fix-obj-10` | Correcciones de Mariano a `a/obj-10` y repetición de la medición | 19:09 |
+| #12 | `m/limpieza-u7` | Datos de ejemplo de la U7 regenerados sin nombres reales | 19:32 |
+| #13 | `m/fix-obj-07` | `a/obj-07` de Andrés Fabre (objetivo 7) con correcciones de Mariano | 20:06 |
+
+### 2. Trabajo de Mariano sobre archivos de Andrés
+- **`a/obj-10` (U7):** se corrigió `u7.md` contra la evidencia (MongoDB figuraba con 10 ms y la salida dice `executionTimeMillis: 0`; se quitó una afirmación sobre el `$lookup` que no estaba medida), se repitió la medición con base propia y se verificaron las referencias en ambos motores. Los límites están declarados en `comparacion_medida.md`.
+- **`a/obj-07` (U6):** se leyeron línea por línea `backup_foodstore.ps1`, `restore_test.ps1`, `crear_rol_respaldo.sql`, `programar_tareas.ps1` y `validar_integridad.sql`. Se corrigió `restore_test.ps1` para que exija y registre los 6 controles de integridad. Se repitieron respaldo, simulacro, roles (T01 a T23, 23 de 23), Programador de tareas, mantenimiento y Pester. `docs/informe/u6.md` se amplió con la repetición y los límites.
+
+### 3. Asistencia de Claude
+Con asistencia de Claude se redactaron y se verificaron contra las salidas crudas: los scripts de repetición de la U6 y la U7, la corrección de `u7.md` y `u6.md`, `docs/informe/u5.md`, `unidad-5/docs/auditoria_roles_opencode.md`, `docs/informe/00_introduccion_uso_ia_limitaciones.md` y el `README.md` raíz. El hallazgo H4b salió de una revisión con Claude, no de OpenCode.
+
+### 4. Auditoría de `roles.sql` con OpenCode
+La sesión original no se conserva. La auditoría del 07/11 es una repetición (Nemotron 3.5 Lightning, modo Plan, carpeta `C:\auditoria_roles`) que salió en 3 partes por 2 interrupciones; los mensajes de las interrupciones los redactó Claude. Hora de la parte 1: 16:38, a verificar; partes 2 y 3: no consta. Registro: `unidad-5/docs/registro_opencode_auditoria_roles_corrida2.txt`.
+
+### 5. Evidencias con tratamiento especial
+- Cinco evidencias de H3 y H4b se generaron en UTF-16 y se convirtieron a UTF-8 sin cambiar el contenido (commit `6346e09`).
+- `unidad-6/evidencias/obj7_repeticion2_mariano_restore_20261107_194601.txt` quedó interrumpido durante `pg_restore`; la causa no consta. Se conserva sin editar, con su nota.
+- Las salidas de `psql` en español traen `ï¿½` en algunas líneas por codificación de la consola; no se editaron.
+- Las evidencias conservan rutas locales y el nombre del equipo (`host` en salidas de `explain`); no se editaron para no alterar lo que prueban.
+- La prueba de H1 en base sucia se corrió en consola y no se guardó.
+
+### 6. Límites del entorno de Mariano
+- El `pg_hba.conf` usa `trust`: las pruebas verifican permisos, no autenticación.
+- Las tareas del Programador se registraron, se dispararon a mano y se desregistraron; no se observó ninguna ejecución por horario.
+- Se ejecutó un `ANALYZE` manual sobre la copia `foodstore` (la copia por plantilla no traía estadísticas).
+- `log_statement = all` sigue activo en el servidor local; las contraseñas de prueba de T04 y T14 quedan en ese log, que no está en el repositorio.
+
+### 7. Datos en el historial de Git
+El repositorio es público. Un correo y un apellido de un integrante estuvieron en `unidad-7/modelo/pedidos_export.json` y en dos archivos más; se regeneraron, pero siguen en el historial. No se reescribió el historial.
+
+### 8. Otros
+- Requisito 11 de la spec de la U8: no consta con qué herramienta se redactó.
+- `roles.sql` cambió tres veces en `m/obj-06` (H1, H3, H4b); quien lo edite debe partir de `main` actual.
+- Las preguntas al profesor sobre el objetivo 11 y el formato del repo no se enviaron; se resolvió con criterio propio y se declara. Tampoco hubo defensa oral en las entregas anteriores.
