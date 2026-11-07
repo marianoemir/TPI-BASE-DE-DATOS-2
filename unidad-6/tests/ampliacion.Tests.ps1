@@ -37,11 +37,22 @@ Describe 'Ampliacion U6 - mantenimiento verificable' {
         $contenido | Should Match 'pg_amcheck'
     }
 
+    It 'instala amcheck solo si falta en la copia descartable' {
+        $contenido = Get-Content -LiteralPath $restore -Raw
+        $contenido | Should Match '--install-missing'
+    }
+
     It 'define controles reutilizables de integridad referencial' {
         Test-Path -LiteralPath $integridad | Should Be $true
         $contenido = Get-Content -LiteralPath $integridad -Raw
         $contenido | Should Match 'huerfanos'
         $contenido | Should Match 'detalle_pedido'
+    }
+
+    It 'lee la salida de integridad sin mensajes de formato de psql' {
+        $contenido = Get-Content -LiteralPath $restore -Raw
+        $contenido | Should Match '-t -A -F'
+        $contenido | Should Match '-q -f \$ArchivoIntegridad'
     }
 
     It 'registra las tareas de respaldo, mantenimiento y restauracion' {

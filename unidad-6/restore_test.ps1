@@ -295,7 +295,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-$salidaAmcheck = & $PgAmcheck -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino 2>&1
+$salidaAmcheck = & $PgAmcheck -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino --install-missing 2>&1
 if ($LASTEXITCODE -ne 0) {
     $cronometro.Stop()
     Escribir-Log "ERROR - pg_amcheck fallo."
@@ -332,7 +332,7 @@ if (-not $fallo) {
 
 # Controles centralizados: FKs huerfanas y valores invalidos deben ser cero.
 if (-not $fallo) {
-    $salidaIntegridad = & $Psql -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino -f $ArchivoIntegridad 2>&1
+    $salidaIntegridad = & $Psql -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino -t -A -F '|' -q -f $ArchivoIntegridad 2>&1
     if ($LASTEXITCODE -ne 0) {
         Escribir-Log "ERROR - validar_integridad.sql fallo."
         foreach ($lin in $salidaIntegridad) { Escribir-Log "INTEGRIDAD: $lin" }
