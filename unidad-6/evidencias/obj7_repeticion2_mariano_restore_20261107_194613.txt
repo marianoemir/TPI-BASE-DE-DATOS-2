@@ -1,0 +1,33 @@
+2026-11-07 19:46:13 - INICIO - Iniciando simulacro de restauracion.
+2026-11-07 19:46:13 - INFO - Respaldo seleccionado: C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_20261107_194611.dump
+2026-11-07 19:46:13 - OK - SHA-256 verificado para C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_20261107_194611.dump
+2026-11-07 19:46:13 - OK - SHA-256 verificado para C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_globals_20261107_194611.sql
+2026-11-07 19:46:14 - INFO - Verificando si existe la base destino 'foodstore_restore_test'.
+2026-11-07 19:46:14 - INFO - La base destino ya existe. Eliminando 'foodstore_restore_test' con dropdb (fuera del cronometro).
+2026-11-07 19:46:14 - OK - Base destino previa eliminada.
+2026-11-07 19:46:14 - INFO - Hora de inicio del simulacro: 2026-11-07 19:46:14
+2026-11-07 19:46:14 - INFO - Creando base destino 'foodstore_restore_test'.
+2026-11-07 19:46:14 - OK - Base destino creada. Restaurando respaldo.
+2026-11-07 19:46:19 - OK - pg_restore finalizo correctamente. Iniciando validaciones.
+2026-11-07 19:46:21 - OK - pg_amcheck finalizo correctamente.
+2026-11-07 19:46:22 - OK - Control de integridad: producto_categoria_huerfanos|0
+2026-11-07 19:46:22 - OK - Control de integridad: productos_invalidos|0
+2026-11-07 19:46:22 - OK - Control de integridad: pedido_usuario_huerfanos|0
+2026-11-07 19:46:22 - OK - Control de integridad: detalles_invalidos|0
+2026-11-07 19:46:22 - OK - Control de integridad: detalle_producto_huerfanos|0
+2026-11-07 19:46:22 - OK - Control de integridad: detalle_pedido_huerfanos|0
+2026-11-07 19:46:22 - OK - 6 controles de integridad en cero.
+2026-11-07 19:46:22 - RESULTADO - Archivo usado: C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_20261107_194611.dump
+2026-11-07 19:46:22 - RESULTADO - Hora de creacion del respaldo: 2026-11-07 19:46:11
+2026-11-07 19:46:22 - RESULTADO - Hora de inicio del simulacro: 2026-11-07 19:46:14
+2026-11-07 19:46:22 - RESULTADO - Hora de fin del simulacro: 2026-11-07 19:46:22
+2026-11-07 19:46:22 - RESULTADO - RTO observado: 7,75 segundos (00:00:07.7464631)
+2026-11-07 19:46:22 - RESULTADO - RPO observado: 0,00 horas (00:00:03.5853868)
+2026-11-07 19:46:22 - RESULTADO - Conteo categoria: origen=6, destino=6
+2026-11-07 19:46:22 - RESULTADO - Conteo usuario: origen=20006, destino=20006
+2026-11-07 19:46:22 - RESULTADO - Conteo producto: origen=50016, destino=50016
+2026-11-07 19:46:22 - RESULTADO - Conteo pedido: origen=200006, destino=200006
+2026-11-07 19:46:22 - RESULTADO - Conteo detalle_pedido: origen=400013, destino=400013
+2026-11-07 19:46:22 - RESULTADO - productos_invalidos: 0
+2026-11-07 19:46:22 - RESULTADO - detalles_invalidos: 0
+2026-11-07 19:46:22 - OK - Restauracion de prueba completada satisfactoriamente. RTO: 7,75 s | RPO: 0,00 h

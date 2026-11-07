@@ -1,0 +1,9 @@
+NOTA sobre obj7_repeticion2_mariano_restore_20261107_194601.txt
+
+Ese log corresponde a una primera corrida del script de la repetición 2 (respaldo de las 19:45:58).
+Se interrumpió durante el pg_restore (último registro: 19:46:03). La causa de la interrupción no consta.
+Se conserva sin editar.
+
+La corrida completa de esa repetición es la de las 19:46:13 (respaldo de las 19:46:11), contra la que se probaron los roles.
+
+La inferencia de que el script se ejecutó dos veces surge de las horas de los logs y no está confirmada.

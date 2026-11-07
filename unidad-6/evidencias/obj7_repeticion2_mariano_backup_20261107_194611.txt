@@ -1,0 +1,7 @@
+2026-11-07 19:46:11 - INICIO - Respaldo de foodstore en localhost:5432.
+2026-11-07 19:46:13 - OK - pg_dump finalizo correctamente.
+2026-11-07 19:46:13 - OK - pg_restore --list finalizo correctamente.
+2026-11-07 19:46:13 - OK - SHA-256 generado para foodstore_20261107_194611.dump.
+2026-11-07 19:46:13 - OK - pg_dumpall --globals-only finalizo correctamente.
+2026-11-07 19:46:13 - OK - SHA-256 generado para foodstore_globals_20261107_194611.sql.
+2026-11-07 19:46:13 - RESULTADO: OK - Datos: C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_20261107_194611.dump | Globales: C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_globals_20261107_194611.sql
