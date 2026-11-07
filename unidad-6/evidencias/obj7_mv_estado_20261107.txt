@@ -1,0 +1,26 @@
+Estado de la vista materializada mv_facturacion_categoria_mes - consultado 2026-11-07 19:47:48
+Nota: la vista se creo con heredado/base_heredada/materializadas.sql en una primera corrida del procedimiento (inferido por las horas de los logs; no confirmado), poco antes del primer respaldo de esta repeticion (19:45:58). La salida de esa corrida se escribio en un archivo que la segunda corrida sobrescribio (no se conserva). Una segunda corrida fallo con 'la relacion ya existe', como corresponde; este archivo solo muestra el estado resultante.
+
+--- base: foodstore ---
+         matviewname          | ispopulated 
+------------------------------+-------------
+ mv_facturacion_categoria_mes | t
+(1 fila)
+
+ filas 
+-------
+    87
+(1 fila)
+
+
+--- base: foodstore_restore_test ---
+         matviewname          | ispopulated 
+------------------------------+-------------
+ mv_facturacion_categoria_mes | t
+(1 fila)
+
+ filas 
+-------
+    87
+(1 fila)
+
