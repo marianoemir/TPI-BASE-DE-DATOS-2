@@ -76,6 +76,13 @@ ALTER ROLE app_web     LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE;
 -- admin_datos es dueño de los objetos y debe poder crear nuevos en public
 -- (desde PostgreSQL 15 PUBLIC ya no tiene CREATE sobre ese esquema).
 GRANT USAGE, CREATE ON SCHEMA public TO admin_datos;
+
+-- H1 (auditoria U5, 2026-11-07): se quita CREATE sobre public a los roles de
+-- aplicacion. Antes solo se revocaba de PUBLIC, y un GRANT CREATE previo a un
+-- rol de aplicacion sobrevivia a la re-ejecucion. Solo admin_datos conserva CREATE.
+-- Prueba: unidad-5/evidencias/obj6_H1_despues_de_correccion.txt
+REVOKE CREATE ON SCHEMA public
+    FROM rol_app_lectura, rol_app_escritura, rol_app_auth, rol_soporte, rol_reportes, app_web;
 -- Defensa en profundidad: quitar CREATE residual de PUBLIC sobre el esquema.
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
