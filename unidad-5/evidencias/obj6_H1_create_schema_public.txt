@@ -1,0 +1,50 @@
+﻿# H1 (alto): privilegio CREATE sobre public para roles de aplicacion
+# fecha: 2026-11-07 17:51:17
+# base: copia_u5, PostgreSQL 17.10
+
+SELECT version();
+                                 version                                  
+--------------------------------------------------------------------------
+ PostgreSQL 17.10 on x86_64-windows, compiled by msvc-19.44.35227, 64-bit
+(1 fila)
+
+SELECT nspname, nspowner::regrole AS dueno, nspacl FROM pg_namespace WHERE nspname = 'public';
+ nspname |       dueno       |                                                                                                                                   nspacl                                                                                                                                   
+---------+-------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | pg_database_owner | {pg_database_owner=UC/pg_database_owner,=U/pg_database_owner,rol_app_lectura=U/pg_database_owner,rol_app_escritura=U/pg_database_owner,rol_app_auth=U/pg_database_owner,rol_soporte=U/pg_database_owner,rol_reportes=U/pg_database_owner,admin_datos=UC/pg_database_owner}
+(1 fila)
+
+SELECT r, has_schema_privilege(r, 'public', 'CREATE') AS puede_create
+FROM unnest(ARRAY['app_web','rol_app_lectura','rol_app_escritura','rol_app_auth','rol_soporte','rol_reportes','admin_datos']) AS r;
+         r         | puede_create 
+-------------------+--------------
+ app_web           | f
+ rol_app_lectura   | f
+ rol_app_escritura | f
+ rol_app_auth      | f
+ rol_soporte       | f
+ rol_reportes      | f
+ admin_datos       | t
+(7 filas)
+
+BEGIN; SET LOCAL ROLE app_web; CREATE TABLE public.prueba_priv(o int); ROLLBACK;
+BEGIN
+SET
+psql:C:/Users/MARIAN~1/AppData/Local/Temp/q_bd4f422fa31f4dcbb96b998e13f109ed.sql:5: ERROR:  permiso denegado al esquema public
+L�NEA 1: CREATE TABLE public.prueba_priv(o int);
+                     ^
+ROLLBACK
+BEGIN; SET LOCAL ROLE rol_soporte; CREATE TABLE public.prueba_priv(o int); ROLLBACK;
+BEGIN
+SET
+psql:C:/Users/MARIAN~1/AppData/Local/Temp/q_bd4f422fa31f4dcbb96b998e13f109ed.sql:6: ERROR:  permiso denegado al esquema public
+L�NEA 1: CREATE TABLE public.prueba_priv(o int);
+                     ^
+ROLLBACK
+SELECT to_regclass('public.prueba_priv') AS tabla_quedo;
+ tabla_quedo 
+-------------
+ 
+(1 fila)
+
+(codigo de salida psql: 0)

@@ -76,6 +76,13 @@ ALTER ROLE app_web     LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE;
 -- admin_datos es dueño de los objetos y debe poder crear nuevos en public
 -- (desde PostgreSQL 15 PUBLIC ya no tiene CREATE sobre ese esquema).
 GRANT USAGE, CREATE ON SCHEMA public TO admin_datos;
+
+-- H1 (auditoria U5, 2026-11-07): se quita CREATE sobre public a los roles de
+-- aplicacion. Antes solo se revocaba de PUBLIC, y un GRANT CREATE previo a un
+-- rol de aplicacion sobrevivia a la re-ejecucion. Solo admin_datos conserva CREATE.
+-- Prueba: unidad-5/evidencias/obj6_H1_despues_de_correccion.txt
+REVOKE CREATE ON SCHEMA public
+    FROM rol_app_lectura, rol_app_escritura, rol_app_auth, rol_soporte, rol_reportes, app_web;
 -- Defensa en profundidad: quitar CREATE residual de PUBLIC sobre el esquema.
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
@@ -203,6 +210,24 @@ REVOKE admin_datos
     FROM app_web, rol_app_lectura, rol_app_escritura, rol_app_auth, rol_soporte, rol_reportes;
 REVOKE rol_soporte, rol_reportes FROM app_web;
 
+-- H3 (auditoria U5, 2026-11-07): se quitan las membresias entre roles de grupo
+-- (p. ej. rol_app_escritura -> rol_soporte), que escalarian privilegios.
+-- Prueba: unidad-5/evidencias/obj6_H3_membresias_entre_grupos.txt
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN
+    SELECT g.rolname AS grupo, m.rolname AS miembro
+    FROM pg_auth_members am
+    JOIN pg_roles g ON g.oid = am.roleid
+    JOIN pg_roles m ON m.oid = am.member
+    WHERE g.rolname IN ('rol_app_lectura','rol_app_escritura','rol_app_auth','rol_soporte','rol_reportes')
+      AND m.rolname IN ('rol_app_lectura','rol_app_escritura','rol_app_auth','rol_soporte','rol_reportes')
+  LOOP
+    EXECUTE format('REVOKE %I FROM %I', r.grupo, r.miembro);
+  END LOOP;
+END $$;
+
 GRANT rol_app_lectura, rol_app_escritura, rol_app_auth TO app_web;
 
 -- ----------------------------------------------------------------------------
@@ -216,6 +241,12 @@ ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos IN SCHEMA public
     REVOKE ALL ON TABLES FROM PUBLIC;
 ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos
     REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+
+-- H4b (auditoria U5, 2026-11-07): las rutinas heredaban EXECUTE de PUBLIC,
+-- asi que app_web podia ejecutarlas sin que ningun GRANT lo autorizara.
+-- Prueba: unidad-5/evidencias/h3_h4b_prueba.txt
+REVOKE EXECUTE ON FUNCTION calcular_total_pedido(bigint), fn_set_subtotal(),
+  fn_recalcular_total(), fn_validar_estado_pedido() FROM PUBLIC;
 
 COMMIT;   -- cambiar por ROLLBACK; para un ensayo sin efectos
 
@@ -236,3 +267,4 @@ COMMIT;   -- cambiar por ROLLBACK; para un ensayo sin efectos
 -- DROP ROLE IF EXISTS rol_app_lectura, rol_app_escritura, rol_app_auth,
 --                     rol_soporte, rol_reportes, app_web, admin_datos;
 -- COMMIT;
+

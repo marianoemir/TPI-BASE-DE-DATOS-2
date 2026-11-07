@@ -1,0 +1,17 @@
+Parse error near line 6 of original_opencode\schema_sqlite.original_opencode.sql: near "STRICT": syntax error
+  o_cache (     producto_id     INTEGER PRIMARY KEY STRICT,     nombre          
+                                      error here ---^
+Parse error near line 17 of original_opencode\schema_sqlite.original_opencode.sql: near "STRICT": syntax error
+  o_borrador (     id_local        TEXT PRIMARY KEY STRICT CHECK (length(id_loca
+                                      error here ---^
+Parse error near line 25 of original_opencode\schema_sqlite.original_opencode.sql: near "STRICT": syntax error
+  _borrador (     id_local            TEXT NOT NULL STRICT,     producto_id     
+                                      error here ---^
+Parse error near line 36 of original_opencode\schema_sqlite.original_opencode.sql: near "STRICT": syntax error
+  ola_sync (     solicitud_uuid    TEXT PRIMARY KEY STRICT CHECK (length(solicit
+                                      error here ---^
+Parse error near line 47 of original_opencode\schema_sqlite.original_opencode.sql: near "STRICT": syntax error
+  servidor (     producto_id    INTEGER PRIMARY KEY STRICT,     nombre         T
+                                      error here ---^
+Parse error near line 6 of original_opencode\semaforo.original_opencode.sql: no such table: cola_sync
+0

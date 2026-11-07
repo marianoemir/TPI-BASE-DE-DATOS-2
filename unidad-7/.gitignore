@@ -26,6 +26,9 @@ pgpass.conf
 *.zip
 respaldos/
 
+# Export de muestra local para el benchmark; puede contener la copia completa.
+modelo/pedidos_benchmark.json
+
 # Archivos temporales y de sistema
 ~$*
 *.tmp

@@ -1,0 +1,121 @@
+# PostgreSQL 17.10 on x86_64-windows, compiled by msvc-19.44.35227, 64-bit
+=== corrida 1 (calentamiento)
+El despliegue de duraci�n est� activado.
+CONSULTA_PRODUCTO
+ id |   estado   |   fecha    |  total  
+----+------------+------------+---------
+  1 | CONFIRMADO | 2026-11-07 | 9400.00
+(1 fila)
+
+Duraci�n: 59,614 ms
+CONSULTA_CATEGORIA
+  categoria   |   ventas    
+--------------+-------------
+ Bebidas      | 13726345.52
+ Empanadas    | 13986172.80
+ Hamburguesas | 13691566.43
+ Pizzas       | 13667204.73
+ Postres      | 13731685.83
+(5 filas)
+
+Duraci�n: 75,820 ms
+=== corrida 2
+El despliegue de duraci�n est� activado.
+CONSULTA_PRODUCTO
+ id |   estado   |   fecha    |  total  
+----+------------+------------+---------
+  1 | CONFIRMADO | 2026-11-07 | 9400.00
+(1 fila)
+
+Duraci�n: 45,193 ms
+CONSULTA_CATEGORIA
+  categoria   |   ventas    
+--------------+-------------
+ Bebidas      | 13726345.52
+ Empanadas    | 13986172.80
+ Hamburguesas | 13691566.43
+ Pizzas       | 13667204.73
+ Postres      | 13731685.83
+(5 filas)
+
+Duraci�n: 74,168 ms
+=== corrida 3
+El despliegue de duraci�n est� activado.
+CONSULTA_PRODUCTO
+ id |   estado   |   fecha    |  total  
+----+------------+------------+---------
+  1 | CONFIRMADO | 2026-11-07 | 9400.00
+(1 fila)
+
+Duraci�n: 54,302 ms
+CONSULTA_CATEGORIA
+  categoria   |   ventas    
+--------------+-------------
+ Bebidas      | 13726345.52
+ Empanadas    | 13986172.80
+ Hamburguesas | 13691566.43
+ Pizzas       | 13667204.73
+ Postres      | 13731685.83
+(5 filas)
+
+Duraci�n: 74,691 ms
+=== corrida 4
+El despliegue de duraci�n est� activado.
+CONSULTA_PRODUCTO
+ id |   estado   |   fecha    |  total  
+----+------------+------------+---------
+  1 | CONFIRMADO | 2026-11-07 | 9400.00
+(1 fila)
+
+Duraci�n: 66,048 ms
+CONSULTA_CATEGORIA
+  categoria   |   ventas    
+--------------+-------------
+ Bebidas      | 13726345.52
+ Empanadas    | 13986172.80
+ Hamburguesas | 13691566.43
+ Pizzas       | 13667204.73
+ Postres      | 13731685.83
+(5 filas)
+
+Duraci�n: 91,575 ms
+=== corrida 5
+El despliegue de duraci�n est� activado.
+CONSULTA_PRODUCTO
+ id |   estado   |   fecha    |  total  
+----+------------+------------+---------
+  1 | CONFIRMADO | 2026-11-07 | 9400.00
+(1 fila)
+
+Duraci�n: 65,942 ms
+CONSULTA_CATEGORIA
+  categoria   |   ventas    
+--------------+-------------
+ Bebidas      | 13726345.52
+ Empanadas    | 13986172.80
+ Hamburguesas | 13691566.43
+ Pizzas       | 13667204.73
+ Postres      | 13731685.83
+(5 filas)
+
+Duraci�n: 89,399 ms
+=== corrida 6
+El despliegue de duraci�n est� activado.
+CONSULTA_PRODUCTO
+ id |   estado   |   fecha    |  total  
+----+------------+------------+---------
+  1 | CONFIRMADO | 2026-11-07 | 9400.00
+(1 fila)
+
+Duraci�n: 58,576 ms
+CONSULTA_CATEGORIA
+  categoria   |   ventas    
+--------------+-------------
+ Bebidas      | 13726345.52
+ Empanadas    | 13986172.80
+ Hamburguesas | 13691566.43
+ Pizzas       | 13667204.73
+ Postres      | 13731685.83
+(5 filas)
+
+Duraci�n: 79,360 ms

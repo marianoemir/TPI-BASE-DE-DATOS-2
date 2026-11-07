@@ -1,0 +1,11 @@
+# PostgreSQL 17.10 on x86_64-windows, compiled by msvc-19.44.35227, 64-bit
+        seccion        | distintos | suma_ids 
+-----------------------+-----------+----------
+ PG_USUARIOS_DISTINTOS |      4996 | 12482506
+(1 fila)
+
+        seccion         | distintos | suma_ids  
+------------------------+-----------+-----------
+ PG_PRODUCTOS_DISTINTOS |     10001 | 175129775
+(1 fila)
+

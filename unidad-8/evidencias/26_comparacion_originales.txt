@@ -1,0 +1,22 @@
+﻿productos   fecha_de_la_copia
+---------  -------------------
+       16  2026-11-07 10:11:45
+sqlite3 : Error near line 63 of movil/casos_f2_semaforo.sql: UNIQUE constraint failed: cola_sync.id_local
+En línea: 5 Carácter: 3
++   sqlite3 -header -column $db ".read movil/casos_f2_semaforo.sql"
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error near line...a_sync.id_local:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+solicitudes_evaluadas
+---------------------
+                    5
+
+-- Estado final de la cola tras el semaforo (F2-1 a F2-5)
+solicitud       estado                              motivo
+---------  -----------------  ---------------------------------------------------
+f2...01b   RECHAZADO          Tiramisú: pedido 10, stock 6
+f2...02b   RECHAZADO          producto 99 no existe en el servidor
+f2...03b   RECHAZADO          borrador sin ítems
+f2...04b   RECHAZADO          Producto temporalmente no disponible: no disponible
+f2...05b   SIMULADO_APROBADO

@@ -107,3 +107,23 @@ El historial tiene 17 commits antes de los de cierre de la Parte E y refleja el 
 - **Qué se haría distinto:** un commit por entregable con mensaje que explique el motivo, rama por integrante también para
   Mariano, y no reescribir archivos de otra persona en un commit genérico: separar cada reescritura en su propio commit, indicando
   qué versión reemplaza y por qué.
+
+## Parte F — Cierre del objetivo 6 y de la documentación (07/11/2026, Mariano)
+
+Se agrega al final de `unidad-5/BITACORA.md`. La auditoría original de la Parte A no conserva su respuesta cruda, así que se repitió.
+
+| Prompt enviado a la IA | Respuesta relevante recibida (resumida) | Validación o corrección humana aplicada |
+|---|---|---|
+| **OpenCode** (Nemotron 3.5 Lightning, modo Plan, carpeta aislada con `roles.sql` y `design.md`): repetir la auditoría de `roles.sql` | 5 hallazgos (H1 a H5), en 3 partes por 2 interrupciones. Los mensajes de las interrupciones los redactó Claude y se pegaron en OpenCode. Horas de las partes 2 y 3: no constan | Cada hallazgo se reprodujo en `copia_u5` antes de decidir. **Aceptados y corregidos:** H1 (`CREATE` en `public`, solo visible sembrando un `GRANT` previo) y H3 (membresías entre grupos). **Descartados con prueba:** H2 (el hash SCRAM no cambia al re-ejecutar), H4 (0 filas para `PUBLIC`) y H5 (la afirmación sobre PostgreSQL 15 es falsa) |
+| **Claude:** revisión de `roles.sql` y de los permisos de las rutinas | `calcular_total_pedido`, `fn_set_subtotal`, `fn_recalcular_total` y `fn_validar_estado_pedido` conservan `EXECUTE` para `PUBLIC` (**H4b**, origen Claude, no OpenCode) | Reproducido en copia antes y después del `REVOKE`; T01 a T23 en 23/23 con las tres correcciones. Límite: `sp_crear_pedido` es `SECURITY DEFINER`, así que la prueba no ejercita una ruta con los permisos propios de `app_web` |
+| **Claude:** pruebas de reproducción como scripts `.ps1` y `.sql` | Scripts para H1, H2b, H3 y H4b | Un primer script con `cmd /c` falló en todas las llamadas (ruta con espacios) y su «Listo» era engañoso. La prueba de H2 no discriminaba porque `pg_hba.conf` usa `trust`: se rehízo comparando el hash antes y después |
+| **Claude:** redacción de `auditoria_roles_opencode.md`, `docs/informe/u5.md` y la sección de uso de IA del informe | Documentos completos, con decisión y prueba por hallazgo | Revisados contra las evidencias. Un error de Claude en la conversación: dijo que las líneas 203 a 206 de `roles.sql` ya corregían H3, cuando eran las que OpenCode describe como insuficientes; H3 se corrigió con un bloque nuevo |
+
+**Evidencias reencodeadas.** Cinco archivos de H3/H4b se generaron en UTF-16 con `Tee-Object` y se convirtieron a UTF-8 sin cambiar el contenido (commit `6346e09`): `h3_h4b_prueba.txt`, `h4b_aplicado.txt`, `h4b_permisos_despues.txt`, `t01_t23_antes_h4b.txt`, `t01_t23_despues_h4b.txt`.
+
+**Merges sin revisión cruzada.** `m/obj-11` (#6), `m/informe-u8` (#7), `m/obj-06` (#8, `b49b290`) y `m/docs-cierre` (#9, `9a80459`) los mergeó Mariano, porque la revisión asignada no respondió. Queda pendiente una lectura posterior.
+
+**Límites que quedan.** `pg_hba.conf` de la copia usa `trust`; el marcador `'cambiar_en_produccion'` es público; el `REVOKE` de H3 solo quita membresías concedidas por `postgres`; la salida de la prueba previa de H1 se corrió en consola y no se guardó.
+
+**Lección de proceso.** No se aprueba ni se descarta un hallazgo por lectura: los dos que OpenCode acertó (H1 y H3) eran de base sucia y la copia limpia no los mostraba.
+

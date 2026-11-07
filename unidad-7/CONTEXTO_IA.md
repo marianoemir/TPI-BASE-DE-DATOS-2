@@ -3,7 +3,7 @@
 > **Cómo usarlo:** pegá este archivo completo al inicio de la conversación con la otra IA y escribí tu pedido en la sección 10.
 > Lo marcado como **[VERIFICADO]** salió de una ejecución real o de un archivo del repo. Lo marcado como **[NO VERIFICADO]**
 > es una estimación o una hipótesis: la IA no debe presentarlo como un resultado.
-> **Última actualización:** 2026-11-01 (partes de Andrés y Facundo integradas y corregidas en `main`; falta la revisión de Andrés y guardar tres salidas de evidencia).
+> **Última actualización:** 2026-11-07 (partes de Andrés y Facundo integradas y corregidas en `main`; falta la revisión de Andrés y guardar tres salidas de evidencia; datos de ejemplo regenerados el 2026-11-07 sin el nombre real de un integrante).
 
 ## 1. De qué se trata
 
@@ -57,20 +57,21 @@ Conteos `usuario / producto / pedido`: **6 / 16 / 6** con `data.sql` solo, **6 /
 | 2 | Juan Pérez (2) | TARJETA | 4×6 (900), 5×6 (850), 8×2 (700) | TERMINADO | 11900.00 | data.sql |
 | 3 | Lucía Martínez (3) | TRANSFERENCIA | 12×1 (3800), 10×1 (1500) | PENDIENTE | 5300.00 | data.sql |
 | 4 | Ana García (1) | TARJETA | 2×1, 9×1 | PENDIENTE | — | data.sql, **`eliminado = TRUE`: no se migra** |
-| 5 | Mariano Chirino (4) | EFECTIVO | 13×2 (4900), 3×1 (4500), 11×2 (2200) | PENDIENTE | 18700.00 | data.sql |
+| 5 | Carlos Rivas (4) | EFECTIVO | 13×2 (4900), 3×1 (4500), 11×2 (2200) | PENDIENTE | 18700.00 | data.sql |
 | 6 | Sofía Torres (5) | EFECTIVO | 6×4 (800) | CANCELADO | 3200.00 | data.sql |
 | 7 | Juan Pérez (2) | TARJETA | 1×1 (3500), 8×1 (700) | PENDIENTE | 4200.00 | prueba (`modelo/pedidos_de_prueba.sql`) |
 | 8 | Lucía Martínez (3) | EFECTIVO | 1×3 (3500), 7×1 (1200) | PENDIENTE | 11700.00 | prueba |
 
-Los `detalle_id` de las líneas de los pedidos de prueba son 14 a 17. `pedido.fecha` toma `CURRENT_DATE` al crear el pedido: los de
-`data.sql` tienen 2026-10-30 en ambos equipos; los de prueba tienen 2026-10-31 en la migración de Mariano y 2026-10-30 en la base de Andrés.
+Los `detalle_id` de las líneas de los pedidos de prueba son 14 a 17. `pedido.fecha` toma `CURRENT_DATE` al crear el pedido. En la regeneración del 2026-11-07
+(base `foodstore_u7_orig`) todos los pedidos, de `data.sql` y de prueba, tienen 2026-11-07.
+En la versión anterior eran 2026-10-30 (`data.sql`) y 2026-10-31 (prueba, migración de Mariano).
 La fecha **no** interviene en la comparación (se compara por ids y cantidades).
 
 ## 4. Modelo documental elegido (MongoDB servidor 9.0.4, `mongosh` 2.14.0, base `foodstore_nosql`, colección `pedidos`)
 
 ```js
 { _id: 1,                                   // = pedido.id
-  fecha: ISODate("2026-10-30T00:00:00Z"),   // Date, medianoche UTC
+  fecha: ISODate("2026-11-07T00:00:00Z"),   // Date, medianoche UTC
   estado: "CONFIRMADO", forma_pago: "EFECTIVO",
   total: Decimal128("9400.00"),             // tal cual está en PostgreSQL, sin recalcular
   cliente: { usuario_id: 1, nombre: "Ana", apellido: "García", mail: "ana.garcia@mail.com" },   // embebido

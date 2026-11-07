@@ -148,8 +148,9 @@ tomar pedidos en la feria.
    devolver solo los productos de `producto_cache` con `eliminado = 0` y `disponible_visto = 1`,
    leyendo únicamente el archivo SQLite de la tablet.
 2. THE Sistema SHALL mostrar el precio en `v_catalogo_disponible` como `precio_centavos / 100.0`.
-3. WHEN la instantánea cargada tiene 16 productos y los productos 15 y 16 no están disponibles o
-   están dados de baja, THE Sistema SHALL devolver 14 productos en `v_catalogo_disponible`.
+3. WHEN la instantánea cargada tiene 16 productos y los productos 3 (dado de baja), 15 (no disponible)
+   y 16 (no disponible y dado de baja) no se muestran, THE Sistema SHALL devolver 13 productos
+   en `v_catalogo_disponible`.
 
 *Se prueba con:* **C1** (`pruebas_sqlite.sql`)
 
@@ -182,6 +183,11 @@ para que la tablet nunca guarde un borrador inconsistente.
 11. THE Sistema SHALL definir `cola_sync.estado` con los valores `PENDIENTE`, `CONFLICTO`, `RECHAZADO`
     y `SIMULADO_APROBADO`, con `PENDIENTE` por defecto, y exigir `motivo` no nulo cuando el estado
     sea `CONFLICTO` o `RECHAZADO`.
+12. THE Sistema SHALL definir `pedido_borrador.creado_en` con un valor por defecto igual a la fecha y
+    hora UTC actual en formato `YYYY-MM-DDTHH:MM:SSZ`, de modo que un borrador pueda crearse sin
+    informar ese campo.
+13. THE Sistema SHALL definir `cola_sync.id_local` como clave foránea a `pedido_borrador(id_local)`,
+    de modo que no se pueda encolar una solicitud de un borrador inexistente.
 
 *Se prueba con:* **C7** (`pruebas_sqlite.sql`)
 

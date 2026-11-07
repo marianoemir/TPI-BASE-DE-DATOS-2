@@ -1,0 +1,25 @@
+     proname     | prosecdef 
+-----------------+-----------
+ sp_crear_pedido | t
+(1 fila)
+
+BEGIN
+SET
+ ejecuta_como 
+--------------
+ app_web
+(1 fila)
+
+CALL
+RESET
+ lee_como 
+----------
+ postgres
+(1 fila)
+
+ id |  total  
+----+---------
+ 13 | 3500.00
+(1 fila)
+
+ROLLBACK

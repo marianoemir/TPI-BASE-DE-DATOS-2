@@ -1,0 +1,194 @@
+[
+    {
+        "_id": 1,
+        "fecha": "2026-11-07",
+        "total": "9400.00",
+        "estado": "CONFIRMADO",
+        "lineas": [
+            {
+                "nombre": "Muzzarella",
+                "cantidad": 2,
+                "subtotal": "7000.00",
+                "detalle_id": 1,
+                "producto_id": 1,
+                "precio_unitario": "3500.00"
+            },
+            {
+                "nombre": "Coca-Cola 500ml",
+                "cantidad": 2,
+                "subtotal": "2400.00",
+                "detalle_id": 2,
+                "producto_id": 7,
+                "precio_unitario": "1200.00"
+            }
+        ],
+        "origen": "ejemplo_regenerado",
+        "cliente": {
+            "mail": "ana.garcia@mail.com",
+            "nombre": "Ana",
+            "apellido": "García",
+            "usuario_id": 1
+        },
+        "forma_pago": "EFECTIVO"
+    },
+    {
+        "_id": 2,
+        "fecha": "2026-11-07",
+        "total": "11900.00",
+        "estado": "TERMINADO",
+        "lineas": [
+            {
+                "nombre": "Empanada de carne",
+                "cantidad": 6,
+                "subtotal": "5400.00",
+                "detalle_id": 3,
+                "producto_id": 4,
+                "precio_unitario": "900.00"
+            },
+            {
+                "nombre": "Empanada de pollo",
+                "cantidad": 6,
+                "subtotal": "5100.00",
+                "detalle_id": 4,
+                "producto_id": 5,
+                "precio_unitario": "850.00"
+            },
+            {
+                "nombre": "Agua mineral 500ml",
+                "cantidad": 2,
+                "subtotal": "1400.00",
+                "detalle_id": 5,
+                "producto_id": 8,
+                "precio_unitario": "700.00"
+            }
+        ],
+        "origen": "ejemplo_regenerado",
+        "cliente": {
+            "mail": "juan.perez@mail.com",
+            "nombre": "Juan",
+            "apellido": "Pérez",
+            "usuario_id": 2
+        },
+        "forma_pago": "TARJETA"
+    },
+    {
+        "_id": 3,
+        "fecha": "2026-11-07",
+        "total": "5300.00",
+        "estado": "PENDIENTE",
+        "lineas": [
+            {
+                "nombre": "Hamburguesa clásica",
+                "cantidad": 1,
+                "subtotal": "3800.00",
+                "detalle_id": 6,
+                "producto_id": 12,
+                "precio_unitario": "3800.00"
+            },
+            {
+                "nombre": "Flan casero",
+                "cantidad": 1,
+                "subtotal": "1500.00",
+                "detalle_id": 7,
+                "producto_id": 10,
+                "precio_unitario": "1500.00"
+            }
+        ],
+        "origen": "ejemplo_regenerado",
+        "cliente": {
+            "mail": "lucia.martinez@mail.com",
+            "nombre": "Lucía",
+            "apellido": "Martínez",
+            "usuario_id": 3
+        },
+        "forma_pago": "TRANSFERENCIA"
+    },
+    {
+        "_id": 6,
+        "fecha": "2026-11-07",
+        "total": "3200.00",
+        "estado": "CANCELADO",
+        "lineas": [
+            {
+                "nombre": "Empanada de jamón y queso",
+                "cantidad": 4,
+                "subtotal": "3200.00",
+                "detalle_id": 13,
+                "producto_id": 6,
+                "precio_unitario": "800.00"
+            }
+        ],
+        "origen": "ejemplo_regenerado",
+        "cliente": {
+            "mail": "sofia.torres@mail.com",
+            "nombre": "Sofía",
+            "apellido": "Torres",
+            "usuario_id": 5
+        },
+        "forma_pago": "EFECTIVO"
+    },
+    {
+        "_id": 7,
+        "fecha": "2025-01-02",
+        "total": "14804.59",
+        "estado": "CONFIRMADO",
+        "lineas": [
+            {
+                "nombre": "Producto_35",
+                "cantidad": 2,
+                "subtotal": "7268.26",
+                "detalle_id": 14,
+                "producto_id": 51,
+                "precio_unitario": "3634.13"
+            },
+            {
+                "nombre": "Producto_36",
+                "cantidad": 3,
+                "subtotal": "7536.33",
+                "detalle_id": 200014,
+                "producto_id": 52,
+                "precio_unitario": "2512.11"
+            }
+        ],
+        "origen": "ejemplo_regenerado",
+        "cliente": {
+            "mail": "juan.perez@mail.com",
+            "nombre": "Juan",
+            "apellido": "Pérez",
+            "usuario_id": 2
+        },
+        "forma_pago": "TRANSFERENCIA"
+    },
+    {
+        "_id": 8,
+        "fecha": "2025-01-03",
+        "total": "6019.60",
+        "estado": "TERMINADO",
+        "lineas": [
+            {
+                "nombre": "Producto_42",
+                "cantidad": 2,
+                "subtotal": "1516.42",
+                "detalle_id": 15,
+                "producto_id": 58,
+                "precio_unitario": "758.21"
+            },
+            {
+                "nombre": "Producto_43",
+                "cantidad": 3,
+                "subtotal": "4503.18",
+                "detalle_id": 200015,
+                "producto_id": 59,
+                "precio_unitario": "1501.06"
+            }
+        ],
+        "origen": "ejemplo_regenerado",
+        "cliente": {
+            "mail": "lucia.martinez@mail.com",
+            "nombre": "Lucía",
+            "apellido": "Martínez",
+            "usuario_id": 3
+        },
+        "forma_pago": "EFECTIVO"
+    }
+]

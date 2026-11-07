@@ -1,0 +1,57 @@
+$ErrorActionPreference = 'Stop'
+
+$unidad7 = Split-Path -Parent $PSScriptRoot
+$exportador = Join-Path $unidad7 'modelo\exportar_pedidos_benchmark.sql'
+$mongo = Join-Path $unidad7 'carga_benchmark_mongodb.js'
+$postgres = Join-Path $unidad7 'consultas_benchmark_postgresql.sql'
+$verificacionMongo = Join-Path $unidad7 'verificar_benchmark_mongodb.js'
+$verificacionPostgres = Join-Path $unidad7 'verificar_benchmark_postgresql.sql'
+$exportadorOriginal = Join-Path $unidad7 'modelo\exportar_pedidos.sql'
+
+Describe 'Medicion U7 - benchmark aislado' {
+    It 'exporta una muestra parametrizada sin datos sensibles' {
+        Test-Path -LiteralPath $exportador | Should Be $true
+        $contenido = Get-Content -LiteralPath $exportador -Raw
+        $contenido | Should Match ':limite'
+        $contenido | Should Match "'benchmark'"
+        $contenido | Should Not Match 'contrasena'
+    }
+
+    It 'carga en una coleccion MongoDB separada con indice multikey y explain' {
+        Test-Path -LiteralPath $mongo | Should Be $true
+        $contenido = Get-Content -LiteralPath $mongo -Raw
+        $contenido | Should Match 'foodstore_nosql_benchmark'
+        $contenido | Should Match 'pedidos_benchmark'
+        $contenido | Should Match 'lineas.producto_id'
+        $contenido | Should Match 'executionStats'
+    }
+
+    It 'mide en PostgreSQL la misma muestra con buffers' {
+        Test-Path -LiteralPath $postgres | Should Be $true
+        $contenido = Get-Content -LiteralPath $postgres -Raw
+        $contenido | Should Match ':limite'
+        $contenido | Should Match 'EXPLAIN \(ANALYZE, BUFFERS, FORMAT JSON\)'
+        $contenido | Should Match 'categoria'
+    }
+
+    It 'verifica conteos, importes y categorias en ambos motores' {
+        Test-Path -LiteralPath $verificacionMongo | Should Be $true
+        Test-Path -LiteralPath $verificacionPostgres | Should Be $true
+        (Get-Content -LiteralPath $verificacionMongo -Raw) | Should Match 'total'
+        (Get-Content -LiteralPath $verificacionPostgres -Raw) | Should Match 'categoria'
+    }
+
+    It 'contrasta ventas por categoria con lookup y categoria embebida' {
+        $contenido = Get-Content -LiteralPath $mongo -Raw
+        $contenido | Should Match '\$lookup'
+        $contenido | Should Match 'productos_benchmark'
+        $contenido | Should Match 'CATEGORIAS_LOOKUP'
+    }
+
+    It 'permite parametrizar los ids y el origen del exportador original' {
+        $contenido = Get-Content -LiteralPath $exportadorOriginal -Raw
+        $contenido | Should Match ":'ids'"
+        $contenido | Should Match ":'origen'"
+        $contenido | Should Not Match 'p\.id IN \(1, 2, 3, 5, 6, 7 ,8\)'
+    }
+}

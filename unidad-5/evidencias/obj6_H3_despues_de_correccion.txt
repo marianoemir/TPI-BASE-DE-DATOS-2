@@ -1,0 +1,26 @@
+# H3 tras la correccion: la membresia heredada rol_app_escritura -> rol_soporte no debe sobrevivir
+# fecha: 2026-11-07 18:09:36
+# base: copia_u5
+
+GRANT rol_app_escritura TO rol_soporte;
+GRANT ROLE
+--- re-ejecuto roles.sql ---
+roles.sql codigo de salida: 0
+
+--- membresias despues (esperado: solo las 3 de app_web) ---
+       grupo       | miembro 
+-------------------+---------
+ rol_app_auth      | app_web
+ rol_app_escritura | app_web
+ rol_app_lectura   | app_web
+(3 filas)
+
+--- rol_soporte sobre sp_crear_pedido (esperado: f) ---
+                  rutina                  | soporte_puede_ejecutar 
+------------------------------------------+------------------------
+ sp_crear_pedido(bigint,forma_pago,jsonb) | f
+(1 fila)
+
+--- limpieza: por si la membresia de prueba sobrevivio ---
+WARNING:  al rol «rol_soporte» no se le ha otorgado membresía en el rol «rol_app_escritura» por parte del rol «postgres»
+REVOKE ROLE

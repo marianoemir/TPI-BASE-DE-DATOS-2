@@ -1,0 +1,190 @@
+# 2.14.0
+DOCUMENTOS: 5000
+PRODUCTOS_AUX: 10001
+TOP3_PRODUCTOS_POR_PEDIDOS
+[
+  {
+    _id: 1,
+    pedidos: 1
+  },
+  {
+    _id: 3,
+    pedidos: 1
+  },
+  {
+    _id: 4,
+    pedidos: 1
+  }
+]
+PRODUCTO_OBJETIVO: 1
+MEDICION_REPETIDA (5 corridas tras 1 de calentamiento)
+POR_PRODUCTO_indice_multikey | ms por corrida: 1, 1, 2, 1, 1 | mediana: 1
+CATEGORIA_embebida | ms por corrida: 12, 13, 12, 12, 12 | mediana: 12
+CATEGORIA_lookup | ms por corrida: 607, 508, 508, 509, 524 | mediana: 509
+EXPLAIN_CATEGORIA_EMBEBIDA
+{
+  explainVersion: '1',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'foodstore_nosql_benchmark.pedidos_benchmark',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '86201FB2',
+          planCacheShapeHash: '86201FB2',
+          planCacheKey: 'F083ACC3',
+          optimizationTimeMillis: 0,
+          optimizationTimeMicros: 148,
+          cursorType: 'regular',
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            transformBy: {
+              lineas: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 5000,
+          executionTimeMillis: 18,
+          executionTimeMicros: 18904,
+          totalKeysExamined: 0,
+          totalDocsExamined: 5000,
+          executionStages: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            nReturned: 5000,
+            executionTimeMillisEstimate: 0,
+            works: 5001,
+            advanced: 5000,
+            needTime: 0,
+            needYield: 0,
+            saveState: 9,
+            restoreState: 8,
+            isEOF: 1,
+            transformBy: {
+              lineas: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nReturned: 5000,
+              executionTimeMillisEstimate: 0,
+              works: 5001,
+              advanced: 5000,
+              needTime: 0,
+              needYield: 0,
+              saveState: 9,
+              restoreState: 8,
+              isEOF: 1,
+              nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+              direction: 'forward',
+              docsExamined: 5000,
+              seeks: 0
+            }
+          }
+        }
+      },
+      nReturned: Long('5000'),
+      executionTimeMillisEstimate: Long('13')
+    },
+    {
+      '$unwind': {
+        path: '$lineas'
+      },
+      nReturned: Long('10001'),
+      executionTimeMillisEstimate: Long('18')
+    },
+    {
+      '$group': {
+        _id: '$lineas.categoria_nombre',
+        ventas: {
+          '$sum': '$lineas.subtotal'
+        },
+        '$willBeMerged': false
+      },
+      nReturned: Long('5'),
+      executionTimeMillisEstimate: Long('18'),
+      maxAccumulatorMemoryUsageBytes: {
+        ventas: Long('1160')
+      },
+      totalOutputDataSizeBytes: Long('1345'),
+      usedDisk: false,
+      spills: Long('0'),
+      spilledDataStorageSize: Long('0'),
+      spilledBytes: Long('0'),
+      spilledRecords: Long('0'),
+      peakTrackedMemBytes: Long('1240')
+    },
+    {
+      '$sort': {
+        sortKey: {
+          _id: 1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: Long('1385'),
+      usedDisk: false,
+      spills: Long('0'),
+      spilledBytes: Long('0'),
+      spilledRecords: Long('0'),
+      spilledDataStorageSize: Long('0'),
+      nReturned: Long('5'),
+      executionTimeMillisEstimate: Long('18'),
+      peakTrackedMemBytes: Long('1385')
+    }
+  ],
+  queryShapeHash: '646152948A923E3B6423436B75A4C02797EE63C38CEB2D1DA641CCDC724922AC',
+  peakTrackedMemBytes: Long('2625'),
+  serverInfo: {
+    host: 'MarianoChirino',
+    port: 27017,
+    version: '9.0.4',
+    gitVersion: '64ade602b836c9adeffba7fa038c887ffab56196'
+  },
+  serverParameters: {
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'pedidos_benchmark',
+    pipeline: [
+      {
+        '$unwind': '$lineas'
+      },
+      {
+        '$group': {
+          _id: '$lineas.categoria_nombre',
+          ventas: {
+            '$sum': '$lineas.subtotal'
+          }
+        }
+      },
+      {
+        '$sort': {
+          _id: 1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'foodstore_nosql_benchmark'
+  },
+  ok: 1
+}
+MONGO_USUARIOS_DISTINTOS: 4996 | suma_ids: 12482506
+MONGO_PRODUCTOS_DISTINTOS: 10001 | suma_ids: 175129775

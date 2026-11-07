@@ -16,7 +16,10 @@ cruda, y qué se aceptó, corrigió o descartó.
 
 **Versión mínima primero:** tareas 1 a 3 y 5 (esquema, carga y semáforo). Después el resto.
 
-Todas las tareas están pendientes (`[ ]`).
+Las casillas `[ ]` se dejan tal como se escribieron antes de generar (spec primero); **no** reflejan el avance.
+El estado real de las dos corridas de OpenCode, las correcciones y las evidencias 22 a 29 está en
+`unidad-8/docs/comparacion_generado_vs_original.md`. Los números de evidencia que figuran abajo (22 a 34) son los
+previstos en este plan; los archivos realmente guardados son `evidencias/22` a `29` y no coinciden uno a uno.
 
 ---
 
@@ -57,8 +60,8 @@ Todas las tareas están pendientes (`[ ]`).
 - [ ] 3. Pruebas del esquema: COMMIT/ROLLBACK, C1 y C7
   - [ ] 3.1 Generar `pruebas_sqlite.sql`
     - El bloque `COMMIT` persiste pedido, ítems y solicitud; el bloque `ROLLBACK` no deja filas nuevas.
-    - C1: `v_catalogo_disponible` devuelve 14 de 16 productos cuando 15 y 16 no están disponibles o están
-      dados de baja, sin tocar PostgreSQL.
+    - C1: `v_catalogo_disponible` devuelve 13 de 16 productos (se ocultan el 3, el 15 y el 16: dado de baja,
+      no disponible, o ambos), sin tocar PostgreSQL. _(Corregido el 07/11: decía 14; ver REQ 5.3.)_
     - C7: exactamente tres errores esperados (`CHECK` de cantidad 0, `FOREIGN KEY` de producto inexistente,
       tipo inválido en columna `STRICT`) y los conteos sin cambios.
     - _Requisitos: 5.1, 5.3, 6.7 a 6.10_

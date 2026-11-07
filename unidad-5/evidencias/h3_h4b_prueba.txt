@@ -1,0 +1,26 @@
+BEGIN
+=== ANTES: membresias entre roles de grupo
+ grupo | miembro 
+-------+---------
+(0 filas)
+
+=== ANTES: EXECUTE de app_web
+ calcular_total_pedido | fn_set_subtotal | fn_recalcular_total | fn_validar_estado_pedido 
+-----------------------+-----------------+---------------------+--------------------------
+ t                     | t               | t                   | t
+(1 fila)
+
+DO
+REVOKE
+=== DESPUES: membresias
+ grupo | miembro 
+-------+---------
+(0 filas)
+
+=== DESPUES: EXECUTE de app_web
+ calcular_total_pedido | fn_set_subtotal | fn_recalcular_total | fn_validar_estado_pedido 
+-----------------------+-----------------+---------------------+--------------------------
+ f                     | f               | f                   | f
+(1 fila)
+
+ROLLBACK

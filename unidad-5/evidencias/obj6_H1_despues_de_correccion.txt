@@ -1,0 +1,41 @@
+# H1 tras la correccion: un GRANT CREATE previo no debe sobrevivir a roles.sql
+# fecha: 2026-11-07 18:11:38
+# base: copia_u5
+
+GRANT CREATE ON SCHEMA public TO app_web, rol_soporte;
+GRANT
+--- re-ejecuto roles.sql ---
+roles.sql codigo de salida: 0
+
+--- CREATE sobre public despues (esperado: f para los de aplicacion, t para admin_datos) ---
+         r         | puede_create 
+-------------------+--------------
+ app_web           | f
+ rol_app_lectura   | f
+ rol_app_escritura | f
+ rol_app_auth      | f
+ rol_soporte       | f
+ rol_reportes      | f
+ admin_datos       | t
+(7 filas)
+
+--- intento de CREATE TABLE como app_web y rol_soporte (esperado: permiso denegado) ---
+BEGIN
+SET
+psql:C:/Users/Mariano_Chirino/AppData/Local/Temp/tmpC8D0.tmp:1: ERROR:  permiso denegado al esquema public
+L�NEA 1: CREATE TABLE public.prueba_priv(o int);
+                     ^
+ROLLBACK
+BEGIN
+SET
+psql:C:/Users/Mariano_Chirino/AppData/Local/Temp/tmpC8D0.tmp:2: ERROR:  permiso denegado al esquema public
+L�NEA 1: CREATE TABLE public.prueba_priv(o int);
+                     ^
+ROLLBACK
+ tabla_quedo 
+-------------
+ 
+(1 fila)
+
+--- limpieza: por si algun CREATE de prueba sobrevivio ---
+REVOKE

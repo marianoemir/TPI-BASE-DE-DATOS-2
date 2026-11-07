@@ -1,0 +1,129 @@
+﻿sqlite3 : Parse error near line 6 of cargar_catalogo.sql: near "DO": syntax error
+En línea: 4 Carácter: 3
++   sqlite3 -header -column $db ".read cargar_catalogo.sql"
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Parse error nea...": syntax error:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ROM snapshot_servidor s ON CONFLICT (producto_id) DO UPDATE SET     nombre    
+                                      error here ---^
+productos_en_cache
+------------------
+                 0
+      etapa        prod_en_cache  borrador_en_pedido  items_en_tabla  cola_en_tabla
+-----------------  -------------  ------------------  --------------  -------------
+Después ROLLBACK:              0                   0               0              0
+           etapa             productos_en_catalogo
+---------------------------  ---------------------
+C1 - v_catalogo_disponible:                      0
+sqlite3 : Error near line 33 of pruebas_sqlite.sql: CHECK constraint failed: cantidad > 0
+En línea: 6 Carácter: 3
++   sqlite3 -header -column $db ".read pruebas_sqlite.sql"
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error near line...d: cantidad > 0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                     resultado
+---------------------------------------------------
+C7 - ERROR: cantidad 0 debería haber sido rechazada
+Error near line 41 of pruebas_sqlite.sql: FOREIGN KEY constraint failed
+                          resultado
+-------------------------------------------------------------
+C7 - ERROR: producto inexistente debería haber sido rechazado
+                          resultado
+--------------------------------------------------------------
+C7 - ERROR: tipo de dato inválido debería haber sido rechazado
+solicitudes_evaluadas
+---------------------
+                    4
+sqlite3 : Parse error near line 15 of casos_c2_c6_resolucion.sql: table cola_sync has no column named criada_en
+En línea: 9 Carácter: 3
++   sqlite3 -header -column $db ".read casos_c2_c6_resolucion.sql"
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Parse error nea...named criada_en:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                  resultado
+---------------------------------------------
+ERROR: INSERT duplicado debería haber fallado
+                        etapa                               estado        motivo      evaluada_en
+-----------------------------------------------------  -----------------  ------  -------------------
+C6 - estado fila original después de intento fallido:  SIMULADO_APROBADO          2026-11-07 17:41:06
+'--- Tercera corrida semáforo (después de C6) ---'
+--------------------------------------------------
+--- Tercera corrida semáforo (después de C6) ---
+sqlite3 : Parse error near line 78 of casos_f2_semaforo.sql: near "TRY": syntax error
+En línea: 10 Carácter: 3
++   sqlite3 -header -column $db ".read casos_f2_semaforo.sql"
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Parse error nea...": syntax error:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  BEGIN TRY;
+        ^--- error here
+Parse error near line 79 of casos_f2_semaforo.sql: table cola_sync has no column named criada_en
+                                resultado
+-------------------------------------------------------------------------
+ERROR: segunda PENDIENTE para mismo borrador debería haber sido rechazada
+Parse error near line 82 of casos_f2_semaforo.sql: near "TRY": syntax error
+  END TRY;
+      ^--- error here
+Parse error near line 83 of casos_f2_semaforo.sql: near "CATCH": syntax error
+  BEGIN CATCH;
+        ^--- error here
+                               resultado
+-----------------------------------------------------------------------
+C2-6 - OK: segunda PENDIENTE correctamente bloqueada por índice parcial
+Parse error near line 85 of casos_f2_semaforo.sql: near "CATCH": syntax error
+  END CATCH;
+      ^--- error here
+                      etiqueta                                    solicitud_uuid                           id_local                 estado    motivo
+-----------------------------------------------------  ------------------------------------  ------------------------------------  ---------  ------
+--- Estados de solicitudes F2 despues de semáforo ---  f2000001-0000-4000-8000-00000000000b  f2000001-0000-4000-8000-00000000000b  PENDIENTE
+--- Estados de solicitudes F2 despues de semáforo ---  f2000002-0000-4000-8000-00000000000b  f2000002-0000-4000-8000-00000000000b  PENDIENTE
+--- Estados de solicitudes F2 despues de semáforo ---  f2000003-0000-4000-8000-00000000000b  f2000003-0000-4000-8000-00000000000b  PENDIENTE
+--- Estados de solicitudes F2 despues de semáforo ---  f2000004-0000-4000-8000-00000000000b  f2000004-0000-4000-8000-00000000000b  PENDIENTE
+--- Estados de solicitudes F2 despues de semáforo ---  f2000005-0000-4000-8000-00000000000b  f2000005-0000-4000-8000-00000000000b  PENDIENTE
+--- Estados de solicitudes F2 despues de semáforo ---  f2000006-0000-4000-8000-00000000000b  f2000006-0000-4000-8000-00000000000b  PENDIENTE
+sqlite3 : Parse error near line 43 of casos_c8_competencia_stock.sql: no such column: s1.solicitud_uuid
+En línea: 11 Carácter: 3
++   sqlite3 -header -column $db ".read casos_c8_competencia_stock.sql"
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Parse error nea....solicitud_uuid:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  os después de semáforo C8 ---' AS etapa,        s1.solicitud_uuid, s1.estado
+                                      error here ---^
+etiqueta  stock_visto
+--------  -----------
+solicitudes_evaluadas
+---------------------
+                    9
+
+-- Estado final de la cola
+solicitud       estado                        motivo
+---------  -----------------  --------------------------------------
+c2...00b   SIMULADO_APROBADO
+c2...00c   SIMULADO_APROBADO
+c3...00b   RECHAZADO          pedido 7, stock 6
+c4...00b   RECHAZADO          dado de baja
+c5...00b   SIMULADO_APROBADO
+c8...00a   SIMULADO_APROBADO
+c8...00b   SIMULADO_APROBADO
+f2...00b   RECHAZADO          dado de baja
+f2...00b   RECHAZADO          producto 9999 no existe en el servidor
+f2...00b   RECHAZADO          borrador sin ítems
+f2...00b   RECHAZADO          no disponible
+f2...00b   SIMULADO_APROBADO
+f2...00b   RECHAZADO          borrador sin ítems
+
+-- Tablas STRICT
+       name         strict
+------------------  ------
+snapshot_servidor        0
+cola_sync                0
+sqlite_schema            0
+producto_cache           0
+pedido_borrador          0
+item_borrador            0
+sqlite_temp_schema       0
