@@ -1,5 +1,5 @@
--- REQ 5.1, 6.1-6.6, 6.11, 7.1, 7.3, 8.2
--- Esquema SQLite de la tablet (corregido a mano sobre la version generada por OpenCode)
+-- REQ 5.1, 6.1-6.6, 6.11, 6.12, 6.13, 7.1, 7.3, 8.2
+-- Esquema SQLite de la tablet (corregido a mano sobre la version generada por OpenCode; REQ 6.12 y 6.13 agregados el 2026-11-07 tras compararla con los originales)
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE producto_cache (
@@ -16,7 +16,7 @@ CREATE TABLE pedido_borrador (
     id_local            TEXT PRIMARY KEY CHECK (length(id_local) = 36),
     usuario_id_servidor INTEGER NOT NULL CHECK (usuario_id_servidor > 0),
     forma_pago          TEXT    NOT NULL CHECK (forma_pago IN ('EFECTIVO','TARJETA','TRANSFERENCIA')),
-    creado_en           TEXT    NOT NULL
+    creado_en           TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 ) STRICT;
 
 CREATE TABLE item_borrador (
@@ -31,7 +31,7 @@ CREATE TABLE item_borrador (
 
 CREATE TABLE cola_sync (
     solicitud_uuid TEXT PRIMARY KEY CHECK (length(solicitud_uuid) = 36),
-    id_local       TEXT NOT NULL,
+    id_local       TEXT NOT NULL REFERENCES pedido_borrador(id_local),
     estado         TEXT NOT NULL DEFAULT 'PENDIENTE'
                    CHECK (estado IN ('PENDIENTE','CONFLICTO','RECHAZADO','SIMULADO_APROBADO')),
     motivo         TEXT,
