@@ -77,6 +77,10 @@ Los textos de este informe y el documento `auditoria_roles_opencode.md` se redac
 
 **De los otros objetivos** `[COMPLETAR por cada autor: U4, U6, U7, code review]`
 
+**De los datos de ejemplo y las evidencias**
+- La base heredada del repositorio usa usuarios inventados. Las exportaciones de la U7 (`unidad-7/modelo/pedidos_export.json` y la salida guardada en `unidad-7/evidencias/mongo_migracion_y_consultas.txt`) vienen de una base anterior a esa limpieza y todavía conservan el nombre y el mail de un integrante en un usuario de ejemplo. Se regeneran desde la base actual. `[ACTUALIZAR cuando se regenere: o quitar este punto]`
+- Las evidencias de las U5 y U6 conservan rutas locales del equipo del autor (`C:\Users\...`). No se editaron, para no alterar lo que prueban.
+
 **Del proceso**
 - Los PR de `m/obj-11`, `m/informe-u8` y `m/obj-06` se mergearon **sin revisión cruzada**, porque la revisión asignada no respondió. Queda pendiente una lectura posterior.
 - Las evidencias de H3 y H4b se generaron en UTF-16 y se reencodearon a UTF-8 sin cambiar el contenido (commit `6346e09`).

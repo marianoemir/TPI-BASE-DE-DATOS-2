@@ -1,7 +1,7 @@
 # TPI «Food Store» — Bases de Datos II (UTN), segunda entrega
 
 Capa de datos de Food Store en **PostgreSQL 16+ (PL/pgSQL)**, **MongoDB** y **SQLite**.
-Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. Nombre del grupo: `[CONFIRMAR: «Lobos Solitarios» o «Grupo 10»]`.
+Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. Grupo 10.
 Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` (PDF final: `[COMPLETAR]`). Etiqueta final: `[COMPLETAR]`.
 
 > Estado de la tabla: 07/11/2026. Los estados marcados «en curso» se actualizan antes de entregar.
@@ -44,7 +44,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 | U4 | `copia_trabajo` | PostgreSQL |
 | U5 | `copia_u5` | PostgreSQL 17.10 |
 | U6 | `foodstore`, `foodstore_restore_test` | PostgreSQL |
-| U7 | `foodstore_nosql` | MongoDB `[CONFIRMAR versión]` |
+| U7 | `foodstore_nosql` | MongoDB 9.0.4 (`mongosh` 2.14.0) |
 | U8 | `foodstore_u8` | PostgreSQL + SQLite 3.54.1 |
 
 ## Cómo reproducir
