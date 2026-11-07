@@ -1,0 +1,13 @@
+
+TaskName                        State
+--------                        -----
+FoodStore-Mantenimiento-Semanal Ready
+FoodStore-Respaldo-Diario       Ready
+FoodStore-Restauracion-Semanal  Ready
+
+
+
+
+LastRunTime    : 07/11/2026 2:38:39
+LastTaskResult : 0
+NextRunTime    : 08/11/2026 2:00:00

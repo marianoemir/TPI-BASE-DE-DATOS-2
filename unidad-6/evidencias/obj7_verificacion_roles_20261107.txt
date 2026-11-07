@@ -1,0 +1,136 @@
+DROP TABLE
+CREATE TABLE
+CREATE FUNCTION
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+ probar
+--------
+
+(1 fila)
+
+INSERT 0 1
+DO
+ id  |        rol        |   esperado    |   obtenido    | estado
+-----+-------------------+---------------+---------------+--------
+ T01 | app_web           | filas         | filas         | OK
+ T02 | app_web           | denegado      | denegado      | OK
+ T03 | app_web           | denegado      | denegado      | OK
+ T04 | app_web           | ok            | ok            | OK
+ T05 | app_web           | denegado      | denegado      | OK
+ T06 | app_web           | denegado      | denegado      | OK
+ T07 | app_web           | ok            | ok            | OK
+ T08 | app_web           | denegado      | denegado      | OK
+ T09 | rol_soporte       | filas         | filas         | OK
+ T10 | rol_soporte       | denegado      | denegado      | OK
+ T11 | rol_soporte       | denegado      | denegado      | OK
+ T12 | rol_soporte       | denegado      | denegado      | OK
+ T13 | rol_soporte       | filas         | filas         | OK
+ T14 | rol_soporte       | ok            | ok            | OK
+ T15 | rol_soporte       | denegado      | denegado      | OK
+ T16 | rol_soporte       | denegado      | denegado      | OK
+ T17 | rol_reportes      | filas         | filas         | OK
+ T18 | rol_reportes      | denegado      | denegado      | OK
+ T19 | rol_reportes      | denegado      | denegado      | OK
+ T20 | rol_app_escritura | denegado      | denegado      | OK
+ T21 | app_web           | denegado      | denegado      | OK
+ T22 | app_web           | sin_membresia | sin_membresia | OK
+ T23 | rol_soporte       | sin_cambio    | sin_cambio    | OK
+(23 filas)
