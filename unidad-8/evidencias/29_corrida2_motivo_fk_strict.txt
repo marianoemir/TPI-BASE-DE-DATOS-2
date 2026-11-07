@@ -1,0 +1,35 @@
+﻿corrida 2 sin editar, evidencia 29 - 2026-11-07 14:55
+3.54.1 2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76 (64-bit)
+
+### 0 esquema (schema_sqlite.sql sin editar)
+
+### A motivo NULL con CONFLICTO y RECHAZADO (REQ 6.11)
+                 etapa                    filas
+----------------------------------------  -----
+A: CONFLICTO o RECHAZADO con motivo NULL      2
+
+### B1 item de producto inexistente SIN PRAGMA (REQ 6.3)
+           etapa             filas
+---------------------------  -----
+B1: filas en producto_cache      0
+                 etapa                   filas
+---------------------------------------  -----
+B1: filas en item_borrador (sin PRAGMA)      1
+
+### B2 item de otro producto inexistente CON PRAGMA ON
+Error near line 2: FOREIGN KEY constraint failed
+                  etapa                     filas
+------------------------------------------  -----
+B2: filas en item_borrador (con PRAGMA ON)      1
+
+### C texto en precio_centavos y modo STRICT (REQ 6.1)
+                    etapa                       tipo
+----------------------------------------------  ----
+C: typeof(precio_centavos) del texto insertado  text
+         etapa                 name         strict
+-----------------------  -----------------  ------
+C: tablas y modo STRICT  snapshot_servidor       0
+C: tablas y modo STRICT  cola_sync               0
+C: tablas y modo STRICT  producto_cache          0
+C: tablas y modo STRICT  pedido_borrador         0
+C: tablas y modo STRICT  item_borrador           0

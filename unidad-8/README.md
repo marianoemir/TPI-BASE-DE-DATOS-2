@@ -93,7 +93,7 @@ sqlite3 -header -column $db ".read movil/semaforo.sql"       # repetir: 0 solici
 
 | Caso | Qué pasa | Resultado |
 |---|---|---|
-| C1 | Catálogo con el servidor apagado | 14 productos (no aparecen el 15 ni el 16) |
+| C1 | Catálogo con el servidor apagado | 13 productos (no aparecen el 3, el 15 ni el 16) |
 | C2 | Muzzarella sube de $3.500 a $4.000 | `CONFLICTO`; tras aceptar, solicitud nueva `SIMULADO_APROBADO` |
 | C3 | 10 Tiramisú, quedan 6 | `RECHAZADO` (stock insuficiente) |
 | C4 | Fugazzeta dada de baja | `RECHAZADO`; sale del catálogo pero la fila queda con `eliminado = 1` |
@@ -105,7 +105,7 @@ sqlite3 -header -column $db ".read movil/semaforo.sql"       # repetir: 0 solici
 
 | Ruta | Qué es | Consigna |
 |---|---|---|
-| `movil/schema_sqlite.sql` | Cuatro tablas STRICT, índice parcial, vista del catálogo, tabla de paso | 1.b |
+| `movil/schema_sqlite.sql` | Cinco tablas STRICT, índice parcial, vista del catálogo, tabla de paso | 1.b |
 | `movil/pruebas_sqlite.sql` | COMMIT, ROLLBACK, C1, C7 | 1.c |
 | `movil/cargar_catalogo.sql` | `producto_cache` desde la instantánea (UPSERT) | 2.a |
 | `movil/semaforo.sql` | Rojo / amarillo / verde sobre las `PENDIENTE` | 2.b |
@@ -116,12 +116,39 @@ sqlite3 -header -column $db ".read movil/semaforo.sql"       # repetir: 0 solici
 | `postgresql/verificar_vista_snapshot.sql`, `movil/verificar_vistas_tablet.sql` | Equivalencia de la vista con la tabla y de la vista de la tablet con `producto_cache` (protocolo de seguridad, paso 5) | 2.a |
 | `movil/casos_f2_semaforo.sql` | Casos borde del semáforo (revisión cruzada F2): rojo + amarillo, producto fuera de la instantánea, sin ítems, no disponible. **Solo en una copia** de la tablet | 2.b |
 | `postgresql/verificar_hallazgos_3c.sql` | Comprobación de los hallazgos H01 y R1 del code review. **Solo en una copia** de la base | 3.c |
-| `evidencias/` | Salidas de cada comando (01 a 12: C1 a C7; 13 y 14: vistas; 15 a 17: code review; 18 y 19: casos borde del semáforo; 20 y 21: revisión de Andrés, A4 completa y 3.c) | todas |
+| `evidencias/` | Salidas de cada comando (01 a 12: C1 a C7; 13 y 14: vistas; 15 a 17: code review; 18 y 19: casos borde del semáforo; 20 y 21: revisión de Andrés, A4 completa y 3.c; 22 a 29: objetivo 11, ver la sección siguiente) | todas |
+| `movil_opencode/`, `movil_opencode_v2/` | Objetivo 11: la base de la tablet regenerada con OpenCode desde la spec (ver la sección siguiente) | 4 y 11 |
 | `heredado/` | Scripts de las Unidades 1 a 7, entrada del code review (ver nota abajo) | 3.c |
 | `docs/` | `informe.pdf` (1.a, 2.c, 3.a, 3.b, 3.c), `kiro/` (spec), `bitacora_ia.md`, `DUIA.md` y `DIVISION_DE_TRABAJO.md` (quién hace qué y en qué orden) | 3 y 4 |
 
 **Nota sobre `heredado/`.** Los scripts están sin modificar, salvo `data.sql`: se reemplazó el usuario con
 nombre real de un integrante por uno inventado (Carlos Rivas), por la regla de datos ficticios.
+
+## Objetivo 11: la base de la tablet regenerada con OpenCode desde la spec
+
+La spec de Kiro (`.kiro/specs/foodstore-tablet-sync/`) se amplió y se commiteó **antes** de generar. Con ella y `AGENTS.md`
+se hicieron dos corridas de OpenCode (agente Nemotron 3.5 Lightning Free). **Ninguna produjo una base funcional sin editar.**
+
+| Carpeta | Qué es | Estado |
+|---|---|---|
+| `movil/` | Scripts originales (hechos con Claude y NotebookLM, spec posterior) | Referencia; no se borra |
+| `movil_opencode/` | Corrida 1 (06/11) corregida con Claude a partir de los errores; originales sin editar en `movil_opencode/original_opencode/` | **Versión final**: pasa C1 a C8 y F2 (evidencias 25 a 27) |
+| `movil_opencode_v2/` | Corrida 2 (07/11), en carpeta aislada sin `movil/`, **sin editar** | Evidencia: nueve defectos (evidencias 28 y 29) |
+
+Qué falló, qué se corrigió y qué diferencias hay con los originales: `docs/comparacion_generado_vs_original.md`.
+Registros de las corridas (modelo, prompt y respuesta cruda): `docs/registro_opencode_corrida1.txt` y `docs/registro_opencode_corrida2.txt`.
+
+| Evidencia | Contenido |
+|---|---|
+| 22 | Corrida 1 sin editar (el esquema no se crea) |
+| 23 a 25 | Versión corregida: esquema, carga y casos (25: `casos.sql` completo) |
+| 26 | Casos F2 originales contra la versión corregida |
+| 27 | `casos.sql` tras los REQ 6.12 y 6.13 |
+| 28 | Corrida 2 sin editar |
+| 29 | Corrida 2: `motivo` sin `CHECK`, clave foránea con y sin `PRAGMA`, tablas sin `STRICT` |
+
+Para ejecutar la versión final se usa el mismo orden de arriba cambiando `movil/` por `movil_opencode/`. Cada script lleva
+`PRAGMA foreign_keys = ON;` porque cada `sqlite3` abre una conexión nueva con la clave foránea desactivada.
 
 ## Uso de IA
 
