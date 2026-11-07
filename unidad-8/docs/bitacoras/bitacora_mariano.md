@@ -29,6 +29,10 @@ Según `DIVISION_DE_TRABAJO.md`:
 | Claude: revisar mi `3a` corregida | Detectó que seguía diciendo «5 pedidos migrados» (valor arrastrado del borrador de Andrés) cuando `esquema_documental.md` dice 7: 1, 2, 3, 5 y 6 de `data.sql` más el 7 y el 8 de prueba. | Corregido a 7 y subido en un commit aparte (`5f073d6`). Mi propia corrección había arrastrado el error: lo verifiqué recién después. |
 | Claude: pasos para integrar el PR #1 y cerrar el push rechazado | Plan: mergear desde la web de GitHub, corregir en un commit y, cuando el push fue rechazado, registrar el merge remoto con `git merge -s ours`. Primero pidió comprobar con `git diff --stat main origin/main` que la diferencia era solo lo que se quería descartar. | Lo comprobé y apliqué. Resultado: `main` quedó sin `sqlite/` ni `.db` vacío, con el `.db` en 16 y 6. |
 | Claude: comandos para las evidencias 13 y 14 | Función `Ev` con contraseña oculta (`-AsSecureString`) y salida guardada en `evidencias/`. | Corrí los comandos, comparé con lo esperado y recién después los subí. |
+| OpenCode (Nemotron 3.5 Lightning Free), corrida 1, 06/11 16:10: generar el esquema, la carga, el semáforo y los casos desde `AGENTS.md` y la spec | Cuatro scripts; el esquema no se pudo crear (`STRICT` dentro de las columnas, `UNIQUE … WHERE` dentro del `CREATE TABLE`) y fallaron en cascada la carga, el semáforo y los casos | Conservé los originales sin editar (`original_opencode/`, commit `e9dd9f8`). Corregí con Claude lo mínimo para que corra y lo declaré; evidencias 22 a 25 |
+| Claude: comparar `movil_opencode/` con `movil/` (07/11) | Faltaban `DEFAULT` en `creado_en` y la clave foránea de `cola_sync.id_local`; la spec no los pedía | Los agregué a la spec (REQ 6.12 y 6.13, commit `772536a`) y después al esquema; evidencias 26 y 27 |
+| OpenCode, corrida 2, 07/11 09:39 a 09:50, carpeta aislada sin `movil/` | Nueve defectos: mismo error de sintaxis en la carga, ninguna tabla `STRICT`, sin `CHECK` de `motivo`, sin `PRAGMA` en seis scripts, `criada_en`, `BEGIN TRY/CATCH`, `SELECT` sin `FROM`, sin `casos.sql`, mensajes de C7 siempre impresos. Afirmó «5 tablas STRICT» y «sintaxis revisada» sin haber ejecutado nada | No lo edité: `movil_opencode_v2/` queda como evidencia (commits `dc1ead0` y `55cb059`). Ejecuté y guardé la salida (evidencia 28) |
+| Claude: analizar la evidencia 28 y proponer la evidencia 29 | Script con tres pruebas (A: `motivo` `NULL`; B: clave foránea con y sin `PRAGMA`; C: `typeof` y `STRICT`) | Lo corrí desde un `.ps1` en SQLite 3.54.1: confirmó los defectos 2, 6 y 7. Commit `229c018` |
 
 ## Revisión cruzada que hice
 
@@ -48,6 +52,8 @@ Según `DIVISION_DE_TRABAJO.md`:
 | Catálogo en la tablet | 16 contra 16 en la copia; 13 contra 13 en el catálogo disponible; 0 diferencias | `verificar_vistas_tablet.sql` (evidencia 14) |
 | Base de la tablet tras la integración | 16 filas en `producto_cache` y 6 en `cola_sync` | `sqlite3 movil/foodstore_movil.db` |
 | Resultado de los casos | C2 CONFLICTO y luego SIMULADO_APROBADO; C3 RECHAZADO (pide 10 Tiramisú, hay 6); C4 RECHAZADO (Fugazzeta dada de baja); C5 SIMULADO_APROBADO; C6 error de clave primaria y 0 solicitudes evaluadas en la repetición | Evidencias 05 a 11 |
+| Corrida 2, ejecución sin editar | `cargar_catalogo.sql` con error de sintaxis; `producto_cache` en 0 filas; C1 da 0 (esperado 13); `criada_en` y `BEGIN TRY` fallan | Evidencia 28 |
+| Evidencia 29 (SQLite 3.54.1) | A: 2 filas con `motivo` `NULL`; B1: ítem de producto inexistente entra sin `PRAGMA` (`producto_cache` en 0); B2: `FOREIGN KEY constraint failed` con `PRAGMA` activo; C: `typeof` = `text` y `strict = 0` en las cinco tablas | `evidencias/29_corrida2_motivo_fk_strict.txt` |
 
 ## Problemas encontrados y cómo se resolvieron
 
@@ -58,6 +64,9 @@ Según `DIVISION_DE_TRABAJO.md`:
 | 04/11/2026 | `git push` rechazado (`fetch first`) | El merge hecho desde la web creó en GitHub un commit que yo no tenía, con el `.db` vacío, `sqlite/` y los borradores de Andrés | `git merge -s ours origin/main` para registrar ese commit sin traer sus archivos; luego push |
 | 04/11/2026 | La `3a` decía 5 pedidos migrados a MongoDB | Arrastré el valor del borrador de Andrés sin contrastarlo con `esquema_documental.md` | Corregido a 7 y subido |
 | 04/11/2026 | Dudé de las frecuencias de la `3b` (respaldo diario, prueba semanal) porque el plan de la U6 no estaba en el repo | Revisé primero solo el informe y el protocolo, que no las fijan. En un primer ajuste quité la «prueba semanal» y escribí que el plan no fijaba frecuencia: era un error, porque `SPEC_U6.md` sí la fija | Con `SPEC_U6.md` a la vista: diario para el respaldo y semanal para la restauración de prueba, igual que el borrador de Andrés. Restauré el «semanal» en la `3b` |
+| 07/11/2026 | El primer intento de la evidencia 29 falló: `Get-Process` en cada línea y `Out-File` sin ruta | Pegué las líneas con el prompt `PS C:\...>` incluido (en PowerShell `ps` es alias de `Get-Process`), con la ruta de ejemplo `C:\RUTA\A\...` sin ajustar y con `>>` dentro de los `.sql` | Guardé el script en un `.ps1` con mis rutas y lo ejecuté desde cero; la salida válida es la de las 14:55 |
+| 07/11/2026 | `git status` mostraba `requirements.md` modificado | Solo cambió `## Glosario` por `## Glossary` (cambio hecho por Kiro, sin contenido nuevo); lo verifiqué con `git diff` | `git checkout --` sobre ese archivo; no se commiteó |
+| 07/11/2026 | Duda sobre quién escribió el Requisito 11 | No quedó registro de la herramienta | Declarado como «no consta» en la DUIA; no se completa por memoria |
 
 ## Decisiones tomadas
 
@@ -69,3 +78,7 @@ Según `DIVISION_DE_TRABAJO.md`:
 | Índice parcial `ux_cola_una_pendiente` | `UNIQUE` simple sobre `id_local` | Un `UNIQUE` simple impediría reenviar una solicitud después de un CONFLICTO |
 | Carga del catálogo con `ON CONFLICT DO UPDATE` | `INSERT OR REPLACE` | `REPLACE` borra la fila y se perdería la lápida |
 | Spec de Kiro escrita después del código, declarándolo | Reescribirla como si fuera anterior | El trabajo se hizo en ese orden; se declara en lugar de ocultarlo |
+| Corrida 2 en carpeta aislada y sin editar | Corregirla como la corrida 1 | Una segunda corrida sin `movil/` a la vista mide qué genera el modelo a partir de la spec; editarla borraría esa evidencia |
+| No agregar requisitos por la corrida 2 | Agregar REQ por cada defecto | Los incumplimientos son contra REQ ya escritos (6.1, 6.3, 6.11) o errores de escritura; las dos lagunas reales ya se habían cerrado (6.12 y 6.13) |
+| `capturado_en` en `v_catalogo_disponible` y criterio `OK`/`FALLA` en el REQ 11 | Agregarlos a la spec y regenerar | No cambian ningún resultado de C1 a C8 ni de F2; se declaran como límites en `comparacion_generado_vs_original.md` |
+| Descartar el cambio de Kiro `Glosario` → `Glossary` | Commitearlo | Sin contenido nuevo; mantiene la spec igual a la usada en las corridas |
