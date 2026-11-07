@@ -1,0 +1,359 @@
+﻿Insertados: 5000
+Documentos: 5000
+lineas.producto_id_1
+Productos auxiliares: 10001
+Producto objetivo: 1
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'foodstore_nosql_benchmark.pedidos_benchmark',
+    parsedQuery: {
+      'lineas.producto_id': {
+        '$eq': 1
+      }
+    },
+    indexFilterSet: false,
+    queryHash: '5797A43E',
+    planCacheShapeHash: '5797A43E',
+    planCacheKey: '9F26A3F9',
+    optimizationTimeMillis: 0,
+    optimizationTimeMicros: 113,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    prunedSimilarIndexes: false,
+    winningPlan: {
+      isCached: false,
+      stage: 'FETCH',
+      nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+      inputStage: {
+        stage: 'IXSCAN',
+        nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+        keyPattern: {
+          'lineas.producto_id': 1
+        },
+        indexName: 'lineas.producto_id_1',
+        isMultiKey: true,
+        multiKeyPaths: {
+          'lineas.producto_id': [
+            'lineas'
+          ]
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          'lineas.producto_id': [
+            '[1, 1]'
+          ]
+        }
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 1,
+    executionTimeMillis: 0,
+    executionTimeMicros: 792,
+    totalKeysExamined: 1,
+    totalDocsExamined: 1,
+    executionStages: {
+      isCached: false,
+      stage: 'FETCH',
+      nReturned: 1,
+      executionTimeMillisEstimate: 0,
+      works: 2,
+      advanced: 1,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+      docsExamined: 1,
+      alreadyHasObj: 0,
+      inputStage: {
+        stage: 'IXSCAN',
+        nReturned: 1,
+        executionTimeMillisEstimate: 0,
+        works: 2,
+        advanced: 1,
+        needTime: 0,
+        needYield: 0,
+        saveState: 0,
+        restoreState: 0,
+        isEOF: 1,
+        nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+        keyPattern: {
+          'lineas.producto_id': 1
+        },
+        indexName: 'lineas.producto_id_1',
+        isMultiKey: true,
+        multiKeyPaths: {
+          'lineas.producto_id': [
+            'lineas'
+          ]
+        },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: {
+          'lineas.producto_id': [
+            '[1, 1]'
+          ]
+        },
+        keysExamined: 1,
+        seeks: 1,
+        dupsTested: 1,
+        dupsDropped: 0,
+        peakTrackedMemBytes: 8
+      }
+    }
+  },
+  queryShapeHash: 'F7A8BDAAEADF1F87A6362F766630E0E8F25737EBF9526FE16FE45886F3ABFA99',
+  peakTrackedMemBytes: Long('8'),
+  command: {
+    find: 'pedidos_benchmark',
+    filter: {
+      'lineas.producto_id': 1
+    },
+    '$db': 'foodstore_nosql_benchmark'
+  },
+  serverInfo: {
+    host: 'DESKTOP-ANDRES',
+    port: 27017,
+    version: '9.0.4',
+    gitVersion: '64ade602b836c9adeffba7fa038c887ffab56196'
+  },
+  serverParameters: {
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  ok: 1
+}
+[
+  {
+    _id: 'Bebidas',
+    ventas: Decimal128('13703741.60')
+  },
+  {
+    _id: 'Empanadas',
+    ventas: Decimal128('13539880.52')
+  },
+  {
+    _id: 'Hamburguesas',
+    ventas: Decimal128('13815749.62')
+  },
+  {
+    _id: 'Pizzas',
+    ventas: Decimal128('13976191.88')
+  },
+  {
+    _id: 'Postres',
+    ventas: Decimal128('13782536.30')
+  }
+]
+CATEGORIAS_LOOKUP
+{
+  explainVersion: '1',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'foodstore_nosql_benchmark.pedidos_benchmark',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '86201FB2',
+          planCacheShapeHash: '86201FB2',
+          planCacheKey: 'F083ACC3',
+          optimizationTimeMillis: 0,
+          optimizationTimeMicros: 77,
+          cursorType: 'regular',
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            transformBy: {
+              lineas: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 5000,
+          executionTimeMillis: 540,
+          executionTimeMicros: 540775,
+          totalKeysExamined: 0,
+          totalDocsExamined: 5000,
+          executionStages: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            nReturned: 5000,
+            executionTimeMillisEstimate: 0,
+            works: 5001,
+            advanced: 5000,
+            needTime: 0,
+            needYield: 0,
+            saveState: 14,
+            restoreState: 13,
+            isEOF: 1,
+            transformBy: {
+              lineas: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nReturned: 5000,
+              executionTimeMillisEstimate: 0,
+              works: 5001,
+              advanced: 5000,
+              needTime: 0,
+              needYield: 0,
+              saveState: 14,
+              restoreState: 13,
+              isEOF: 1,
+              nss: 'foodstore_nosql_benchmark.pedidos_benchmark',
+              direction: 'forward',
+              docsExamined: 5000,
+              seeks: 0
+            }
+          }
+        }
+      },
+      nReturned: Long('5000'),
+      executionTimeMillisEstimate: Long('2')
+    },
+    {
+      '$unwind': {
+        path: '$lineas'
+      },
+      nReturned: Long('10001'),
+      executionTimeMillisEstimate: Long('2')
+    },
+    {
+      '$lookup': {
+        from: 'productos_benchmark',
+        as: 'producto',
+        localField: 'lineas.producto_id',
+        foreignField: '_id',
+        unwinding: {
+          preserveNullAndEmptyArrays: false
+        }
+      },
+      nReturned: Long('10001'),
+      executionTimeMillisEstimate: Long('540'),
+      totalDocsExamined: Long('10002'),
+      totalKeysExamined: Long('10002'),
+      collectionScans: Long('0'),
+      indexesUsed: [
+        '_id_'
+      ],
+      expressionEvaluationPeakMemoryBytes: Long('0')
+    },
+    {
+      '$group': {
+        _id: '$producto.categoria_nombre',
+        ventas: {
+          '$sum': '$lineas.subtotal'
+        },
+        '$willBeMerged': false
+      },
+      nReturned: Long('5'),
+      executionTimeMillisEstimate: Long('540'),
+      maxAccumulatorMemoryUsageBytes: {
+        ventas: Long('1160')
+      },
+      totalOutputDataSizeBytes: Long('1345'),
+      usedDisk: false,
+      spills: Long('0'),
+      spilledDataStorageSize: Long('0'),
+      spilledBytes: Long('0'),
+      spilledRecords: Long('0'),
+      peakTrackedMemBytes: Long('1240')
+    },
+    {
+      '$sort': {
+        sortKey: {
+          _id: 1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: Long('1385'),
+      usedDisk: false,
+      spills: Long('0'),
+      spilledBytes: Long('0'),
+      spilledRecords: Long('0'),
+      spilledDataStorageSize: Long('0'),
+      nReturned: Long('5'),
+      executionTimeMillisEstimate: Long('540'),
+      peakTrackedMemBytes: Long('1385')
+    }
+  ],
+  queryShapeHash: '719E3C7D0E41D4EC7F600F89AA34E9641F8717E4726B162A43F7C5BB6A67906E',
+  peakTrackedMemBytes: Long('2625'),
+  serverInfo: {
+    host: 'DESKTOP-ANDRES',
+    port: 27017,
+    version: '9.0.4',
+    gitVersion: '64ade602b836c9adeffba7fa038c887ffab56196'
+  },
+  serverParameters: {
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'pedidos_benchmark',
+    pipeline: [
+      {
+        '$unwind': '$lineas'
+      },
+      {
+        '$lookup': {
+          from: 'productos_benchmark',
+          localField: 'lineas.producto_id',
+          foreignField: '_id',
+          as: 'producto'
+        }
+      },
+      {
+        '$unwind': '$producto'
+      },
+      {
+        '$group': {
+          _id: '$producto.categoria_nombre',
+          ventas: {
+            '$sum': '$lineas.subtotal'
+          }
+        }
+      },
+      {
+        '$sort': {
+          _id: 1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'foodstore_nosql_benchmark'
+  },
+  ok: 1
+}

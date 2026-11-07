@@ -1,0 +1,18 @@
+     seccion      | documentos |    total
+------------------+------------+-------------
+ RESUMEN_POSTGRES |       5000 | 68818099.92
+(1 fila)
+
+       seccion        | usuarios_inexistentes | productos_inexistentes
+----------------------+-----------------------+------------------------
+ REFERENCIAS_POSTGRES |                     0 |                      0
+(1 fila)
+
+            seccion            |  categoria   |   ventas
+-------------------------------+--------------+-------------
+ VENTAS_POR_CATEGORIA_POSTGRES | Bebidas      | 13703741.60
+ VENTAS_POR_CATEGORIA_POSTGRES | Empanadas    | 13539880.52
+ VENTAS_POR_CATEGORIA_POSTGRES | Hamburguesas | 13815749.62
+ VENTAS_POR_CATEGORIA_POSTGRES | Pizzas       | 13976191.88
+ VENTAS_POR_CATEGORIA_POSTGRES | Postres      | 13782536.30
+(5 filas)
