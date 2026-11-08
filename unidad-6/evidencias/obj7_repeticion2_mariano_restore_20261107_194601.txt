@@ -1,0 +1,10 @@
+2026-11-07 19:46:01 - INICIO - Iniciando simulacro de restauracion.
+2026-11-07 19:46:01 - INFO - Respaldo seleccionado: C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_20261107_194558.dump
+2026-11-07 19:46:01 - OK - SHA-256 verificado para C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_20261107_194558.dump
+2026-11-07 19:46:01 - OK - SHA-256 verificado para C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backups\foodstore_globals_20261107_194558.sql
+2026-11-07 19:46:02 - INFO - Verificando si existe la base destino 'foodstore_restore_test'.
+2026-11-07 19:46:02 - INFO - La base destino ya existe. Eliminando 'foodstore_restore_test' con dropdb (fuera del cronometro).
+2026-11-07 19:46:03 - OK - Base destino previa eliminada.
+2026-11-07 19:46:03 - INFO - Hora de inicio del simulacro: 2026-11-07 19:46:03
+2026-11-07 19:46:03 - INFO - Creando base destino 'foodstore_restore_test'.
+2026-11-07 19:46:03 - OK - Base destino creada. Restaurando respaldo.

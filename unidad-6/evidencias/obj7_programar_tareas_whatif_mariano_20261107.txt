@@ -1,0 +1,3 @@
+WHATIF - Registraria FoodStore-Respaldo-Diario con: -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\backup_foodstore.ps1"
+WHATIF - Registraria FoodStore-Mantenimiento-Semanal con: -NoProfile -ExecutionPolicy Bypass -Command "& 'C:\Program Files\PostgreSQL\17\bin\psql.exe' -w -U 'postgres' -d 'foodstore' -f 'C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\maintenance.sql'; exit $LASTEXITCODE"
+WHATIF - Registraria FoodStore-Restauracion-Semanal con: -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2\unidad-6\restore_test.ps1"

@@ -11,13 +11,15 @@ param (
     [string]$Createdb = "C:\Program Files\PostgreSQL\17\bin\createdb.exe",
     [string]$Dropdb = "C:\Program Files\PostgreSQL\17\bin\dropdb.exe",
     [string]$PgRestore = "C:\Program Files\PostgreSQL\17\bin\pg_restore.exe",
+    [string]$PgAmcheck = "C:\Program Files\PostgreSQL\17\bin\pg_amcheck.exe",
     [string]$Psql = "C:\Program Files\PostgreSQL\17\bin\psql.exe",
     [string]$Servidor = "localhost",
     [int]$Puerto = 5432,
     [string]$Usuario = "postgres",
     [string]$BaseDestino = "foodstore_restore_test",
     [string]$DirBackups = "$PSScriptRoot\backups",
-    [string]$DirLogs = "$PSScriptRoot\logs"
+    [string]$DirLogs = "$PSScriptRoot\logs",
+    [string]$ArchivoIntegridad = "$PSScriptRoot\validar_integridad.sql"
 )
 
 # Nombre fijo y unico permitido como destino de la restauracion
@@ -37,6 +39,24 @@ function Escribir-Log {
     $fechaHora = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $linea = "$fechaHora - $Mensaje"
     Add-Content -Path $rutaLog -Value $linea -Encoding ASCII
+}
+
+# Verifica el contenido real contra el SHA-256 guardado junto al archivo.
+function Verificar-Hash {
+    param ([string]$Archivo)
+    $archivoHash = "$Archivo.sha256"
+    if (-not (Test-Path -LiteralPath $Archivo) -or -not (Test-Path -LiteralPath $archivoHash)) {
+        Escribir-Log "ERROR - Faltan el archivo o su SHA-256: $Archivo"
+        return $false
+    }
+    $esperado = (Get-Content -LiteralPath $archivoHash -Raw).Trim().Split()[0]
+    $actual = (Get-FileHash -LiteralPath $Archivo -Algorithm SHA256).Hash
+    if ($esperado -ne $actual) {
+        Escribir-Log "ERROR - SHA-256 no coincide para $Archivo"
+        return $false
+    }
+    Escribir-Log "OK - SHA-256 verificado para $Archivo"
+    return $true
 }
 
 # Funcion auxiliar para ejecutar una consulta escalar con psql y devolver el valor
@@ -90,9 +110,19 @@ if (-not (Test-Path -LiteralPath $PgRestore)) {
     Write-Host "RESULTADO: ERROR - No se encontro el ejecutable pg_restore"
     exit 1
 }
+if (-not (Test-Path -LiteralPath $PgAmcheck)) {
+    Escribir-Log "ERROR - No se encontro el ejecutable pg_amcheck en la ruta: $PgAmcheck"
+    Write-Host "RESULTADO: ERROR - No se encontro el ejecutable pg_amcheck"
+    exit 1
+}
 if (-not (Test-Path -LiteralPath $Psql)) {
     Escribir-Log "ERROR - No se encontro el ejecutable psql en la ruta: $Psql"
     Write-Host "RESULTADO: ERROR - No se encontro el ejecutable psql"
+    exit 1
+}
+if (-not (Test-Path -LiteralPath $ArchivoIntegridad)) {
+    Escribir-Log "ERROR - No existe el script de integridad: $ArchivoIntegridad"
+    Write-Host "RESULTADO: ERROR - No existe el script de integridad"
     exit 1
 }
 
@@ -125,6 +155,31 @@ else {
     Escribir-Log "ERROR - El nombre del respaldo no contiene una fecha valida: $nombreSinExt"
     Write-Host "RESULTADO: ERROR - Nombre de respaldo sin fecha valida"
     exit 1
+}
+
+# La restauracion no toca la copia hasta comprobar los hashes de datos y roles.
+$archivoGlobales = Join-Path $DirBackups "foodstore_globals_$($Matches[1]).sql"
+if (-not (Verificar-Hash -Archivo $archivoRestore) -or -not (Verificar-Hash -Archivo $archivoGlobales)) {
+    Write-Host "RESULTADO: ERROR - Fallo la verificacion SHA-256; no se modifico la base destino"
+    exit 1
+}
+
+# Conteos de origen para comparar automaticamente con la copia restaurada.
+$consultasConteo = [ordered]@{
+    'categoria'      = 'SELECT count(*) FROM categoria;'
+    'usuario'        = 'SELECT count(*) FROM usuario;'
+    'producto'       = 'SELECT count(*) FROM producto;'
+    'pedido'         = 'SELECT count(*) FROM pedido;'
+    'detalle_pedido' = 'SELECT count(*) FROM detalle_pedido;'
+}
+$conteosOrigen = [ordered]@{}
+foreach ($clave in $consultasConteo.Keys) {
+    $valor = Consultar-Psql -Etiqueta "origen_$clave" -Consulta $consultasConteo[$clave] -BaseDatos 'foodstore'
+    if ($null -eq $valor) {
+        Write-Host "RESULTADO: ERROR - No se pudo obtener el conteo de origen"
+        exit 1
+    }
+    $conteosOrigen[$clave] = $valor
 }
 
 # Verificar si la base destino ya existe (ANTES de arrancar el cronometro)
@@ -231,15 +286,26 @@ if ($codigoRestore -ne 0) {
 
 Escribir-Log "OK - pg_restore finalizo correctamente. Iniciando validaciones."
 
-# Validacion: conteos de las tablas principales
-$consultasConteo = [ordered]@{
-    'categoria'      = 'SELECT count(*) FROM categoria;'
-    'usuario'        = 'SELECT count(*) FROM usuario;'
-    'producto'       = 'SELECT count(*) FROM producto;'
-    'pedido'         = 'SELECT count(*) FROM pedido;'
-    'detalle_pedido' = 'SELECT count(*) FROM detalle_pedido;'
+# Actualiza estadisticas de la copia y revisa estructuras sin pedir bloqueos fuertes.
+$salidaAnalyze = & $Psql -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino -c 'ANALYZE;' 2>&1
+if ($LASTEXITCODE -ne 0) {
+    $cronometro.Stop()
+    Escribir-Log "ERROR - ANALYZE fallo despues de restaurar."
+    foreach ($lin in $salidaAnalyze) { Escribir-Log "PSQL: $lin" }
+    exit 1
 }
 
+$salidaAmcheck = & $PgAmcheck -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino --install-missing 2>&1
+if ($LASTEXITCODE -ne 0) {
+    $cronometro.Stop()
+    Escribir-Log "ERROR - pg_amcheck fallo."
+    foreach ($lin in $salidaAmcheck) { Escribir-Log "PG_AMCHECK: $lin" }
+    Write-Host "RESULTADO: ERROR - pg_amcheck fallo"
+    exit 1
+}
+Escribir-Log "OK - pg_amcheck finalizo correctamente."
+
+# Validacion: conteos de las tablas principales, comparados con la fuente.
 $conteos = [ordered]@{}
 $fallo = $false
 
@@ -250,6 +316,10 @@ foreach ($clave in $consultasConteo.Keys) {
         break
     }
     $conteos[$clave] = $valor
+    if ($valor -ne $conteosOrigen[$clave]) {
+        Escribir-Log "ERROR - Conteo distinto en ${clave}: origen=$($conteosOrigen[$clave]), destino=$valor"
+        $fallo = $true
+    }
 }
 
 # Validacion: controles de registros invalidos (deben dar cero)
@@ -257,6 +327,38 @@ if (-not $fallo) {
     $productosInvalidos = Consultar-Psql -Etiqueta 'productos_invalidos' -Consulta 'SELECT count(*) FROM producto WHERE precio < 0 OR stock < 0;' -BaseDatos $BaseDestino
     if ($null -eq $productosInvalidos) {
         $fallo = $true
+    }
+}
+
+# Controles centralizados: FKs huerfanas y valores invalidos deben ser cero.
+if (-not $fallo) {
+    $salidaIntegridad = & $Psql -w -h $Servidor -p $Puerto -U $Usuario -d $BaseDestino -t -A -F '|' -q -f $ArchivoIntegridad 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Escribir-Log "ERROR - validar_integridad.sql fallo."
+        foreach ($lin in $salidaIntegridad) { Escribir-Log "INTEGRIDAD: $lin" }
+        $fallo = $true
+    }
+    else {
+        $controles = 0
+        foreach ($linea in $salidaIntegridad) {
+            $texto = ([string]$linea).Trim()
+            if (-not $texto) { continue }
+            $controles++
+            if ($texto -notmatch '^[^|]+\|0$') {
+                Escribir-Log "ERROR - Control de integridad distinto de cero: $texto"
+                $fallo = $true
+            }
+            else {
+                Escribir-Log "OK - Control de integridad: $texto"
+            }
+        }
+        if ($controles -ne 6) {
+            Escribir-Log "ERROR - Se esperaban 6 controles de integridad y hubo $controles"
+            $fallo = $true
+        }
+        else {
+            Escribir-Log "OK - $controles controles de integridad en cero."
+        }
     }
 }
 if (-not $fallo) {
@@ -286,7 +388,7 @@ Escribir-Log "RESULTADO - Hora de fin del simulacro: $($horaFinSimulacro.ToStrin
 Escribir-Log "RESULTADO - RTO observado: $($rto.TotalSeconds.ToString('F2')) segundos ($rto)"
 Escribir-Log "RESULTADO - RPO observado: $($rpo.TotalHours.ToString('F2')) horas ($rpo)"
 foreach ($clave in $conteos.Keys) {
-    Escribir-Log "RESULTADO - Conteo ${clave}: $($conteos[$clave])"
+    Escribir-Log "RESULTADO - Conteo ${clave}: origen=$($conteosOrigen[$clave]), destino=$($conteos[$clave])"
 }
 Escribir-Log "RESULTADO - productos_invalidos: $productosInvalidos"
 Escribir-Log "RESULTADO - detalles_invalidos: $detallesInvalidos"

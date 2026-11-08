@@ -1,0 +1,14 @@
+Salida de Invoke-Pester (Pester 3.4.0), 2026-11-07, maquina de Mariano.
+Aclaracion: estos tests solo buscan texto en los scripts (ampliacion.Tests.ps1); no prueban comportamiento. El comportamiento esta en las corridas de respaldo y restauracion de esta carpeta.
+
+Describing Ampliacion U6 - mantenimiento verificable
+ [+] define un rol de respaldo sin atributos administrativos 42ms
+ [+] respalda los objetos globales sin hashes de contrasenas 12ms
+ [+] verifica la integridad de los archivos antes de crear la copia restaurada 12ms
+ [+] ejecuta pg_amcheck durante la restauracion de prueba 11ms
+ [+] instala amcheck solo si falta en la copia descartable 12ms
+ [+] define controles reutilizables de integridad referencial 14ms
+ [+] lee la salida de integridad sin mensajes de formato de psql 13ms
+ [+] registra las tareas de respaldo, mantenimiento y restauracion 13ms
+Tests completed in 133ms
+Passed: 8 Failed: 0 Skipped: 0 Pending: 0 Inconclusive: 0

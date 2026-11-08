@@ -24,7 +24,7 @@ figura como «no consta», sin completarlo. Las notas de revisión de Mariano Ch
 **Materia:** Base de Datos II (UTN) — Unidad 8, TP N.º 8
 **Proyecto Integrador:** Food Store
 **Alcance:** consignas 1 y 2 (base de la tablet en SQLite, instantánea, semáforo, casos C2 a C6), spec en Kiro (4.a), regeneración de la base de la tablet con OpenCode a partir de la spec (objetivo 11), armado del repositorio y revisión de los pull requests de Andrés y Facundo
-**Herramientas:** Claude (versión web, claude.ai), NotebookLM, Kiro y OpenCode (agente Nemotron 3.5 Lightning Free, solo para regenerar la base de la tablet en el objetivo 11). El code review de la consigna 3.c con OpenCode lo hizo Facundo (`duia_facundo.md`).
+**Herramientas:** Claude (versión web, claude.ai), NotebookLM, Kiro y OpenCode (agente Nemotron 3.5 Lightning Free, solo para regenerar la base de la tablet en el objetivo 11: dos corridas, 06/11 y 07/11). El code review de la consigna 3.c con OpenCode lo hizo Facundo (`duia_facundo.md`).
 
 > Esta declaración cubre únicamente lo que hice y usé yo. Andrés Fabre y Facundo Quiroga
 > declaran su propio uso de IA en `duia_andres.md` y `duia_facundo.md`.
@@ -55,11 +55,14 @@ figura como «no consta», sin completarlo. Las notas de revisión de Mariano Ch
 
 | Herramienta | Para qué se usó | Se aceptó / se descartó — por qué |
 |---|---|---|
-| Claude (borrador) y Kiro (edición de la spec) | Ampliar la spec **antes** de generar: casos C1, C7, C8 y F2, esquema `STRICT`, recarga del catálogo y reglas del semáforo (Requisitos 5 a 10) | **Los Requisitos 5 a 10 los redactó Claude** como borrador y se pegaron en Kiro casi sin cambios (103 de 113 líneas idénticas); se leyeron y se aceptaron. El Requisito 11 (entregables, ejecución y evidencia) y el historial de revisiones no provienen de ese borrador [CONFIRMAR: con qué herramienta se redactaron]. Commit `be854e4` del 06/11/2026 15:38, anterior a la generación (`e9dd9f8`, 16:10). Después se corrigió el REQ 5.3 (13 productos visibles y no 14, tras ejecutar contra el CSV real, commit `a088c03`) y se agregaron el REQ 6.12 y el 6.13 el 07/11 (commit `772536a`). |
+| Claude (borrador) y Kiro (edición de la spec) | Ampliar la spec **antes** de generar: casos C1, C7, C8 y F2, esquema `STRICT`, recarga del catálogo y reglas del semáforo (Requisitos 5 a 10) | **Los Requisitos 5 a 10 los redactó Claude** como borrador y se pegaron en Kiro casi sin cambios (103 de 113 líneas idénticas); se leyeron y se aceptaron. El Requisito 11 (entregables, ejecución y evidencia) y el historial de revisiones no provienen de ese borrador. **No consta** con qué herramienta se redactaron; no se completa por memoria. Commit `be854e4` del 06/11/2026 15:38, anterior a la generación (`e9dd9f8`, 16:10). Después se corrigió el REQ 5.3 (13 productos visibles y no 14, tras ejecutar contra el CSV real, commit `a088c03`) y se agregaron el REQ 6.12 y el 6.13 el 07/11 (commit `772536a`). |
 | OpenCode (agente Nemotron 3.5 Lightning Free) | Generar `schema_sqlite.sql`, `cargar_catalogo.sql`, `semaforo.sql` y `casos.sql` en `movil_opencode/` dándole solo `AGENTS.md` y la spec | **La corrida 1 no produjo una base funcional**: el esquema no se creó y por eso fallaron en cascada la carga, el semáforo y los casos (`evidencias/22_corrida1_con_errores.txt`). Se conservan los originales sin editar en `movil_opencode/original_opencode/` y el registro en `docs/registro_opencode_corrida1.txt` (commit `e9dd9f8`). **No consta** si OpenCode leyó `movil/` durante la corrida, aunque el prompt lo prohibía. |
 | Claude (web) | Diagnosticar los errores de la corrida 1 y corregirlos; después comparar la versión corregida con los originales de `movil/` | **Aceptado, ejecutado y verificado por mí:** `STRICT` como opción de tabla, índice parcial fuera del `CREATE TABLE`, `motivo` nullable, `WHERE true` en el `UPSERT`, sin `DELETE` previo y semáforo reescrito con una CTE de causas; `casos.sql` reescrito con datos reales del CSV. **Descartado:** un cambio que Claude hizo en la vista (precio sin dividir por 100) por una suposición, contrario al REQ 5.2; se restauró. **Hallazgo de la comparación:** faltaban un valor por defecto en `pedido_borrador.creado_en` y la clave foránea de `cola_sync.id_local`; la spec no los pedía, así que se agregaron a la spec (REQ 6.12 y 6.13) y después al esquema. Evidencias `22` a `27` y `docs/comparacion_generado_vs_original.md`. |
+| OpenCode (agente Nemotron 3.5 Lightning Free), corrida 2 | Repetir la generación, sin editar, en una carpeta aislada (`C:\corrida2_opencode`) que no contenía `movil/`, `docs/` ni `evidencias/`; se le dieron `AGENTS.md`, la spec (REQ 5 a 13), `.kiro/steering/` y `servidor_snapshot.csv`. 07/11/2026, de 09:39 a 09:50 | **Tampoco produjo una base funcional.** Se conserva sin editar en `movil_opencode_v2/` (commits `dc1ead0` y `55cb059`) y el registro (prompt y respuesta cruda) en `docs/registro_opencode_corrida2.txt`. Nueve defectos (`docs/comparacion_generado_vs_original.md`, sección 8): `cargar_catalogo.sql` con el mismo error de sintaxis de la corrida 1; ninguna tabla es `STRICT`; falta el `CHECK` de `motivo`; falta el `PRAGMA foreign_keys = ON;` en seis scripts; `criada_en` mal escrito; `BEGIN TRY/CATCH` de otro motor; un `SELECT` sin `FROM`; no existe `casos.sql`; mensajes de C7 que se imprimen siempre. **Descartado:** las afirmaciones de su respuesta («5 tablas STRICT», «sintaxis revisada», «`PRAGMA` en cada script»), que son falsas; el propio agente dijo no haber ejecutado nada. **Aceptado como evidencia, sin corregir:** `semaforo.sql` y los `DEFAULT` y la clave foránea del esquema. No se agrega ningún requisito por esta corrida: los incumplimientos son contra REQ ya escritos. La versión final sigue siendo `movil_opencode/`. Evidencias `28` y `29`. |
+| Claude (web) | Analizar la evidencia 28 contra la spec, redactar la sección 8 de la comparación y proponer el script de la evidencia 29 (motivo `NULL`, clave foránea con y sin `PRAGMA`, modo `STRICT`) | **Aceptado, después de leer el script y correrlo yo** en SQLite 3.54.1 (Windows): confirmó por ejecución los defectos 2, 6 y 7 (`evidencias/29_corrida2_motivo_fk_strict.txt`, commit `229c018`). **Corregido:** un primer intento falló porque pegué las líneas con el prompt `PS` y PowerShell las ejecutó como `Get-Process`; se rehízo desde un `.ps1`. **Declarado como límite, sin tocar la spec:** `v_catalogo_disponible` sin `capturado_en` y la falta de un criterio `OK`/`FALLA` en el REQ 11. |
+| Kiro | Se tocó la spec solo para el registro: al abrirla, Kiro cambió el encabezado `## Glosario` por `## Glossary` en `requirements.md` | **Descartado** con `git checkout` (sin contenido nuevo). Comportamiento observado, no un cambio pedido. |
 
-**Declaración honesta:** los scripts que funcionan hoy en `movil_opencode/` son en su mayor parte reescrituras hechas con Claude a partir de los errores de la corrida 1. De OpenCode quedan la estructura general y algunas ideas de casos.
+**Declaración honesta:** los scripts que funcionan hoy en `movil_opencode/` son en su mayor parte reescrituras hechas con Claude a partir de los errores de la corrida 1. De OpenCode quedan la estructura general y algunas ideas de casos. La corrida 2 (sin editar, sin `movil/` a la vista) tampoco funcionó; se conserva como evidencia.
 
 ##### Revisión del trabajo de un compañero (PR #1 de Andrés Fabre)
 
@@ -88,6 +91,8 @@ Todo se probó en mi máquina (Windows PowerShell 5.1): PostgreSQL 17.10 con la 
 5. Casos borde del semáforo (F2): `movil/casos_f2_semaforo.sql`, con las salidas en `evidencias/18` y `19`.
 6. Versión de OpenCode (objetivo 11): corrida 1 sin editar (`evidencias/22`), versión corregida (`23` a `25`), casos F2 originales contra la versión corregida (`26`) y `casos.sql` tras los REQ 6.12 y 6.13 (`27`).
 
+7. Corrida 2 de OpenCode, sin editar (`evidencias/28`) y verificación adicional de los defectos de motivo, clave foránea y `STRICT` en SQLite 3.54.1 (`evidencias/29`).
+
 Ninguna propuesta de la IA se incorporó sin leerla y correrla.
 
 #### Resumen de decisiones
@@ -99,7 +104,55 @@ Ninguna propuesta de la IA se incorporó sin leerla y correrla.
 | Reenvío de una solicitud | `UUID` como clave primaria; índice parcial para permitir reenviar solo tras un `CONFLICTO` |
 | Código de la cátedra | No se usó: el `kit_u8_campus` no estaba disponible |
 | Spec de Kiro | Primera versión (03/11): posterior al código; declarado. Objetivo 11: revisada y con commit antes de generar con OpenCode (06/11, `be854e4`) |
-| Regeneración con OpenCode | La corrida 1 no funcionó; la versión actual se corrigió con Claude y se declara; originales conservados |
+| Regeneración con OpenCode | Las corridas 1 y 2 no funcionaron sin editar; la versión final (`movil_opencode/`) se corrigió con Claude y se declara; originales (`original_opencode/`, `movil_opencode_v2/`) conservados |
+
+#### Declaraciones del 07/11/2026 (cierre de la segunda entrega)
+
+##### 1. Merges a `main` sin revisión cruzada
+Todos los merges del 07/11 los hizo Mariano Chirino sin revisión cruzada (Facundo Quiroga no respondió y no hay ninguna rama suya). Se pide una lectura posterior a Andrés Fabre.
+
+| PR | Rama | Contenido | Hora |
+|---|---|---|---|
+| #6 | `m/obj-11` | Objetivo 11: SQLite con OpenCode, comparación y evidencias | 15:12 |
+| #7 | `m/informe-u8` | `docs/informe/u8.md` | 15:52 |
+| #8 | `m/obj-06` | Objetivo 6: auditoría de `roles.sql`, correcciones H1, H3 y H4b | 18:16 |
+| #9 | `m/docs-cierre` | README raíz, `u5.md`, introducción, bitácora unificada | 18:42 |
+| #10 | `m/bitacora-cierre` | Parte F de la bitácora de la U5 | 18:51 |
+| #5 | `a/obj-10` | Objetivo 10, de Andrés Fabre; lo mergeó Mariano | 19:00 |
+| #11 | `m/fix-obj-10` | Correcciones de Mariano a `a/obj-10` y repetición de la medición | 19:09 |
+| #12 | `m/limpieza-u7` | Datos de ejemplo de la U7 regenerados sin nombres reales | 19:32 |
+| #13 | `m/fix-obj-07` | `a/obj-07` de Andrés Fabre (objetivo 7) con correcciones de Mariano | 20:06 |
+
+##### 2. Trabajo de Mariano sobre archivos de Andrés
+- **`a/obj-10` (U7):** se corrigió `u7.md` contra la evidencia (MongoDB figuraba con 10 ms y la salida dice `executionTimeMillis: 0`; se quitó una afirmación sobre el `$lookup` que no estaba medida), se repitió la medición con base propia y se verificaron las referencias en ambos motores. Los límites están declarados en `comparacion_medida.md`.
+- **`a/obj-07` (U6):** se leyeron línea por línea `backup_foodstore.ps1`, `restore_test.ps1`, `crear_rol_respaldo.sql`, `programar_tareas.ps1` y `validar_integridad.sql`. Se corrigió `restore_test.ps1` para que exija y registre los 6 controles de integridad. Se repitieron respaldo, simulacro, roles (T01 a T23, 23 de 23), Programador de tareas, mantenimiento y Pester. `docs/informe/u6.md` se amplió con la repetición y los límites.
+
+##### 3. Asistencia de Claude
+Con asistencia de Claude se redactaron y se verificaron contra las salidas crudas: los scripts de repetición de la U6 y la U7, la corrección de `u7.md` y `u6.md`, `docs/informe/u5.md`, `unidad-5/docs/auditoria_roles_opencode.md`, `docs/informe/00_introduccion_uso_ia_limitaciones.md` y el `README.md` raíz. El hallazgo H4b salió de una revisión con Claude, no de OpenCode.
+
+##### 4. Auditoría de `roles.sql` con OpenCode
+La sesión original no se conserva. La auditoría del 07/11 es una repetición (Nemotron 3.5 Lightning, modo Plan, carpeta `C:\auditoria_roles`) que salió en 3 partes por 2 interrupciones; los mensajes de las interrupciones los redactó Claude. Hora de la parte 1: 16:38, a verificar; partes 2 y 3: no consta. Registro: `unidad-5/docs/registro_opencode_auditoria_roles_corrida2.txt`.
+
+##### 5. Evidencias con tratamiento especial
+- Cinco evidencias de H3 y H4b se generaron en UTF-16 y se convirtieron a UTF-8 sin cambiar el contenido (commit `6346e09`).
+- `unidad-6/evidencias/obj7_repeticion2_mariano_restore_20261107_194601.txt` quedó interrumpido durante `pg_restore`; la causa no consta. Se conserva sin editar, con su nota.
+- Las salidas de `psql` en español traen `ï¿½` en algunas líneas por codificación de la consola; no se editaron.
+- Las evidencias conservan rutas locales y el nombre del equipo (`host` en salidas de `explain`); no se editaron para no alterar lo que prueban.
+- La prueba de H1 en base sucia se corrió en consola y no se guardó.
+
+##### 6. Límites del entorno de Mariano
+- El `pg_hba.conf` usa `trust`: las pruebas verifican permisos, no autenticación.
+- Las tareas del Programador se registraron, se dispararon a mano y se desregistraron; no se observó ninguna ejecución por horario.
+- Se ejecutó un `ANALYZE` manual sobre la copia `foodstore` (la copia por plantilla no traía estadísticas).
+- `log_statement = all` sigue activo en el servidor local; las contraseñas de prueba de T04 y T14 quedan en ese log, que no está en el repositorio.
+
+##### 7. Datos en el historial de Git
+El repositorio es público. Un correo y un apellido de un integrante estuvieron en `unidad-7/modelo/pedidos_export.json` y en dos archivos más; se regeneraron, pero siguen en el historial. No se reescribió el historial.
+
+##### 8. Otros
+- Requisito 11 de la spec de la U8: no consta con qué herramienta se redactó.
+- `roles.sql` cambió tres veces en `m/obj-06` (H1, H3, H4b); quien lo edite debe partir de `main` actual.
+- Las preguntas al profesor sobre el objetivo 11 y el formato del repo no se enviaron; se resolvió con criterio propio y se declara. Tampoco hubo defensa oral en las entregas anteriores.
 
 ---
 

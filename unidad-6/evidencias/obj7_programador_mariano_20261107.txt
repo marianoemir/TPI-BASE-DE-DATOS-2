@@ -1,0 +1,26 @@
+=== Registro real 2026-11-07 19:56:06 ===
+RESULTADO: OK - FoodStore-Respaldo-Diario registrada
+RESULTADO: OK - FoodStore-Mantenimiento-Semanal registrada
+RESULTADO: OK - FoodStore-Restauracion-Semanal registrada
+=== Tareas registradas (antes de disparar) ===
+  FoodStore-Respaldo-Diario State=Ready Usuario=Mariano_Chirino LogonType=Interactive RunLevel=Limited
+  FoodStore-Respaldo-Diario: LastRunTime=1999-11-30 00:00:00 LastTaskResult=267011 NextRunTime=2026-11-08 02:00:00
+  FoodStore-Mantenimiento-Semanal State=Ready Usuario=Mariano_Chirino LogonType=Interactive RunLevel=Limited
+  FoodStore-Mantenimiento-Semanal: LastRunTime=1999-11-30 00:00:00 LastTaskResult=267011 NextRunTime=2026-11-08 03:00:00
+  FoodStore-Restauracion-Semanal State=Ready Usuario=Mariano_Chirino LogonType=Interactive RunLevel=Limited
+  FoodStore-Restauracion-Semanal: LastRunTime=1999-11-30 00:00:00 LastTaskResult=267011 NextRunTime=2026-11-08 04:00:00
+=== Disparo con Start-ScheduledTask: respaldo ===
+  Disparado: 2026-11-07 19:56:08
+  Estado final de FoodStore-Respaldo-Diario: Ready
+  FoodStore-Respaldo-Diario: LastRunTime=2026-11-07 19:56:08 LastTaskResult=0 NextRunTime=2026-11-08 02:00:00
+=== Disparo con Start-ScheduledTask: restauracion ===
+  Disparado: 2026-11-07 19:56:12
+  Estado final de FoodStore-Restauracion-Semanal: Ready
+  FoodStore-Restauracion-Semanal: LastRunTime=2026-11-07 19:56:12 LastTaskResult=0 NextRunTime=2026-11-08 04:00:00
+=== Logs mas recientes en unidad-6\logs ===
+  restore_20261107_195612.log  2026-11-07 19:56:20  2947 bytes
+  backup_20261107_195608.log  2026-11-07 19:56:11  737 bytes
+  restore_20261107_194613.log  2026-11-07 19:46:22  2947 bytes
+  backup_20261107_194611.log  2026-11-07 19:46:13  737 bytes
+=== Desregistro ===
+  Tareas FoodStore-* que quedan: 0

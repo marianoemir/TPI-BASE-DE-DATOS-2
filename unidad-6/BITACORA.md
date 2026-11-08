@@ -18,6 +18,27 @@ Reglas de uso:
 | Claude (claude.ai) | Mariano | Armar `SPEC_U6.md`, `AGENTS.md` y `health_check.sql`; preparar los prompts para OpenCode; revisar scripts con la lista de ocho preguntas; corregir `maintenance.sql`; armar `informe_u6.pdf` y esta bitácora; guiar los comandos paso a paso |
 | pgAdmin 4, `psql`, `pg_dump`, `pg_restore` | Mariano, Andrés | Armar las bases, ejecutar los scripts y consultar |
 
+## Ampliación del objetivo 7 (Andrés, 2026-11-07)
+
+| Prompt o pedido | Respuesta relevante recibida (resumida) | Validación o corrección humana aplicada |
+|---|---|---|
+| **Andrés · OpenCode (GPT-5.6 Terra):** completar solamente la parte asignada de U6 a partir de la división del equipo, `SPEC_U6.md` y `AGENTS.md`; primero escribir `SPEC_U6_ampliacion.md`, comprometerla y recién después generar código | Propuso especificar respaldo de globales sin hashes de contraseña, rol de respaldo limitado, SHA-256 previo a restaurar, `pg_amcheck`, controles de huérfanos, comparación automática de conteos y tres tareas de Windows | Se revisó la spec y se confirmó el commit `cfb6f0a` antes de crear scripts. Se separó deliberadamente la restauración de roles de la tarea automática: `pg_dumpall --globals-only --no-role-passwords` se conserva y verifica, pero no se ejecuta automáticamente porque altera el clúster completo. |
+| **Andrés · OpenCode (GPT-5.6 Terra):** generar scripts y pruebas desde la spec, sin ejecutar PostgreSQL ni registrar tareas todavía | Agregó pruebas Pester y los scripts `crear_rol_respaldo.sql`, `validar_integridad.sql`, `programar_tareas.ps1`, y cambios a respaldo/restauración | Primero se ejecutaron las pruebas Pester sin la implementación: 0 aprobadas y 6 fallidas por funcionalidades ausentes. Después de la implementación, el análisis sintáctico de los cuatro `.ps1` y Pester dieron 6/6. `programar_tareas.ps1 -WhatIf` mostró las tres acciones sin registrar tareas. |
+
+### Pruebas reales posteriores (Andrés, 2026-11-07)
+
+| Caso | Resultado observado | Evidencia |
+|---|---|---|
+| Rol de respaldo | `operador_respaldo` se creó con `LOGIN` y sin `SUPERUSER`, `CREATEDB`, `CREATEROLE`, `REPLICATION` ni `BYPASSRLS`. El primer login falló porque la entrada de `pgpass.conf` no coincidía con la contraseña; se corrigió con `\password operador_respaldo`, sin exponer la clave. | `evidencias/obj7_rol_respaldo_20261107.txt` |
+| Respaldo | `pg_dump` ejecutado como `operador_respaldo`, `pg_restore --list` correcto, dump de 10.667.028 bytes, respaldo global sin hashes de contraseña y SHA-256 para ambos. | `evidencias/obj7_backup_ok_20261107.txt` |
+| Restauración e integridad | SHA-256 de datos y globales verificados antes de borrar la copia. Restauración, `ANALYZE`, `pg_amcheck --install-missing`, conteos origen/destino e integridad finalizaron correctamente. RTO observado: 7,11 s; RPO observado: 0,05 h. | `evidencias/obj7_restore_ok_20261107.txt` |
+| Hash alterado | Se reemplazó temporalmente la huella del dump por una inválida. El script devolvió código 1 antes de modificar `foodstore_restore_test`; el OID de la copia se mantuvo y la huella válida se restauró. | `evidencias/obj7_hash_alterado_20261107.txt` |
+| Retención | Se creó un conjunto artificial completo con fecha 2026-10-01. Una nueva ejecución de respaldo eliminó sus cuatro archivos y conservó el conjunto vigente. | `evidencias/obj7_retencion_20261107.txt` |
+| Programador de tareas | Se registraron las tareas diaria de respaldo y semanales de mantenimiento/restauración. La tarea de respaldo fue iniciada desde el Programador y devolvió `LastTaskResult = 0`. | `evidencias/obj7_tareas_programadas_20261107.txt` |
+| Roles tras restauración | Se restauró una copia nueva en `foodstore_restore_test`; se aplicó manualmente `unidad-5/sql/roles.sql` y luego `verificacion_roles.sql`. Las pruebas T01 a T23 devolvieron `OK`. Los avisos de `REVOKE ROLE` indicaron membresías ausentes y no impidieron el `COMMIT`. | `evidencias/obj7_roles_aplicacion_20261107.txt`, `evidencias/obj7_verificacion_roles_20261107.txt` |
+
+**Errores de la primera versión y corrección humana.** `pg_amcheck` falló porque la base restaurada no tenía registrada la extensión `amcheck`; se agregó `--install-missing`, que solo la instala en `foodstore_restore_test`. Luego `validar_integridad.sql` emitía mensajes de `\pset` que el script interpretaba como controles no nulos; se movió el formato a `psql -t -A -F '|' -q`. En ambos casos se agregó primero una prueba Pester que falló y después el cambio mínimo; el resultado final fue 8/8 pruebas Pester.
+
 ## H0 — Entorno (cada integrante)
 
 | Quién | Servidor y versión | Conteos de `usuario`, `producto`, `pedido` | Problemas y cómo se resolvieron |

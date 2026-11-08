@@ -1,0 +1,8 @@
+2026-11-07 02:39:08 - INICIO - Respaldo de foodstore en localhost:5432.
+2026-11-07 02:39:10 - OK - pg_dump finalizo correctamente.
+2026-11-07 02:39:10 - OK - pg_restore --list finalizo correctamente.
+2026-11-07 02:39:10 - OK - SHA-256 generado para foodstore_20261107_023908.dump.
+2026-11-07 02:39:10 - OK - pg_dumpall --globals-only finalizo correctamente.
+2026-11-07 02:39:10 - OK - SHA-256 generado para foodstore_globals_20261107_023908.sql.
+2026-11-07 02:39:10 - OK - Retencion elimino el conjunto valido vencido 20261001_010101.
+2026-11-07 02:39:10 - RESULTADO: OK - Datos: <RAIZ_REPO>\unidad-6\backups\foodstore_20261107_023908.dump | Globales: <RAIZ_REPO>\unidad-6\backups\foodstore_globals_20261107_023908.sql

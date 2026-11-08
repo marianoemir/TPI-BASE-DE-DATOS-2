@@ -21,5 +21,7 @@ Food Store usa tres motores. **PostgreSQL es la única fuente de verdad**: ningu
 señal, cada solicitud se compara con una instantánea nueva (en este TP el envío es una simulación y no escribe en PostgreSQL) → solo PostgreSQL
 confirmaría la venta. MongoDB no participa de la sincronización: atiende su parte sin tocar el stock ni las ventas.
 
+**Controles transversales.** La U4 normaliza el control de lotes y documenta la desnormalización de consultas analíticas. La U5 define roles y auditoría de PostgreSQL; la U6 respalda `foodstore`, conserva los globales de roles por separado y prueba su restauración únicamente en `foodstore_restore_test`. Ninguno de esos controles cambia la regla de autoridad: PostgreSQL sigue siendo la fuente de verdad y MongoDB/SQLite permanecen como copias de propósito específico.
+
 ---
 *Versión corregida por Mariano Chirino tras revisar el borrador de Andrés Fabre (PR #1): el borrador ubicaba la cola en PostgreSQL, describía MongoDB como metadatos de productos y daba autoridad local a SQLite.*

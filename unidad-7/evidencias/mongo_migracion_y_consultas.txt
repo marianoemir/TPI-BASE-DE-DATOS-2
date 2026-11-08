@@ -1,4 +1,4 @@
-﻿Insertados: 7
+Insertados: 7
 countDocuments: 7
 
 --- Regla 1 - total distinto de la suma de subtotales (esperado: []) ---
@@ -46,7 +46,7 @@ countDocuments: 7
 [
   {
     _id: 3,
-    fecha: ISODate('2026-10-30T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('5300.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -78,7 +78,7 @@ countDocuments: 7
   },
   {
     _id: 5,
-    fecha: ISODate('2026-10-30T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('18700.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -109,16 +109,16 @@ countDocuments: 7
     ],
     origen: 'data.sql',
     cliente: {
-      mail: 'mariano.chirino@mail.com',
-      nombre: 'Mariano',
-      apellido: 'Chirino',
+      mail: 'carlos.rivas@mail.com',
+      nombre: 'Carlos',
+      apellido: 'Rivas',
       usuario_id: 4
     },
     forma_pago: 'EFECTIVO'
   },
   {
     _id: 7,
-    fecha: ISODate('2026-10-31T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('4200.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -150,7 +150,7 @@ countDocuments: 7
   },
   {
     _id: 8,
-    fecha: ISODate('2026-10-31T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('11700.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -187,7 +187,7 @@ b) ids: [3,5,7,8]
 [
   {
     _id: 1,
-    fecha: ISODate('2026-10-30T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('9400.00'),
     estado: 'CONFIRMADO',
     lineas: [
@@ -219,7 +219,7 @@ b) ids: [3,5,7,8]
   },
   {
     _id: 7,
-    fecha: ISODate('2026-10-31T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('4200.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -251,7 +251,7 @@ b) ids: [3,5,7,8]
   },
   {
     _id: 8,
-    fecha: ISODate('2026-10-31T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('11700.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -288,7 +288,7 @@ c) ids: [1,7,8]
 [
   {
     _id: 1,
-    fecha: ISODate('2026-10-30T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('9400.00'),
     estado: 'CONFIRMADO',
     lineas: [
@@ -320,7 +320,7 @@ c) ids: [1,7,8]
   },
   {
     _id: 8,
-    fecha: ISODate('2026-10-31T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('11700.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -356,7 +356,7 @@ c) ids: [1,7,8]
 [
   {
     _id: 2,
-    fecha: ISODate('2026-10-30T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('11900.00'),
     estado: 'TERMINADO',
     lineas: [
@@ -396,7 +396,7 @@ c) ids: [1,7,8]
   },
   {
     _id: 5,
-    fecha: ISODate('2026-10-30T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('18700.00'),
     estado: 'PENDIENTE',
     lineas: [
@@ -427,16 +427,16 @@ c) ids: [1,7,8]
     ],
     origen: 'data.sql',
     cliente: {
-      mail: 'mariano.chirino@mail.com',
-      nombre: 'Mariano',
-      apellido: 'Chirino',
+      mail: 'carlos.rivas@mail.com',
+      nombre: 'Carlos',
+      apellido: 'Rivas',
       usuario_id: 4
     },
     forma_pago: 'EFECTIVO'
   },
   {
     _id: 8,
-    fecha: ISODate('2026-10-31T00:00:00.000Z'),
+    fecha: ISODate('2026-11-07T00:00:00.000Z'),
     total: Decimal128('11700.00'),
     estado: 'PENDIENTE',
     lineas: [
