@@ -100,6 +100,8 @@ Aplicando el algoritmo de descomposición sin pérdida sobre la dependencia viol
 5. Verificar la integridad y equivalencia exacta utilizando conteos y **los dos `EXCEPT`** en ambas direcciones.
 6. Probar el script de reversión (bloque "down" de la sección 8 del script): ejecutar el down, verificar que desaparecen la vista y las dos tablas, y volver a correr el script completo (up → down → up).
 
+> Actualizado el 08/11/2026 en la sección 9: el script único se separó en `up.sql` y `down.sql` dentro de `unidad-4/migracion/`.
+
 ## 6. Criterios de aceptación
 
 - [x] `COUNT(*)` coincide entre la relación original y la reconstruida por la vista.
@@ -112,8 +114,67 @@ Aplicando el algoritmo de descomposición sin pérdida sobre la dependencia viol
 Contenido del bloque "down" (sección 8 de `tp_fnbc_control_lote.sql`):
 Elimina la vista de compatibilidad y las tablas descompuestas `control_lote` y `responsable_deposito`, manteniendo intactas las tablas originales.
 
+> Actualizado el 08/11/2026 en la sección 9.5: orden de borrado, qué se pierde al revertir y reversión de emergencia.
+
 ## 8. Riesgos
 
 - Perder restricciones de FK si las tablas maestras `lote` y `deposito` no están correctamente creadas antes de la descomposición.
 - **Limitación conocida (FNBC vs. preservación de dependencias):** la descomposición es sin pérdida pero no preserva `{LoteID, DepositoID} -> ResponsableControlID`. Contraejemplo (sección 7 del script, captura 9): con `(803, 30)` en `responsable_deposito` y `(501, 803)` en `control_lote`, el lote `501` queda con dos responsables en el depósito `30`, algo que la clave primaria de la tabla original impediría. Para imponer esa regla haría falta un trigger o una verificación por consulta.
 - El script inserta usuarios de prueba (801-803) en `usuario`: se ejecuta en `copia_fnbc` y nunca en `plantilla_food_store`.
+
+---
+
+## 9. Actualización del 08/11/2026: migración en archivos separados
+
+> Esta sección se agrega **después** de que los archivos de migración ya existían: el plan de reversión se formalizó a posteriori y no antes de generar el código. Actualiza las secciones 5 y 7; el resto no cambia. Redactada con ayuda de Claude y revisada por Facundo Quiroga.
+
+### 9.1 Motivo
+
+El Paso 6 de `protocolo_seguridad.md` exige `up.sql` y `down.sql` separados, cada uno dentro de `BEGIN…COMMIT`. El script original (`tp_fnbc_control_lote.sql`) tenía el `down` comentado y el `up` sin transacción.
+
+### 9.2 Archivos (en `unidad-4/migracion/`)
+
+| Archivo | Contenido |
+|---|---|
+| `setup_previo.sql` | Estado previo: `lote`, `deposito`, responsables 801 a 803 y `control_lote_almacen` con las 3 filas. Re-ejecutable, solo para copias de trabajo. |
+| `up.sql` | Precondición `R -> D`, expandir (tablas nuevas), migrar (`INSERT…SELECT DISTINCT`), vista de compatibilidad y verificación interna. |
+| `down.sql` | Elimina la vista y las dos tablas nuevas. |
+| `verificar_migracion.sql` | Consultas V1 a V5, de solo lectura. |
+
+### 9.3 Plan de migración actualizado (orden de ejecución)
+
+1. Copia de trabajo (`copia_u4`) con `schema.sql`, `objects.sql` y `data.sql`.
+2. `setup_previo.sql`.
+3. Respaldo con `pg_dump` (Paso 3 del protocolo), fuera del repo, antes de `up.sql`.
+4. `up.sql`:
+   - **Precondición:** ningún responsable en más de un depósito; si no se cumple, aborta sin crear nada.
+   - **Expandir:** crea `responsable_deposito` y `control_lote`.
+   - **Migrar:** copia los datos sin tocar `control_lote_almacen`.
+   - **Vista:** crea `v_control_lote_almacen`.
+   - **Verificar:** los dos `EXCEPT` más el conteo, dentro de la transacción; si algo no coincide, lanza una excepción y no se confirma nada.
+5. `verificar_migracion.sql`: V1 a V4.
+6. `down.sql`, y después V1 y V5 para comprobar que se volvió al estado previo.
+
+**Contraer** (eliminar `control_lote_almacen`) queda fuera de esta migración y se haría en una migración posterior, como indica el Paso 6. Todos los pasos anteriores a contraer son reversibles sin pérdida.
+
+### 9.4 Criterios de aceptación adicionales
+
+- [x] `up.sql` termina con `COMMIT` y el aviso `Verificación OK: perdidas=0, espurias=0, filas antes=3 / despues=3`.
+- [x] Tras `up.sql`: V1 devuelve 3 objetos, V2 y V3 devuelven 0 filas y V4 devuelve `3 / 3 / 2 / 3`.
+- [x] Tras `down.sql`: V1 devuelve 0 filas y V5 devuelve las 3 filas originales.
+- [x] `up.sql` repetido falla sin dejar nada a medias; `down.sql` repetido no da error. *(Probado en PostgreSQL 16 local con Claude; sin captura propia.)*
+- [x] `up.sql` con datos que violan `R -> D` se frena en la precondición y no crea ningún objeto. *(Ídem.)*
+
+Evidencia: `unidad-4/capturas/` y `docs/informe/u4.md`.
+
+### 9.5 Plan de reversión ampliado
+
+- **Contenido de `down.sql`:** elimina primero la vista, después `control_lote` (tiene FK a `responsable_deposito`) y por último `responsable_deposito`. Usa `IF EXISTS`, por lo que se puede repetir.
+- **Qué se pierde al revertir:** lo escrito en `responsable_deposito` y `control_lote` *después* del `up` (por ejemplo, un responsable dado de alta solo en las tablas nuevas). El estado previo no se pierde, porque `control_lote_almacen` se conserva. Si hubiera que conservar esos datos, se respaldan las tablas nuevas antes de revertir.
+- **Reversión de emergencia:** restaurar el respaldo de `pg_dump` tomado antes del `up`.
+
+### 9.6 Riesgos adicionales
+
+- **`up.sql` no es idempotente a propósito:** si las tablas ya existen, falla. Para repetir el ciclo hay que correr antes `down.sql` o `setup_previo.sql`.
+- **`setup_previo.sql` borra las tablas de la U4 al empezar:** solo se ejecuta en copias de trabajo, nunca en una base con datos que importen.
+- **pgAdmin y transacciones abortadas:** si un script con `BEGIN` falla a mitad, la transacción puede quedar abierta y abortada; se resuelve ejecutando `ROLLBACK;`.
