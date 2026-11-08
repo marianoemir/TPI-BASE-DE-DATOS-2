@@ -9,7 +9,7 @@ Reglas que se declararon y se respetaron en todas las unidades: nada generado se
 | Integrante | Herramientas declaradas | Dónde |
 |---|---|---|
 | Mariano Chirino | Claude (chat), Kiro, OpenCode (Nemotron 3.5 Lightning Free), NotebookLM | `unidad-4/duia/`, `unidad-5/BITACORA.md`, `unidad-7/BITACORA.md`, `unidad-8/docs/` |
-| Andrés Fabre | Gemini (U4, U8), OpenCode / Muse Spark (U5, U7), OpenCode / «GPT-5.6 Terra» para la revisión del 05/11 (U8, sin logs) | ídem; U6 `[COMPLETAR por Andrés]` |
+| Andrés Fabre | Gemini (U4, U8), OpenCode / Muse Spark (U5, U7), OpenCode / «GPT-5.6 Terra» para la revisión del 05/11 (U8, sin logs) y para las ampliaciones U6/U7 del 07/11 | ídem; U6 queda detallada en la sección 4 |
 | Facundo Quiroga | Gemini (U4, U5; «a confirmar por Facundo»), Claude (U7), OpenCode agente Plan (U8; modelo y proveedor «no consta») | ídem |
 
 ## 2. Unidad 4 — normalización y desnormalización (objetivos 1 a 3)
@@ -26,7 +26,7 @@ Fuentes: `unidad-4/duia/duia_mariano.md`, `duia_andres.md`, `duia_facundo.md`. F
 | Mariano | Claude | Elegir el patrón y generar el DDL | **Aceptada** la vista materializada `mv_ventas_categoria_dia` (0,106 ms); se corrigió la clave de agrupación |
 | Mariano | Claude | Auditoría de desincronización | **Error detectado:** el `JOIN` interno daba un falso negativo. Se reemplazó por `FULL OUTER JOIN … IS DISTINCT FROM` y se probó con `ROLLBACK` |
 
-**Límites declarados.** Mariano indica «OpenCode/Kiro en las primeras versiones del grupo», pero ninguna fila de su tabla los registra (**no consta** qué se hizo con ellos). Las DUIA de Andrés y Facundo conservan notas pendientes dirigidas a ellos (`confirmá…`). La Parte 1 se probó en `copia_fnbc` y la Parte 2 en `copia_trabajo`, ambas en PostgreSQL 18.
+**Límites declarados.** Mariano indica «OpenCode/Kiro en las primeras versiones del grupo», pero ninguna fila de su tabla los registra (**no consta** qué se hizo con ellos). La DUIA de Facundo conserva una nota pendiente; la de Andrés declara «no consta» donde no hay registro. La Parte 1 se probó en `copia_fnbc` y la Parte 2 en `copia_trabajo`, ambas en PostgreSQL 18.
 
 ## 3. Unidad 5 — roles, auditoría y simulacro (objetivos 4 a 6)
 
@@ -63,9 +63,13 @@ Fuente: `unidad-5/BITACORA.md` (esta unidad no tiene DUIA propia).
 
 ## 4. Unidad 6 — respaldo, restauración y mantenimiento (objetivos 7 y 8)
 
-**Sin bitácora ni DUIA de la unidad en las fuentes recibidas.** `[COMPLETAR por Andrés: herramientas, prompts, respuestas y decisiones de U6 y de la rama a/obj-07: spec de ampliación, OpenCode, programador de tareas]`
+Fuente: `unidad-6/BITACORA.md`, sección «Ampliación del objetivo 7».
 
-Dato conocido por la revisión del 07/11 (no es declaración del autor): la bitácora de la rama `a/obj-07` trae los prompts resumidos, sin la respuesta cruda de OpenCode; queda pedido guardarla o declarar «no consta».
+| Quién | Herramienta, modelo y fecha | Qué se pidió | Decisión, corrección y prueba |
+|---|---|---|---|
+| Andrés | OpenCode, proveedor OpenAI, modelo GPT-5.6 Terra; 07/11/2026 | Completar solo el objetivo 7 asignado: primero redactar y commitear `SPEC_U6_ampliacion.md`; después generar rol limitado de respaldo, backup de globales sin hashes de claves, retención, hashes previos, `pg_amcheck`, controles de integridad, comparación de conteos y tareas de Windows. | **Aceptado tras lectura y prueba:** la spec se confirmó en `cfb6f0a`; los scripts y pruebas se revisaron antes de usarlos. **Corregido tras ejecución:** se añadió `--install-missing` porque `amcheck` faltaba en la copia restaurada, y se ajustó la lectura de `psql` a `-t -A -F '|' -q` porque los mensajes de formato se interpretaban como controles. **Descartado:** restaurar automáticamente los roles globales, porque afecta todo el clúster; se preservan y verifican los globales, y los roles se aplican manualmente sobre la copia. Se probó en PostgreSQL 17 local: `foodstore` solo como origen y `foodstore_restore_test` como destino descartable. |
+
+**Respuesta cruda de OpenCode:** no consta. Solo se conserva el resumen de prompts, decisiones y resultados en `unidad-6/BITACORA.md`; no se reconstruye una respuesta de memoria.
 
 ## 5. Unidad 7 — MongoDB (objetivos 9 y 10)
 
@@ -78,8 +82,10 @@ Fuente: `unidad-7/BITACORA.md` (unificada por Mariano el 01/11/2026 contra los a
 | Facundo | Claude | Comparación PostgreSQL / MongoDB (consigna 6) | Se contrastaron dos afirmaciones: «MongoDB no valida esquemas» es falsa; que el embebido elimine el costo de los JOIN no está respaldado. Mariano hizo 4 correcciones al contraste |
 | Mariano | Claude | Revisión final del repo | Se agregó la verificación subtotal = cantidad × precio |
 
-**Pendientes declarados en la fuente:** salida guardada de la ejecución de Facundo; revisión del PDF por Andrés; comprobación de que el contraste de Facundo quedó fiel.
+**Pendientes declarados en la fuente:** salida guardada de la ejecución de Facundo y comprobación de que su contraste quedó fiel.
 **Límite:** `pedidos_export.json` y la evidencia de Mongo conservan el nombre de un integrante en un usuario de ejemplo (base anterior a la limpieza); se regeneran con la tarea del objetivo 10.
+
+**Revisión posterior de Andrés (08/11/2026):** se leyó `unidad-7/informe_u7.pdf`: tiene 4 páginas y los resultados de la migración original (7 documentos; consultas b y c; reglas de integridad; contraste de IA) coinciden con las evidencias citadas. El PDF corresponde a la entrega original de U7; la medición adicional de 5.000 pedidos se documenta separadamente en `docs/informe/u7.md` y no reemplaza esas cuatro páginas. El conteo local de Andrés para la migración original no tiene salida guardada, por lo que queda como **no consta**; no se usa como evidencia.
 
 ## 6. Unidad 8 — SQLite y sincronización (objetivos 11 a 14)
 
@@ -124,7 +130,7 @@ Fuentes: `unidad-8/docs/DUIA.md`, `duia_*.md`, `bitacoras/`.
 ## 8. Huecos que solo puede completar su autor
 
 - U6 completa (Andrés).
-- Andrés y Facundo, U4: notas `confirmá…` de sus DUIA.
+- Facundo, U4: nota `confirmá…` de su DUIA.
 - Facundo, U8: modelo, proveedor, prompt, fecha y total de hallazgos de OpenCode; qué salió de OpenCode y qué de otra fuente.
 - Facundo, U7: salida guardada de su ejecución.
 - Andrés, U5: qué parte del recorte del log y de la guía de la Parte B cambió respecto de lo declarado.

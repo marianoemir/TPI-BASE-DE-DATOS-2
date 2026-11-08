@@ -25,7 +25,7 @@ La spec subida por Andrés tenía dos detalles que se revisaron en el grupo ante
 1. **Ambigüedad en la sección 4.** Dejaba dos alternativas para la vista de compatibilidad (crear `v_control_lote_almacen` aparte, o "renombrar la tabla original") sin decidir una. La decisión del grupo fue la vista aparte, sin renombrar la tabla original.
 2. **Nombre del archivo.** El prompt pedía guardarlo como `specs/parte1_control_lote.md`, pero el archivo se subió como `specs/spec_parte_1_fnbc_control_lote.md`; el repositorio usa este último nombre.
 
-*(Andrés: confirmá si hiciste alguna otra modificación a mano sobre lo que devolvió Gemini antes de subirlo, y si usaste la IA para algo más de la Parte 1. Si fue así, agregalo como una fila nueva en la tabla.)*
+**Dato que no consta:** no quedó registrado que Andrés hubiera hecho otra modificación manual sobre la respuesta de Gemini antes de subir la spec, ni otro uso de IA en la Parte 1. No se completa por memoria.
 
 ## Verificación
 
