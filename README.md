@@ -2,7 +2,7 @@
 
 Capa de datos de Food Store en **PostgreSQL 16+ (PL/pgSQL)**, **MongoDB** y **SQLite**.
 Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. Grupo 10.
-Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` (PDF final: `docs/informe/informe_final.pdf`). Etiqueta final: `tp-final`.
+Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `informe_final.pdf` (en la raíz del repositorio; los textos fuente están en `docs/informe/`). Etiqueta final: `tp-final`.
 
 > Estado de la tabla: 09/11/2026.
 
