@@ -156,6 +156,41 @@ El repositorio es público. Un correo y un apellido de un integrante estuvieron 
 
 ---
 
+#### Declaraciones del 09/11/2026 (cierre del objetivo 13 y declaraciones pendientes del 08/11)
+
+##### 1. Revisión del PR #18 y trabajo sobre la rama de Facundo (08/11)
+- El PR #18 (`f/obj-02-u4-migration`, objetivo 2, de Facundo Quiroga) lo revisó Mariano con Claude, sin revisión independiente de Andrés Fabre. Mariano además aportó commits a esa rama (PR #20 y PR #21, de `m/fix-pr18-revision`). El #18 se mergeó el 08/11.
+- Se revisaron `up.sql`, `down.sql`, `setup_previo.sql` y `verificar_migracion.sql`: sin errores de código. Lo corregido fue de texto y evidencia (informe y DUIA se contradecían sobre Gemini; faltaban citas de `migracion_up.png` y `migracion_down.png`; se agregaron límites del objetivo 2).
+- Los caminos de falla de `up.sql` (repetido y datos que violan `R -> D`) se reprodujeron en pgAdmin sobre `copia_u4`, una copia local (PostgreSQL 17), con cuatro capturas `migracion_falla_*` en `unidad-4/capturas/`. El `down.sql` repetido no tiene captura propia.
+- **Sin confirmar por Facundo** (no respondió; Mariano decidió no esperar el 08/11): si el primer borrador fue de Gemini, si se ejecutó en pgAdmin y quién sacó `migracion_up.png` y `migracion_down.png` (PostgreSQL 18, subidas por la cuenta `Buhonero009`, commit `5a2472f`). El informe y la DUIA dicen «sin confirmar».
+- La frase de la DUIA de Facundo sobre credenciales la actualizó Mariano (commit `a3ad2d5`).
+- El script `corregir_pr18_parte2.ps1` y los bloques de PowerShell de esa revisión se redactaron con Claude y no se editaron en Kiro.
+- En `unidad-7/AGENTS.md` (archivo de Andrés) se quitó el nombre de un integrante (commit `4969ce3`, PR #23).
+- La introducción (`docs/informe/00_introduccion_uso_ia_limitaciones.md`) se redactó con Claude.
+- Búsqueda de credenciales en el repositorio (08/11): tres comprobaciones (palabras clave, hashes, archivos tipo `pgpass`, `.env` y claves); solo se encontraron marcadores y contraseñas de prueba. No se revisó el contenido de los PDF.
+
+##### 2. Objetivo 13 (code review con IA): quién lo hizo y cómo
+- La tarea T9 estaba asignada a Facundo Quiroga y la hizo Mariano (reasignación del 08/11), entre el 08 y el 09/11.
+- Herramienta: OpenCode en modo Plan (solo lectura). El modelo figura en las cabeceras de las tandas como «Croutou Alpha Free» (01, 07 y 08) y «Crouton Alpha Free» (09, 10 y 11); no se pudo verificar cuál es el nombre exacto.
+- 11 tandas; cada respuesta se guardó cruda en `docs/auditoria_codigo/tanda_NN_*.md`. La primera corrida de la tanda 01 salió con el marcador de la lista de archivos sin reemplazar: se guardó como corrida fallida y se repitió en `tanda_01_repeticion.md`.
+- La tanda 05 no siguió el formato (sin ids ni severidad): sus 27 filas de `hallazgos.md` las armó Mariano con Claude a partir de la prosa de OpenCode.
+- El 09/11 se completaron los campos Modelo, Fecha, Estado y Total en las cabeceras de las tandas 01 a 06 (commit `e815760`). Las respuestas de OpenCode no se editaron.
+- `hallazgos.md` tiene 196 filas. Se decidió sobre 42 (las 35 altas y críticas y 7 más); 154 quedan «No evaluado». Solo 14 decisiones tienen ejecución propia (`T06-H-01`, `T06-H-02` con un archivo de prueba y no con el script real, `T06-H-17`, `T01-H-34` con el comando solo y `T11-H-01` a `-06` y `-08` a `-11`); el resto se decidió por lectura de código.
+- Las decisiones se cargaron por lote, con scripts de PowerShell redactados con Claude y ejecutados por Mariano; los motivos de las filas se redactaron con Claude contra las salidas que pegó Mariano. Los commits están separados por grupo y no hay un commit por hallazgo.
+- No se corrigió ningún script: `git diff pre-review main` sobre `unidad-4` a `unidad-8` salió vacío el 09/11.
+- `codereview.md` se redactó con Claude.
+- Las filas «Claude, no OpenCode»: solo `C-05` tiene decisión; `C-01` a `C-04` y `C-06` no la tienen.
+- El merge de `review-final` a `main` (PR #24, `4313ac5`, 09/11) lo hizo Mariano sin revisión cruzada.
+
+##### 3. Evidencias del objetivo 13 con tratamiento especial
+- `T06-H-01_pester_sin_llamada.txt` es un `Start-Transcript` y trae usuario, equipo y ruta locales en la cabecera; se conserva sin editar.
+- Para esa prueba se modificó temporalmente la copia de trabajo de `unidad-6/restore_test.ps1` (se reemplazaron las llamadas a `Verificar-Hash`); quedó sin cambios respecto de `HEAD` (`git status` vacío).
+- `T06-H-17_version_pester.txt` está en UTF-16 porque ya estaba commiteado; el resto de la evidencia nueva se convirtió de UTF-16 a UTF-8 sin cambiar el contenido (copia de respaldo en `%TEMP%`, commit `bd8d271`).
+- `T11-H-11_f2_huerfanas.txt` se conserva pero no se usa como prueba de `T11-H-11`: `producto_cache` estaba vacío en esa corrida.
+- `T11-H-08` y `T11-H-09` se probaron con el paso 6 del README simulado, no con el paso real de PostgreSQL.
+- Los acentos rotos de algunas salidas (por ejemplo `├¡`) vienen de la consola de PowerShell 5.1 y no se editaron.
+- La prueba de `T06-H-02` se hizo con un archivo de ejemplo en la carpeta temporal (ya borrado) y la de `T01-H-34` sobre la base `postgres` del servidor local; ninguna modificó datos.
+
 ## Declaración de Andrés Fabre
 
 ### Declaración de Uso de Inteligencia Artificial (DUIA)
