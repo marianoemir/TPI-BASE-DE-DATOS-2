@@ -100,9 +100,11 @@ LIMIT 5;
 -- ============================================================
 -- 5.2 (c) — Implementación: estructura desnormalizada + sincronización
 -- ============================================================
--- Cambio estructural (CREATE MATERIALIZED VIEW): en copia_trabajo, que es
--- descartable y se recrea desde plantilla_food_store, no se requirió
--- respaldo previo (protocolo_seguridad.md, Paso 3).
+-- Cambio estructural (CREATE MATERIALIZED VIEW): se ejecutó en copia_trabajo,
+-- que es descartable y se recrea desde plantilla_food_store, SIN respaldo
+-- previo con pg_dump. El protocolo (Paso 3) lo exige antes de todo cambio
+-- estructural: es un desvío declarado en docs/informe/u4.md, no una
+-- excepción del protocolo.
 
 DROP MATERIALIZED VIEW IF EXISTS mv_ventas_categoria_dia;
 
