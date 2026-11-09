@@ -1,0 +1,21 @@
+Parse error near line 78 of casos_f2_semaforo.sql: near "TRY": syntax error
+  BEGIN TRY;
+        ^--- error here
+Parse error near line 79 of casos_f2_semaforo.sql: table cola_sync has no column named criada_en
+ERROR: segunda PENDIENTE para mismo borrador deber├¡a haber sido rechazada
+Parse error near line 82 of casos_f2_semaforo.sql: near "TRY": syntax error
+  END TRY;
+      ^--- error here
+Parse error near line 83 of casos_f2_semaforo.sql: near "CATCH": syntax error
+  BEGIN CATCH;
+        ^--- error here
+C2-6 - OK: segunda PENDIENTE correctamente bloqueada por ├¡ndice parcial
+Parse error near line 85 of casos_f2_semaforo.sql: near "CATCH": syntax error
+  END CATCH;
+      ^--- error here
+--- Estados de solicitudes F2 despues de sem├íforo ---|f2000001-0000-4000-8000-00000000000b|f2000001-0000-4000-8000-00000000000b|PENDIENTE|
+--- Estados de solicitudes F2 despues de sem├íforo ---|f2000002-0000-4000-8000-00000000000b|f2000002-0000-4000-8000-00000000000b|PENDIENTE|
+--- Estados de solicitudes F2 despues de sem├íforo ---|f2000003-0000-4000-8000-00000000000b|f2000003-0000-4000-8000-00000000000b|PENDIENTE|
+--- Estados de solicitudes F2 despues de sem├íforo ---|f2000004-0000-4000-8000-00000000000b|f2000004-0000-4000-8000-00000000000b|PENDIENTE|
+--- Estados de solicitudes F2 despues de sem├íforo ---|f2000005-0000-4000-8000-00000000000b|f2000005-0000-4000-8000-00000000000b|PENDIENTE|
+--- Estados de solicitudes F2 despues de sem├íforo ---|f2000006-0000-4000-8000-00000000000b|f2000006-0000-4000-8000-00000000000b|PENDIENTE|

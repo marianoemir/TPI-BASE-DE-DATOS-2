@@ -1,0 +1,2 @@
+casos_c2_c6_resolucion.sql:15: INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, criada_en, evaluada_en)
+casos_f2_semaforo.sql:79: INSERT INTO cola_sync (solicitud_uuid, id_local, estado, motivo, criada_en, evaluada_en)

@@ -1,0 +1,12 @@
+== casos_c2_c6_resolucion.sql ==
+Parse error near line 15 of casos_c2_c6_resolucion.sql: table cola_sync has no column named criada_en
+ERROR: INSERT duplicado deber├¡a haber fallado
+C6 - estado fila original despu├®s de intento fallido:|SIMULADO_APROBADO||2026-11-09 03:43:54
+--- Tercera corrida sem├íforo (despu├®s de C6) ---
+== semaforo ==
+1
+c2000000..00b|CONFLICTO|producto 1: borrador 400000 centavos, servidor 401000 centavos
+c2000000..00c|CONFLICTO|producto 1: borrador 400000 centavos, servidor 401000 centavos
+c3000000..00b|RECHAZADO|pedido 7, stock 6
+c4000000..00b|RECHAZADO|dado de baja
+c5000000..00b|SIMULADO_APROBADO|

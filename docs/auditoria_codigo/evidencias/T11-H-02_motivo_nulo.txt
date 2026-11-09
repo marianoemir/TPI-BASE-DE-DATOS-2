@@ -1,0 +1,10 @@
+RECHAZADO|1
+== v1: movil_opencode/schema_sqlite.sql, lineas 37-44 ==
+    motivo         TEXT,
+    creada_en      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S','now')),
+    evaluada_en    TEXT,
+    CHECK (estado NOT IN ('CONFLICTO','RECHAZADO') OR motivo IS NOT NULL)
+) STRICT;
+
+CREATE UNIQUE INDEX ux_cola_una_pendiente
+    ON cola_sync (id_local) WHERE estado = 'PENDIENTE';

@@ -1,0 +1,8 @@
+== 1) Proceso nuevo, sin PRAGMA: fila huerfana (id_local inexistente) ==
+0
+1
+cola_sync|1|pedido_borrador|0
+== 2) Con PRAGMA foreign_keys=ON y otro id_local inexistente ==
+Error in 2nd command line argument: FOREIGN KEY constraint failed
+== 3) Control positivo: segunda PENDIENTE para el mismo id_local (indice parcial) ==
+Error in 2nd command line argument: UNIQUE constraint failed: cola_sync.id_local

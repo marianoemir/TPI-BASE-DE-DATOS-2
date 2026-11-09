@@ -1,0 +1,7 @@
+cola_sync|6|pedido_borrador|0
+item_borrador|1|producto_cache|0
+item_borrador|2|producto_cache|0
+item_borrador|3|producto_cache|0
+item_borrador|4|producto_cache|0
+item_borrador|5|producto_cache|0
+item_borrador|6|producto_cache|0

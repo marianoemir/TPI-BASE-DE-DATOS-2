@@ -1,0 +1,4 @@
+== H-01: sin STRICT, ¿entra TEXT en una columna INTEGER? ==
+text|abc
+== Control: misma inserción en una tabla STRICT ==
+Error in 2nd command line argument: cannot store TEXT value in INTEGER column t.a
