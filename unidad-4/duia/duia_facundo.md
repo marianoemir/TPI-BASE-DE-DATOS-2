@@ -4,7 +4,7 @@
 **Materia:** Base de Datos II (UTN) — Unidad 4
 **Proyecto Integrador:** Food Store
 **Aporte:** primera versión de `tp_fnbc_control_lote.sql` (Parte 1), subida en la rama `integrante-3` (commit `28cdbca`)
-**Herramienta de IA utilizada:** Gemini **
+**Herramienta de IA utilizada:** Gemini
 **Aporte adicional (08/11/2026):** migración transaccional `up.sql`/`down.sql` de la Parte 1 (`unidad-4/migracion/`), actualización de la spec (sección 9) e informe `docs/informe/u4.md`
 **Herramienta adicional (08/11/2026):** Claude (chat, claude.ai); ver la sección "Actualización del 08/11/2026" al final
 
