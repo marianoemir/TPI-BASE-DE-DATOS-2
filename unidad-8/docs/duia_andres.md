@@ -11,6 +11,7 @@
 | Herramienta / Modelo | Versión / Plataforma | Propósito principal |
 |---|---|---|
 | **Gemini** | Gemini 3 Flash / Web (Free Tier) | Asistencia en estructuración de Markdown, redacción de documentos técnicos (1.a, 3.a, 3.b), diagnóstico de errores CLI en Windows 11 e interpretación de hashes de verificación. |
+| **OpenCode** | Proveedor OpenAI, modelo GPT-5.6 Terra | Revisión cruzada A4 y contraste de la 3.c (05/11/2026). |
 
 ---
 
@@ -36,11 +37,18 @@
 
 ### Interacción 4: Revisión completa A4 y contraste de 3.c
 * **Fecha:** 05/11/2026.
-* **Herramienta:** OpenCode / asistente GPT-5.6 Terra.
+* **Herramienta:** OpenCode, proveedor OpenAI, modelo GPT-5.6 Terra.
 * **Objetivo:** Completar la revisión cruzada pendiente: reproducir el flujo desde cero (H0, C1, C7 y C2 a C6), verificar las dos vistas y revisar los hallazgos de 3.c con sus evidencias.
 * **Prompt representativo:**
   > *"Revisá mi parte del TP8 contra la división, ejecutá la revisión cruzada pendiente desde cero sobre una copia y verificá los hallazgos documentados de 3.c sin modificar los scripts funcionales."*
 * **Resultado / Aceptación:** Se aceptaron únicamente los resultados obtenidos en los motores: H0 dio 6 / 16 / 6; C2 a C6 y C1/C7 dieron los resultados esperados; las vistas no tuvieron diferencias; pedidos y stock no cambiaron. H36 y H04 se descartaron con fundamento; H01 y R1 se confirmaron como hallazgos documentados. Las salidas se guardaron en `evidencias/20_andres_revision_a4_completa.txt` y `evidencias/21_andres_revision_3c.txt`.
+
+### Interacción 5: Ampliaciones de los objetivos 7 y 10
+* **Fecha:** 07/11/2026.
+* **Herramienta:** OpenCode, proveedor OpenAI, modelo GPT-5.6 Terra.
+* **Objetivo / pedido registrado:** para U6, redactar primero `SPEC_U6_ampliacion.md` y luego proponer scripts y pruebas de respaldo, restauración e integridad sin ejecutar PostgreSQL al generar. Para U7, preparar y ejecutar una comparación aislada de 5.000 pedidos entre PostgreSQL y MongoDB, con evidencia reproducible.
+* **Aceptado:** los cambios que se verificaron en el motor y en las pruebas: hashes previos, `pg_amcheck`, controles de integridad, conteos y tareas de Windows para U6; y conteos, importes, referencias, categorías, índice multikey y planes para U7. La prueba destructiva de U6 se limitó a `foodstore_restore_test`; PostgreSQL fue solo lectura en la exportación de U7.
+* **Corregido / descartado:** se añadió `--install-missing` para `amcheck` y se ajustó el parseo de la salida de integridad de `psql`; se descartó restaurar roles globales automáticamente. La respuesta cruda de OpenCode para U6 no consta y no se reconstruyó. El prompt literal de U7 tampoco consta en un archivo; sus decisiones y evidencia se conservan en `docs/bitacora_ia.md`, `unidad-6/BITACORA.md`, `docs/informe/u6.md` y `docs/informe/u7.md`.
 
 ---
 

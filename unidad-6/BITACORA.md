@@ -20,6 +20,8 @@ Reglas de uso:
 
 ## Ampliación del objetivo 7 (Andrés, 2026-11-07)
 
+**Respuesta cruda de OpenCode:** no consta. Se conserva el modelo, la fecha, los pedidos resumidos, las decisiones y las evidencias de ejecución de esta sección; no se reconstruye una respuesta de memoria.
+
 | Prompt o pedido | Respuesta relevante recibida (resumida) | Validación o corrección humana aplicada |
 |---|---|---|
 | **Andrés · OpenCode (GPT-5.6 Terra):** completar solamente la parte asignada de U6 a partir de la división del equipo, `SPEC_U6.md` y `AGENTS.md`; primero escribir `SPEC_U6_ampliacion.md`, comprometerla y recién después generar código | Propuso especificar respaldo de globales sin hashes de contraseña, rol de respaldo limitado, SHA-256 previo a restaurar, `pg_amcheck`, controles de huérfanos, comparación automática de conteos y tres tareas de Windows | Se revisó la spec y se confirmó el commit `cfb6f0a` antes de crear scripts. Se separó deliberadamente la restauración de roles de la tarea automática: `pg_dumpall --globals-only --no-role-passwords` se conserva y verifica, pero no se ejecuta automáticamente porque altera el clúster completo. |
