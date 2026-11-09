@@ -162,8 +162,9 @@ El Paso 6 de `protocolo_seguridad.md` exige `up.sql` y `down.sql` separados, cad
 - [x] `up.sql` termina con `COMMIT` y el aviso `Verificación OK: perdidas=0, espurias=0, filas antes=3 / despues=3`.
 - [x] Tras `up.sql`: V1 devuelve 3 objetos, V2 y V3 devuelven 0 filas y V4 devuelve `3 / 3 / 2 / 3`.
 - [x] Tras `down.sql`: V1 devuelve 0 filas y V5 devuelve las 3 filas originales.
-- [x] `up.sql` repetido falla sin dejar nada a medias; `down.sql` repetido no da error. *(Probado en PostgreSQL 16 local con Claude; sin captura propia.)*
-- [x] `up.sql` con datos que violan `R -> D` se frena en la precondición y no crea ningún objeto. *(Ídem.)*
+- [x] `up.sql` repetido falla sin dejar nada a medias. *(Reproducido en pgAdmin el 08/11/2026: `migracion_falla_up_repetido.png` y `migracion_falla_up_repetido_v1.png`.)*
+- [x] `down.sql` repetido no da error. *(Probado en PostgreSQL 16 local con Claude; sin captura propia.)*
+- [x] `up.sql` con datos que violan `R -> D` se frena en la precondición y no crea ningún objeto. *(Reproducido en pgAdmin el 08/11/2026: `migracion_falla_precondicion.png` y `migracion_falla_precondicion_v1.png`.)*
 
 Evidencia: `unidad-4/capturas/` y `docs/informe/u4.md`.
 

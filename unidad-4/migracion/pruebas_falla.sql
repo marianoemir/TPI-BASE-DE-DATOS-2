@@ -1,0 +1,34 @@
+-- =============================================================================
+-- unidad-4/migracion/pruebas_falla.sql  (GUIA PARA PGADMIN, no se corre entera)
+-- Reproduce los dos caminos de falla de up.sql. Se hizo el 08/11/2026 en la base
+-- copia_u4 (PostgreSQL 17, pgAdmin 4). Cada paso se ejecuta por separado.
+--
+-- Antes de empezar: copia_u4 con heredado/base_heredada/ (schema, objects, data).
+-- Query Tool: cada pestaña es una sesion distinta. Si up.sql falla, la transaccion
+-- queda abortada EN ESA PESTANA: se descarta cerrando la pestana y eligiendo
+-- "Rollback" en el cartel (o ejecutando ROLLBACK; en esa misma pestana).
+-- verificar_migracion.sql: para V1, seleccionar solo esa consulta y ejecutar.
+-- =============================================================================
+
+-- ####### PRUEBA A: up.sql repetido falla y no deja nada a medias #######
+-- A1. Ejecutar setup_previo.sql completo.
+-- A2. Ejecutar up.sql completo (debe terminar con "Verificacion OK" y COMMIT).
+-- A3. Ejecutar up.sql otra vez. Esperado: ERROR "la relacion responsable_deposito
+--     ya existe" (42P07).                  CAPTURA: capturas/migracion_falla_up_repetido.png
+-- A4. Cerrar esa pestana y elegir Rollback. Abrir una pestana nueva.
+-- A5. Ejecutar V1. Esperado: las mismas 3 filas (control_lote, responsable_deposito,
+--     v_control_lote_almacen).             CAPTURA: capturas/migracion_falla_up_repetido_v1.png
+-- A6. Ejecutar down.sql completo para dejar limpio.
+
+-- ####### PRUEBA B: datos que violan R -> D frenan en la precondicion #######
+-- B1. Ejecutar setup_previo.sql completo. Ejecutar V1: debe dar 0 filas (base limpia).
+-- B2. En una pestana nueva, ejecutar esta unica linea (el responsable 801 queda en
+--     los depositos 30 y 31):
+INSERT INTO control_lote_almacen VALUES (502, 31, 801);
+-- B3. Ejecutar up.sql completo. Esperado: ERROR "Precondicion violada: hay
+--     responsables asignados a mas de un deposito (R -> D no se cumple)." (P0001).
+--                                          CAPTURA: capturas/migracion_falla_precondicion.png
+-- B4. Cerrar esa pestana y elegir Rollback. Abrir una pestana nueva.
+-- B5. Ejecutar V1. Esperado: 0 filas (no se creo ningun objeto).
+--                                          CAPTURA: capturas/migracion_falla_precondicion_v1.png
+-- B6. Ejecutar setup_previo.sql completo otra vez (borra la fila de prueba).

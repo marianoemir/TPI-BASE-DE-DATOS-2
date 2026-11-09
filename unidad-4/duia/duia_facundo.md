@@ -101,7 +101,7 @@ directamente al archivo tp_fnbc_control_lote.sql.
 **Alcance:** `unidad-4/migracion/` (`setup_previo.sql`, `up.sql`, `down.sql`, `verificar_migracion.sql`), la sección 9 de `specs/spec_parte_1_fnbc_control_lote.md` (commit `b55a4cb`) y `docs/informe/u4.md`. Esta parte sí es de Facundo.
 **Herramienta:** Claude (chat, claude.ai), modelo Claude Sonnet 5.5, el 08/11/2026.
 **No se usaron OpenCode ni Kiro para generar los archivos de migración.** El protocolo pide spec en Kiro, después OpenCode; en este paso no se cumplió así: los archivos se escribieron primero con Claude y la spec se actualizó después (ver `docs/informe/u4.md`). La edición de la spec si se realizó en Kiro.
-**Datos enviados a la IA:** se subió el zip del repositorio. Los datos de ejemplo son ficticios (los usuarios de `data.sql` son inventados) y los nombres de los integrantes aparecen solo como autoría en comentarios. No se enviaron datos reales ni credenciales.
+**Datos enviados a la IA:** se subió el zip del repositorio. Los datos de ejemplo son ficticios (los usuarios de `data.sql` son inventados) y los nombres de los integrantes aparecen como autoría en documentos y comentarios. El repositorio también contiene, en archivos de evidencia (`unidad-5/evidencias/`, `unidad-6/evidencias/` y `unidad-7/evidencias/`), el nombre de usuario de Windows de Mariano Chirino dentro de rutas (`C:\Users\Mariano_Chirino\...`) y el nombre de host `MarianoChirino`; el zip incluyó lo que el repositorio tuviera ese día, así que esos archivos pueden haber viajado a la IA. No se enviaron datos reales ni credenciales.
 
 ### Registro de interacciones
 
@@ -116,6 +116,6 @@ directamente al archivo tp_fnbc_control_lote.sql.
 ### Verificación
 
 - Los archivos se ejecutaron en `copia_u4` (pgAdmin 4) con respaldo previo; capturas en `unidad-4/capturas/`.
-- Los caminos de falla (`up` repetido y datos que violan `R -> D`) se probaron en el PostgreSQL de Claude, no en el de Facundo; no hay captura propia.
+- Los caminos de falla (`up` repetido y datos que violan `R -> D`) se probaron primero en el PostgreSQL de Claude, sin captura. El 08/11/2026 Mariano Chirino los reprodujo en pgAdmin (`copia_u4`, PostgreSQL 17) con cuatro capturas: `migracion_falla_up_repetido.png`, `migracion_falla_up_repetido_v1.png`, `migracion_falla_precondicion.png` y `migracion_falla_precondicion_v1.png`. El `down` repetido sigue sin captura.
 - Sin pasada previa con ROLLBACK (Paso 2). El protocolo pide ejecutar primero cada script terminando en ROLLBACK y repetirlo con COMMIT solo después de inspeccionar el efecto. Corrimos up.sql directamente con COMMIT. Lo compensamos con tres controles: respaldo previo con pg_dump (Paso 3), verificación dentro de la transacción (si algo no coincide se lanza una excepción y no se confirma nada) y down.sql probado después del up. Con más tiempo haríamos la pasada con ROLLBACK antes de la definitiva.
 
