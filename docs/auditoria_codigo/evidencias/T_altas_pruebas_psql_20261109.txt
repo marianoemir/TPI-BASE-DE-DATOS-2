@@ -1,0 +1,12 @@
+﻿== T01-H-34: SET TRANSACTION fuera de un bloque (psql de PostgreSQL 17, base postgres)
+WARNING:  la orden SET TRANSACTION s├│lo puede ser usada en bloques de transacci├│n
+SET
+exit=0
+== T06-H-02: archivo de prueba con ON_ERROR_STOP dentro, psql -f sin -v
+ ?column? 
+----------
+        1
+(1 fila)
+
+psql:err_stop.sql:3: ERROR:  divisi├│n por cero
+exit=3

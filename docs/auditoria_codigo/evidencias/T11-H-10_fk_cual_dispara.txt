@@ -1,0 +1,4 @@
+== a) id_local EXISTENTE + producto_id 9999 (FK ON) ==
+Error in 3rd command line argument: FOREIGN KEY constraint failed
+== b) id_local INEXISTENTE + producto_id 1 (FK ON) ==
+Error in 3rd command line argument: FOREIGN KEY constraint failed

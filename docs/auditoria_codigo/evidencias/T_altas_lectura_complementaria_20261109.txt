@@ -1,0 +1,162 @@
+﻿=== T01-H-13 (resto del procedimiento) :: objects.sql líneas 144-175
+--- heredado\base_heredada\objects.sql
+144: 
+145:         -- Bloquea la fila del producto para evitar sobreventa concurrente
+146:         SELECT stock, disponible INTO v_stock, v_disponible
+147:         FROM producto WHERE id = v_producto_id AND eliminado = FALSE
+148:         FOR UPDATE;
+149: 
+150:         IF NOT FOUND THEN
+151:             RAISE EXCEPTION 'Producto % inexistente o eliminado', v_producto_id;
+152:         END IF;
+153: 
+154:         IF NOT v_disponible THEN
+155:             RAISE EXCEPTION 'Producto % no disponible', v_producto_id;
+156:         END IF;
+157: 
+158:         IF v_stock < v_cantidad THEN
+159:             RAISE EXCEPTION 'Stock insuficiente (producto %): hay %, se piden %',
+160:                 v_producto_id, v_stock, v_cantidad;
+161:         END IF;
+162: 
+163:         INSERT INTO detalle_pedido(pedido_id, producto_id, cantidad)
+164:         VALUES (v_pedido_id, v_producto_id, v_cantidad);
+165: 
+166:         -- Descuenta stock dentro de la misma transacción
+167:         UPDATE producto SET stock = stock - v_cantidad WHERE id = v_producto_id;
+168:     END LOOP;
+169: 
+170:     -- Si alguna inserción falla, toda la transacción se revierte (rollback).
+171: END;
+172: $$ LANGUAGE plpgsql;
+=== T01-H-33/35 (encabezado) :: transacciones.sql líneas 1-27
+--- heredado\base_heredada\transacciones.sql
+1: -- ============================================================
+2: -- Escenario 1 — Atomicidad
+3: -- ============================================================
+4: 
+5: CALL sp_crear_pedido(1, 'EFECTIVO', '[{"producto_id":1,"cantidad":999}]'::jsonb);
+6: SELECT * FROM pedido;
+7: 
+8: -- ============================================================
+9: -- Escenario 2 — Transacción manual (COMMIT vs ROLLBACK)
+10: -- ============================================================
+11: 
+12: BEGIN;
+13: UPDATE producto SET stock = stock - 1 WHERE id = 7;
+14: SELECT stock FROM producto WHERE id = 7;
+15: COMMIT;
+16: 
+17: SELECT stock FROM producto WHERE id = 7;
+18: 
+19: BEGIN;
+20: UPDATE producto SET stock = stock - 1 WHERE id = 7;
+21: SELECT stock FROM producto WHERE id = 7;
+22: ROLLBACK;
+23: 
+24: SELECT stock FROM producto WHERE id = 7;
+25: 
+26: -- ============================================================
+27: -- Escenario 3 — Aislamiento (dos sesiones al mismo tiempo)
+=== T04-H-03 (resto) :: roles.sql líneas 247-275
+--- unidad-5\sql\roles.sql
+247: -- Prueba: unidad-5/evidencias/h3_h4b_prueba.txt
+248: REVOKE EXECUTE ON FUNCTION calcular_total_pedido(bigint), fn_set_subtotal(),
+249:   fn_recalcular_total(), fn_validar_estado_pedido() FROM PUBLIC;
+250: 
+251: COMMIT;   -- cambiar por ROLLBACK; para un ensayo sin efectos
+252: 
+253: -- ----------------------------------------------------------------------------
+254: -- Paso 10. LIMPIEZA (comentada). Descomentar SOLO para partir de cero.
+255: --          El orden es obligatorio.
+256: -- ----------------------------------------------------------------------------
+257: -- BEGIN;
+258: -- -- 1) Devolver la propiedad a postgres. Sin esto, DROP OWNED BY admin_datos
+259: -- --    BORRARIA todas las tablas, vistas y funciones del esquema.
+260: -- REASSIGN OWNED BY admin_datos TO postgres;
+261: -- -- 2) Revocar privilegios y limpiar default privileges. admin_datos se incluye
+262: -- --    porque, aunque ya no posee objetos, tiene ALTER DEFAULT PRIVILEGES a su
+263: -- --    nombre; sin esto DROP ROLE admin_datos falla.
+264: -- DROP OWNED BY rol_app_lectura, rol_app_escritura, rol_app_auth,
+265: --               rol_soporte, rol_reportes, app_web, admin_datos;
+266: -- -- 3) Eliminar los siete roles del proyecto.
+267: -- DROP ROLE IF EXISTS rol_app_lectura, rol_app_escritura, rol_app_auth,
+268: --                     rol_soporte, rol_reportes, app_web, admin_datos;
+269: -- COMMIT;
+270: 
+=== T04-H-03 (otros ALTER DEFAULT) :: buscar /ALTER DEFAULT PRIVILEGES/
+unidad-5\sql\roles.sql:238: --         ALTER DEFAULT PRIVILEGES va SIN "IN SCHEMA".
+unidad-5\sql\roles.sql:240: ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos IN SCHEMA public
+unidad-5\sql\roles.sql:242: ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos
+unidad-5\sql\roles.sql:262: -- --    porque, aunque ya no posee objetos, tiene ALTER DEFAULT PRIVILEGES a su
+=== T06-H-02 (maintenance antes del set) :: maintenance.sql líneas 1-40
+--- unidad-6\maintenance.sql
+1: -- ===================================================================
+2: -- maintenance.sql - Revision de mantenimiento semanal (Unidad 6)
+3: -- Proyecto: Food Store - Base de Datos II
+4: -- Motor: PostgreSQL 16 o superior
+5: --
+6: -- QUE HACE ESTE SCRIPT
+7: --   FASE 0 (solo lectura, base 'foodstore'): revisa TODAS las tablas de la
+8: --          base real y decide, con la observacion previa, si hace falta
+9: --          VACUUM o ANALYZE manual.
+10: --   FASES 1 a 5 (base 'foodstore_restore_test'): ensayo de una accion de
+11: --          mantenimiento segura (VACUUM (ANALYZE)) en la base descartable.
+12: --
+13: -- SEGURIDAD: sobre 'foodstore' este script solo ejecuta SELECT dentro de una
+14: -- transaccion READ ONLY. Todo lo que escribe (UPDATE, VACUUM) corre despues
+15: -- de conectarse a 'foodstore_restore_test'. Si esa base no existe, el script
+16: -- se detiene (ON_ERROR_STOP) y no hace nada mas.
+17: --
+18: -- RESTRICCION: las fases 1 a 5 no usan BEGIN/COMMIT. VACUUM no puede
+19: -- ejecutarse dentro de un bloque transaccional. Cada sentencia se
+20: -- ejecuta en autocommit.
+21: --
+22: -- Como se ejecuta (PowerShell, desde la raiz del repo). Se usa psql -f
+23: -- y no el Query Tool de pgAdmin:
+24: --   & "C:\Program Files\PostgreSQL\17\bin\psql.exe" -h localhost -U postgres -d foodstore_restore_test -w -f .\maintenance.sql -o .\evidencias\maintenance_salida.txt
+25: --
+26: -- Por que hay pausas (pg_sleep): las estadisticas de pg_stat_user_tables
+27: -- se actualizan con un pequeno retraso. Sin la pausa, la consulta de
+28: -- observacion puede mostrar el estado anterior a la accion (en una
+29: -- corrida anterior se vio n_dead_tup = 0 despues del UPDATE y 50015
+30: -- despues del VACUUM, al reves de lo esperado).
+31: -- ===================================================================
+32: 
+33: \set ON_ERROR_STOP on
+34: 
+35: -- ===================================================================
+36: -- FASE 0: Revision de la base real 'foodstore' (SOLO LECTURA)
+37: -- ===================================================================
+38: -- Para cada tabla se compara el estado actual contra los umbrales
+39: -- teoricos de autovacuum y autoanalyze (valores globales del servidor):
+40: --   umbral VACUUM  = autovacuum_vacuum_threshold  + autovacuum_vacuum_scale_factor  * n_live_tup
+=== T08-H-08 (como se arma pg) :: buscar /\$pg\s*=|-w|-X/
+unidad-7\correr_correcciones_obj10.ps1:32: $pg = @('-U', $Usuario, '-d', $Base)
+unidad-7\correr_correcciones_obj10.ps1:47: if ($malos) { Write-Warning "JSON de ejemplo con caracteres rotos o nombres reales:"; $malos | ForEach-Object { Write-Warning $_.Line } }
+=== T09-H-01 (alcance) :: AGENTS.md líneas 20-36
+--- unidad-7\AGENTS.md
+20: | Entregables | `consultas_mongodb.js`, `consultas_postgresql.sql`, `informe_u7.pdf` (se redacta en `informe_u7.md`) | Ver "Las tres partes" |
+21: 
+22: ## Alcance (regla principal): migración PARCIAL
+23: 
+24: La consigna **no** pide migrar toda la base, ni instalar Redis o Neo4j, ni configurar un clúster.
+25: 
+26: | Qué entra | Qué NO entra |
+27: |---|---|
+28: | El subconjunto **pedidos y detalle de pedidos**: al menos **5 pedidos** con sus líneas | Las demás tablas como colecciones propias (`usuario`, `producto`, `categoria`) |
+29: | Datos esenciales del cliente y del producto **embebidos** dentro de cada pedido | Los otros pedidos de la carga masiva (200.000) |
+30: | Una sola colección: `pedidos` | Redis, Neo4j, clúster, réplicas, índices avanzados |
+31: 
+32: Todo se ejecuta **solo contra el servidor propio de desarrollo**.
+33: 
+34: ## Bases
+35: 
+36: | Base | Motor | Rol en el TP |
+=== T09-H-01 (regla 7) :: AGENTS.md líneas 93-97
+--- unidad-7\AGENTS.md
+93: Propias de la Unidad 7:
+94: 
+95: 7. **La migración es parcial.** Solo pedidos y detalle, con cliente y producto embebidos. No se migra toda la
+96:    base ni se crean colecciones de usuarios o productos.
+97: 8. **Se conservan los identificadores de origen** (`pedido.id` como `_id`, y `usuario_id`, `producto_id`,

@@ -1,0 +1,45 @@
+== H-14: fragmentos de motivo en v1 ==
+movil_opencode/semaforo.sql:5: -- No suma ni reserva stock entre solicitudes (REQ 10.2) y no toca producto_cache (REQ 10.3).
+movil_opencode/semaforo.sql:13: i.producto_id, i.cantidad, i.precio_centavos_visto,
+movil_opencode/semaforo.sql:14: s.producto_id AS s_id, s.nombre, s.precio_centavos, s.stock,
+movil_opencode/semaforo.sql:28: SELECT solicitud_uuid, 'R', 2, nombre || ': dado de baja'
+movil_opencode/semaforo.sql:31: SELECT solicitud_uuid, 'R', 3, nombre || ': no disponible'
+movil_opencode/semaforo.sql:34: SELECT solicitud_uuid, 'R', 4, nombre || ': pedido ' || cantidad || ', stock ' || stock
+movil_opencode/semaforo.sql:35: FROM det WHERE s_id IS NOT NULL AND cantidad > stock
+movil_opencode/semaforo.sql:38: nombre || ': borrador ' || precio_centavos_visto || ' centavos, servidor ' || precio_centavos || ' centavos'
+movil_opencode/semaforo.sql:39: FROM det WHERE s_id IS NOT NULL AND precio_centavos_visto <> precio_centavos
+== H-14: fragmentos de motivo en v2 ==
+movil_opencode_v2/semaforo.sql:16: i.precio_centavos_visto,
+movil_opencode_v2/semaforo.sql:20: s.precio_centavos,
+movil_opencode_v2/semaforo.sql:21: s.stock,
+movil_opencode_v2/semaforo.sql:23: -- Orden según el diseño: 0=sin ítems, 1=no existe, 2=dado de baja, 3=no disponible,
+movil_opencode_v2/semaforo.sql:24: -- 4=stock insuficiente, 5=conflicto de precio, 6=sin diferencias (verde)
+movil_opencode_v2/semaforo.sql:30: WHEN i.cantidad > s.stock THEN 4
+movil_opencode_v2/semaforo.sql:31: WHEN i.precio_centavos_visto != s.precio_centavos THEN 5
+movil_opencode_v2/semaforo.sql:40: WHEN i.cantidad > s.stock THEN 'R'
+movil_opencode_v2/semaforo.sql:41: WHEN i.precio_centavos_visto != s.precio_centavos THEN 'A'
+movil_opencode_v2/semaforo.sql:48: WHEN s.eliminado = 't' THEN 'dado de baja'
+movil_opencode_v2/semaforo.sql:49: WHEN s.disponible = 'f' THEN 'no disponible'
+movil_opencode_v2/semaforo.sql:50: WHEN i.cantidad > s.stock THEN 'pedido ' || i.cantidad || ', stock ' || s.stock
+movil_opencode_v2/semaforo.sql:51: WHEN i.precio_centavos_visto != s.precio_centavos THEN
+movil_opencode_v2/semaforo.sql:52: 'producto ' || i.producto_id || ': borrador ' || i.precio_centavos_visto ||
+movil_opencode_v2/semaforo.sql:53: ' centavos, servidor ' || s.precio_centavos || ' centavos'
+== H-15: vista en v1 ==
+> CREATE VIEW v_catalogo_disponible AS
+  SELECT producto_id,
+         nombre,
+         precio_centavos / 100.0 AS precio,
+         stock_visto,
+         disponible_visto
+  FROM producto_cache
+  WHERE eliminado = 0 AND disponible_visto = 1;
+== H-15: vista en v2 ==
+> CREATE VIEW v_catalogo_disponible AS
+  SELECT producto_id,
+         nombre,
+         precio_centavos / 100.0 AS precio,
+         stock_visto,
+         disponible_visto,
+         eliminado
+  FROM producto_cache
+  WHERE eliminado = 0 AND disponible_visto = 1;

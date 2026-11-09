@@ -1,0 +1,17 @@
+== schema_sqlite.sql: CREATE, cierres y STRICT ==
+schema_sqlite.sql:1: -- REQ 5.1, 5.2, 6.1 a 6.13: Esquema SQLite STRICT
+schema_sqlite.sql:2: -- Tablas en modo STRICT (SQLite 3.37+), solo tipos INTEGER/REAL/TEXT/BLOB/ANY
+schema_sqlite.sql:8: CREATE TABLE producto_cache (
+schema_sqlite.sql:16: );
+schema_sqlite.sql:19: CREATE TABLE pedido_borrador (
+schema_sqlite.sql:24: );
+schema_sqlite.sql:27: CREATE TABLE item_borrador (
+schema_sqlite.sql:35: );
+schema_sqlite.sql:38: CREATE TABLE cola_sync (
+schema_sqlite.sql:47: );
+schema_sqlite.sql:53: CREATE TABLE snapshot_servidor (
+schema_sqlite.sql:61: );
+schema_sqlite.sql:65: CREATE VIEW v_catalogo_disponible AS
+== PRAGMA foreign_keys en los .sql de v2 ==
+pruebas_sqlite.sql:39: PRAGMA foreign_keys = ON;
+schema_sqlite.sql:5: PRAGMA foreign_keys = ON;

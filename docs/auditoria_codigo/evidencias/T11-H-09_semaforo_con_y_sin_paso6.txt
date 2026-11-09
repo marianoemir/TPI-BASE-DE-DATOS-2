@@ -1,0 +1,12 @@
+== 7a semaforo SIN paso 6 ==
+4
+c2000000|SIMULADO_APROBADO|
+c3000000|RECHAZADO|pedido 7, stock 6
+c4000000|RECHAZADO|dado de baja
+c5000000|SIMULADO_APROBADO|
+== 7b semaforo CON paso 6 SIMULADO por UPDATE (no es el paso 6 real de PostgreSQL) ==
+4
+c2000000|CONFLICTO|producto 1: borrador 400000 centavos, servidor 401000 centavos
+c3000000|RECHAZADO|pedido 7, stock 6
+c4000000|RECHAZADO|dado de baja
+c5000000|SIMULADO_APROBADO|

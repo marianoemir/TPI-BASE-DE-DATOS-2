@@ -1,0 +1,45 @@
+﻿**********************
+Inicio de la transcripción de Windows PowerShell
+Hora de inicio: 20261108232005
+Nombre de usuario: MarianoChirino\Mariano_Chirino
+Usuario RunAs: MarianoChirino\Mariano_Chirino
+Nombre de la configuración: 
+Máquina: MARIANOCHIRINO (Microsoft Windows NT 10.0.26300.0)
+Aplicación host: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe
+Id. de proceso: 22652
+PSVersion: 5.1.26100.9818
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9818
+BuildVersion: 10.0.26100.9818
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+La transcripción ha comenzado. El archivo de salida es docs\auditoria_codigo\evidencias\T06-H-01_pester_sin_llamada.txt
+PS C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2> $orig -replace 'Verificar-Hash -Archivo','LLAMADA_ELIMINADA -Archivo' | Set-Content -LiteralPath $ruta -Encoding UTF8
+PS C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2> Select-String -Path $ruta -Pattern "Verificar-Hash|LLAMADA_ELIMINADA"
+
+unidad-6\restore_test.ps1:45:function Verificar-Hash {
+unidad-6\restore_test.ps1:162:if (-not (LLAMADA_ELIMINADA -Archivo $archivoRestore) -or -not (LLAMADA_ELIMINADA
+-Archivo $archivoGlobales)) {
+
+
+PS C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2> Invoke-Pester unidad-6\tests\ampliacion.Tests.ps1
+
+Describing Ampliacion U6 - mantenimiento verificable
+ [+] define un rol de respaldo sin atributos administrativos 90ms
+ [+] respalda los objetos globales sin hashes de contrasenas 58ms
+ [+] verifica la integridad de los archivos antes de crear la copia restaurada 36ms
+ [+] ejecuta pg_amcheck durante la restauracion de prueba 28ms
+ [+] instala amcheck solo si falta en la copia descartable 31ms
+ [+] define controles reutilizables de integridad referencial 35ms
+ [+] lee la salida de integridad sin mensajes de formato de psql 31ms
+ [+] registra las tareas de respaldo, mantenimiento y restauracion 58ms
+Tests completed in 370ms
+Passed: 8 Failed: 0 Skipped: 0 Pending: 0 Inconclusive: 0
+PS C:\Users\Mariano_Chirino\Documents\GitHub\TPI-BASE-DE-DATOS-2> Stop-Transcript
+**********************
+Fin de la transcripción de Windows PowerShell
+Hora de finalización: 20261108232006
+**********************

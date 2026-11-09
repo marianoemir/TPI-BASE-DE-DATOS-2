@@ -1,0 +1,3 @@
+Parse error near line 43 of casos_c8_competencia_stock.sql: no such column: s1.solicitud_uuid
+  os despu├®s de sem├íforo C8 ---' AS etapa,        s1.solicitud_uuid, s1.estado
+                                      error here ---^

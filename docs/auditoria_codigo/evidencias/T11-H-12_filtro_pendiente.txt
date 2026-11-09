@@ -1,0 +1,6 @@
+semaforo.sql:2: -- Evalúa todas las solicitudes PENDIENTE contra snapshot_servidor en una sola pasada
+semaforo.sql:6: -- Actualiza estado, motivo y evaluada_en solo para filas PENDIENTE
+semaforo.sql:56: FROM cola_sync c
+semaforo.sql:83: -- UPDATE final: solo filas PENDIENTE; registra evaluada_en
+semaforo.sql:90: WHERE cola_sync.solicitud_uuid = a.solicitud_uuid
+semaforo.sql:91: AND cola_sync.estado = 'PENDIENTE';
