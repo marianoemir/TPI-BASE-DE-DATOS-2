@@ -2,7 +2,7 @@
 
 Capa de datos de Food Store en **PostgreSQL 16+ (PL/pgSQL)**, **MongoDB** y **SQLite**.
 Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. Grupo 10.
-Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` (PDF final: `docs/informe/informe_final.pdf`). Etiqueta final: `tp-final`.
+Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `informe_final.pdf` (en la raíz del repositorio; los textos fuente están en `docs/informe/`). Etiqueta final: `tp-final`.
 
 > Estado de la tabla: 09/11/2026.
 
@@ -29,7 +29,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 | 5 | Auditoría y simulacro de acceso indebido, con contención | Cubierto | `unidad-5/docs/informe_auditoria.md`, `unidad-5/sql/simulacro_incidente.*`, `unidad-5/docs/informe_incidente.md` | Evidencia repartida en tres servidores y fechas |
 | 6 | Auditoría de permisos asistida por IA, con decisión humana | Cubierto | `unidad-5/docs/auditoria_roles_opencode.md`, `unidad-5/docs/registro_opencode_auditoria_roles_corrida2.txt`, `unidad-5/evidencias/obj6_*` | Repetición del 07/11: la sesión original no se conserva |
 | 7 | Plan de mantenimiento completo | Cubierto con límites | `unidad-6/` (`backup_foodstore.ps1`, `restore_test.ps1`, `programar_tareas.ps1`, `validar_integridad.sql`, `SPEC_U6_ampliacion.md`), `unidad-6/evidencias/obj7_*_20261107.txt`, `docs/informe/u6.md` | Tareas registradas y ejecutadas por el Programador solo por disparo manual (ninguna por horario); `Interactive` sin `-StartWhenAvailable`; el mantenimiento sobre `foodstore` solo observa (las acciones se ensayan en la base descartable); respaldo y mantenimiento corren como `postgres`; `pg_hba` en `trust`; Pester solo busca texto |
-| 8 | Simulacro de desastre contra reloj | Cubierto | `unidad-6/restore_test.ps1`, `unidad-6/evidencias/restore_log_ok.txt`, `informe_u6.pdf` | RTO 6,19 s sobre ~10,6 MB, mismo equipo |
+| 8 | Simulacro de desastre contra reloj | Cubierto | `unidad-6/restore_test.ps1`, `unidad-6/evidencias/restore_log_ok.txt`, `informe_u6.pdf` | RTO 6,19 s sobre ~10,6 MB, mismo equipo (otra medición, 7,11 s, en `docs/informe/u6.md`) |
 | 9 | Modelado documental con consultas verificadas | Cubierto | `unidad-7/modelo/esquema_documental.md`, `unidad-7/consultas_mongodb.js` | Escala de laboratorio (7 documentos) |
 | 10 | Comparación documental vs relacional | Cubierto con límites | `unidad-7/evidencias/comparacion_medida.md`, `unidad-7/evidencias/obj10_*_20261107.txt`, `unidad-7/SPEC_U7_medicion.md`, `docs/informe/u7.md` | Una sola máquina y una muestra de 5.000 pedidos; el producto más frecuente aparece en un solo pedido; en la repetición no se capturó el plan de PostgreSQL; tiempos no comparables 1 a 1 con `EXPLAIN ANALYZE` |
 | 11 | SQLite especificado en Kiro y generado con OpenCode | Cubierto con límites | `unidad-8/.kiro/specs/foodstore-tablet-sync/`, `unidad-8/movil_opencode/`, `unidad-8/movil_opencode_v2/`, `unidad-8/docs/comparacion_generado_vs_original.md` | Ninguna corrida de OpenCode produjo una base funcional sin correcciones |

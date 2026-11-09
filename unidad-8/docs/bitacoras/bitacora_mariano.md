@@ -167,3 +167,9 @@ El repositorio es público. Un correo y un apellido de un integrante estuvieron 
 - `T11-H-08` y `T11-H-09` se probaron con el paso 6 del README simulado, no con el paso real de PostgreSQL.
 - Los acentos rotos de algunas salidas (por ejemplo `├¡`) vienen de la consola de PowerShell 5.1 y no se editaron.
 - La prueba de `T06-H-02` se hizo con un archivo de ejemplo en la carpeta temporal (ya borrado) y la de `T01-H-34` sobre la base `postgres` del servidor local; ninguna modificó datos.
+
+#### Declaración del 09/11/2026 (informe final)
+
+- El PDF `informe_final.pdf` se armó con asistencia de Claude (pandoc y wkhtmltopdf) a partir de los `.md` del repositorio. El texto se copió sin reescribir; se agregaron la portada, una nota sobre el PDF, el link, la etiqueta y la fila 14 de la tabla.
+- El PR #28 (informe final) y el PR que mueve `informe_final.pdf` a la raíz se mergearon sin revisión cruzada de otro integrante.
+- La etiqueta `tp-final` se movió después de ese segundo merge para que apunte a un commit que contiene el PDF en la raíz.
