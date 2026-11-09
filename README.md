@@ -2,9 +2,9 @@
 
 Capa de datos de Food Store en **PostgreSQL 16+ (PL/pgSQL)**, **MongoDB** y **SQLite**.
 Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. Grupo 10.
-Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` (PDF final: `[COMPLETAR]`). Etiqueta final: `[COMPLETAR]`.
+Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` (PDF final: `docs/informe/informe_final.pdf`). Etiqueta final: `tp-final`.
 
-> Estado de la tabla: 07/11/2026. Los estados marcados «en curso» se actualizan antes de entregar.
+> Estado de la tabla: 09/11/2026.
 
 ## Cómo está organizado el repositorio
 
@@ -35,7 +35,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 | 11 | SQLite especificado en Kiro y generado con OpenCode | Cubierto con límites | `unidad-8/.kiro/specs/foodstore-tablet-sync/`, `unidad-8/movil_opencode/`, `unidad-8/movil_opencode_v2/`, `unidad-8/docs/comparacion_generado_vs_original.md` | Ninguna corrida de OpenCode produjo una base funcional sin correcciones |
 | 12 | Sincronización simulada con conflictos | Cubierto | `unidad-8/movil_opencode/semaforo.sql`, casos C1–C8 y F2, `unidad-8/evidencias/01` a `29` | El semáforo evalúa cada borrador por separado; solo el servidor resuelve la competencia por stock (C8) |
 | 13 | Code review final asistido por IA | Cubierto con límites | `docs/informe/codereview.md`, `docs/auditoria_codigo/` (`hallazgos.md`, `tanda_*.md`, `evidencias/`) | 196 hallazgos; 42 decididos (35 altas o críticas; 14 con ejecución propia, el resto por lectura); 154 «No evaluado»; sin correcciones de código; sin revisión cruzada independiente |
-| 14 | Capa de datos completa en Git, lista para entrega | En curso | Este README, `docs/bitacora_ia.md`, `docs/informe/` | `[ACTUALIZAR al cerrar]` |
+| 14 | Capa de datos completa en Git, lista para entrega | Cubierto con límites | Este README, `docs/bitacora_ia.md`, `docs/informe/` | Sin revisión cruzada en varios PR; 154 de 196 hallazgos del code review sin evaluar; evidencias con rutas locales sin editar (ver sección 5) |
 
 ## Bases de datos usadas
 
