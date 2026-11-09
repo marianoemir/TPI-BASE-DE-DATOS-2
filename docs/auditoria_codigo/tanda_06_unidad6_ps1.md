@@ -1,8 +1,8 @@
 # Tanda 06 — unidad-6 (respaldo, restauración, programador de tareas y pruebas Pester)
 
 Herramienta: OpenCode (modo Plan, solo lectura)
-Modelo: <Crouton Alpha Free>
-Fecha y hora: <8/11/2026, 23:16>
+Modelo: Crouton Alpha Free
+Fecha y hora: 8/11/2026, 23:16
 Sesión: nueva
 Archivos (4):
 - unidad-6/backup_foodstore.ps1
@@ -10,8 +10,8 @@ Archivos (4):
 - unidad-6/programar_tareas.ps1
 - unidad-6/tests/ampliacion.Tests.ps1
 Prompt: ver prompt_base.md, más la línea final: «Devolvé exactamente el formato indicado: un id H-nn y una severidad por hallazgo, sin resumen por archivo.»
-Estado: <corrida completa / cortada / con error>
-Total de hallazgos devueltos: <n>
+Estado: Corrida completa
+Total de hallazgos devueltos: 17 (2  Alta / 6 Media / 9 Baja)
 Estado del repo: rama review-final, etiqueta pre-review (351ddb9)
 
 ---

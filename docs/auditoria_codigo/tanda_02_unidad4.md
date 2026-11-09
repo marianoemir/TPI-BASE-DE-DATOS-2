@@ -2,13 +2,13 @@
 
 Herramienta: OpenCode (modo Plan, solo lectura)
 Modelo: Croutou Alpha Free
-Fecha y hora: <8/11/2026, 23:01>
+Fecha y hora: 8/11/2026, 23:01
 Archivos (2):
 - unidad-4/tp_fnbc_control_lote.sql
 - unidad-4/tp_desnormalizacion_top_categorias.sql
 Prompt: ver prompt_base.md (solo cambia la lista de archivos)
-Estado: <corrida completa / cortada / con error>
-Total de hallazgos devueltos: <n>
+Estado: Corrida completa
+Total de hallazgos devueltos: 16 (1 alta / 9 media / 6 baja)
 Estado del repo: rama review-final, etiqueta pre-review (351ddb9)
 
 ---

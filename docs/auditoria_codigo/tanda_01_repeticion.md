@@ -1,8 +1,8 @@
 # Tanda 01 — heredado/base_heredada (repetición con lista real)
 
 Herramienta: OpenCode (modo Plan, solo lectura)
-Modelo: <Croutou Alpha Free>
-Fecha y hora: <8/11/2026, 22:57>
+Modelo: Croutou Alpha Free
+Fecha y hora: 8/11/2026, 22:57
 Archivos (10):
 - heredado/base_heredada/schema.sql
 - heredado/base_heredada/objects.sql
@@ -16,7 +16,7 @@ Archivos (10):
 - heredado/base_heredada/carga_masiva.sql
 Prompt: ver prompt_base.md (solo cambia la lista de archivos)
 Estado: corrida completa. Repite la corrida fallida de tanda_01_heredado.md (marcador sin reemplazar).
-Total de hallazgos devueltos: 48 (H-01 a H-48)
+Total de hallazgos devueltos: 48 (12 alta / 20 media / 16 baja)
 Estado del repo: rama review-final, etiqueta pre-review (351ddb9)
 
 ---

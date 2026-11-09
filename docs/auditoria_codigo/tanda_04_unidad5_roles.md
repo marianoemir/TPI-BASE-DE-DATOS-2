@@ -2,15 +2,15 @@
 
 Herramienta: OpenCode (modo Plan, solo lectura)
 Modelo: Croutou Alpha Free
-Fecha y hora: <8/11/2026, 23:05>
+Fecha y hora: 8/11/2026, 23:05
 Archivos (4):
 - unidad-5/sql/roles.sql
 - unidad-5/sql/verificacion_roles.sql
 - unidad-5/sql/usuario_anon.sql
 - unidad-5/sql/verificacion_equivalencia.sql
 Prompt: ver prompt_base.md (solo cambia la lista de archivos)
-Estado: <corrida completa / cortada / con error>
-Total de hallazgos devueltos: <n>
+Estado: Corrida completa
+Total de hallazgos devueltos: 16 (2 alta / 7 media / 7 baja)
 Estado del repo: rama review-final, etiqueta pre-review (351ddb9)
 
 ---

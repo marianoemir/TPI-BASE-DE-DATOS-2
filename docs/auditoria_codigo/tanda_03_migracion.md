@@ -2,7 +2,7 @@
 
 Herramienta: OpenCode (modo Plan, solo lectura)
 Modelo: Croutou Alpha Free
-Fecha y hora: <8/11/2026, 23:03>
+Fecha y hora: 8/11/2026, 23:03
 Archivos (5):
 - unidad-4/migracion/setup_previo.sql
 - unidad-4/migracion/up.sql
@@ -10,8 +10,8 @@ Archivos (5):
 - unidad-4/migracion/verificar_migracion.sql
 - unidad-4/migracion/pruebas_falla.sql
 Prompt: ver prompt_base.md (solo cambia la lista de archivos)
-Estado: <corrida completa / cortada / con error>
-Total de hallazgos devueltos: <n>
+Estado: Corrida completa
+Total de hallazgos devueltos: 14 (1 alta / 4 media / 9 baja)
 Estado del repo: rama review-final, etiqueta pre-review (351ddb9)
 
 ---

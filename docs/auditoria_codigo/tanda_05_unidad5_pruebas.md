@@ -1,8 +1,8 @@
 # Tanda 05 — unidad-5/sql (simulacro, auditoría y pruebas de correcciones)
 
 Herramienta: OpenCode (modo Plan, solo lectura)
-Modelo: <Croutou Alpha Free>
-Fecha y hora: <8/11/2026, 23:12>
+Modelo: Croutou Alpha Free
+Fecha y hora: 8/11/2026, 23:12
 Sesión: nueva (distinta de las tandas 01 a 04)
 Archivos (10):
 - unidad-5/sql/simulacro_incidente.ps1
@@ -16,8 +16,8 @@ Archivos (10):
 - unidad-5/sql/prueba_h4b_trigger.sql
 - unidad-5/sql/correccion_h4b.sql
 Prompt: ver prompt_base.md (solo cambia la lista de archivos)
-Estado: <corrida completa / cortada / con error>
-Total de hallazgos devueltos: <n>
+Estado: Corrida completa
+Total de hallazgos devueltos:  sin ids ni severidad (27 filas armadas después desde la prosa, ver hallazgos.md)
 Estado del repo: rama review-final, etiqueta pre-review (351ddb9)
 
 ---
