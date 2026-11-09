@@ -67,7 +67,7 @@ Y otros cambian de formulación, de alcance o de gravedad:
 
 ### Lo que sí confirma la revisión sobre el código generado por OpenCode (tanda 11, unidad-8/movil_opencode_v2)
 
-Las dos corridas de OpenCode para el móvil no entregaron nada ejecutable sin correcciones (ver T1). En la corrida 2 se reprodujo, entre otros: que las tablas no son `STRICT` aunque el encabezado y el README lo afirman (`T11-H-01`); que un script usa sintaxis de T-SQL inexistente en SQLite (`T11-H-03`); que un script de pruebas no ejecuta el semáforo y deja los seis casos F2 en `PENDIENTE` (`T11-H-07`); y que `PRAGMA foreign_keys` falta en casi todos los scripts (`T11-H-11`).
+Las dos corridas de OpenCode para el móvil no entregaron nada ejecutable sin correcciones (ver U8). En la corrida 2 se reprodujo, entre otros: que las tablas no son `STRICT` aunque el encabezado y el README lo afirman (`T11-H-01`); que un script usa sintaxis de T-SQL inexistente en SQLite (`T11-H-03`); que un script de pruebas no ejecuta el semáforo y deja los seis casos F2 en `PENDIENTE` (`T11-H-07`); y que `PRAGMA foreign_keys` falta en casi todos los scripts (`T11-H-11`).
 
 ## 4. Hallazgos propios (no de OpenCode)
 
