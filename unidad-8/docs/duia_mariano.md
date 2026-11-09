@@ -173,6 +173,6 @@ El repositorio es público. Un correo y un apellido de un integrante estuvieron 
 
 #### Declaración del 09/11/2026 (informe final)
 
-- El PDF informe_final.pdf se armó con asistencia de Claude (pandoc y wkhtmltopdf) a partir de los .md del repositorio. El texto se copió sin reescribir; se agregaron la portada, una nota sobre el PDF, el link, la etiqueta y la fila 14 de la tabla.
-- El PR #28 (informe final) y el PR que mueve informe_final.pdf a la raíz se mergearon sin revisión cruzada de otro integrante.
-- La etiqueta 	p-final se movió después de ese segundo merge para que apunte a un commit que contiene el PDF en la raíz.
+- El PDF `informe_final.pdf` se armó con asistencia de Claude (pandoc y wkhtmltopdf) a partir de los `.md` del repositorio. El texto se copió sin reescribir; se agregaron la portada, una nota sobre el PDF, el link, la etiqueta y la fila 14 de la tabla.
+- El PR #28 (informe final) y el PR que mueve `informe_final.pdf` a la raíz se mergearon sin revisión cruzada de otro integrante.
+- La etiqueta `tp-final` se movió después de ese segundo merge para que apunte a un commit que contiene el PDF en la raíz.
