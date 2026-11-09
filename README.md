@@ -23,7 +23,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 | # | Objetivo | Estado | Evidencia | Límite conocido |
 |---|---|---|---|---|
 | 1 | Refactor a BCNF validado contra dependencias funcionales | Cubierto | `unidad-4/tp_fnbc_control_lote.sql`, `unidad-4/specs/spec_parte_1_fnbc_control_lote.md` | La dependencia `{L,D}→R` no se preserva (documentado) |
-| 2 | Migración sin pérdida, transaccional, con plan de reversión | En curso | `unidad-4/migracion/up.sql` y `down.sql` `[COMPLETAR]` | Hoy hay un solo script, sin `BEGIN…COMMIT` |
+| 2 | Migración sin pérdida, transaccional, con plan de reversión | Cubierto con límites (en `main`, PR #18) | `unidad-4/migracion/` (`setup_previo.sql`, `up.sql`, `down.sql`, `verificar_migracion.sql`, `pruebas_falla.sql`), `unidad-4/capturas/migracion_*`, `docs/informe/u4.md` | Spec posterior al código; sin pasada previa con `ROLLBACK`; no preserva `{L,D} -> R`; contraer pendiente; dos fuentes de verdad; sin permisos para los roles de la U5; `down` repetido sin captura propia; escala de 3 filas |
 | 3 | Desnormalización controlada documentada | Cubierto | `unidad-4/tp_desnormalizacion_top_categorias.sql`, `unidad-4/capturas/explain_*.txt` | La consulta base tarda 6,5 ms: difícil de justificar como «lenta» |
 | 4 | Roles y permisos de mínimo privilegio | Cubierto | `unidad-5/sql/roles.sql`, `unidad-5/docs/kiro_roles_spec/`, `unidad-5/docs/verificacion_permisos.md` (T01–T23: 23/23) | No cubre los objetos de la U4 (`control_lote`, `responsable_deposito`, `mv_ventas_categoria_dia`) |
 | 5 | Auditoría y simulacro de acceso indebido, con contención | Cubierto | `unidad-5/docs/informe_auditoria.md`, `unidad-5/sql/simulacro_incidente.*`, `unidad-5/docs/informe_incidente.md` | Evidencia repartida en tres servidores y fechas |
@@ -35,7 +35,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 | 11 | SQLite especificado en Kiro y generado con OpenCode | Cubierto con límites | `unidad-8/.kiro/specs/foodstore-tablet-sync/`, `unidad-8/movil_opencode/`, `unidad-8/movil_opencode_v2/`, `unidad-8/docs/comparacion_generado_vs_original.md` | Ninguna corrida de OpenCode produjo una base funcional sin correcciones |
 | 12 | Sincronización simulada con conflictos | Cubierto | `unidad-8/movil_opencode/semaforo.sql`, casos C1–C8 y F2, `unidad-8/evidencias/01` a `29` | El semáforo evalúa cada borrador por separado; solo el servidor resuelve la competencia por stock (C8) |
 | 13 | Code review final asistido por IA | En curso | `docs/auditoria_codigo/` `[COMPLETAR]` | Sin hallazgos completos hasta que termine la revisión |
-| 14 | Capa de datos completa en Git, lista para defensa | En curso | Este README, `docs/bitacora_ia.md`, `docs/informe/` | `[ACTUALIZAR al cerrar]` |
+| 14 | Capa de datos completa en Git, lista para entrega | En curso | Este README, `docs/bitacora_ia.md`, `docs/informe/` | `[ACTUALIZAR al cerrar]` |
 
 ## Bases de datos usadas
 
