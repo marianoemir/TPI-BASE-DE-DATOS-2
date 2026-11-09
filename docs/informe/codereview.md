@@ -79,7 +79,7 @@ Las filas `C-01` a `C-09` registran lo que Mariano y Claude encontraron por su c
 2. **Las altas y críticas se decidieron en su mayoría por lectura.** Solo 14 filas tienen ejecución propia.
 3. **Tres hallazgos dependen de lo que pide el enunciado y no se contrastaron con él:** `T01-H-01`, `T01-H-31` y `T09-H-01`.
 4. **Las pruebas con paso 6 simulado** (`T11-H-08`, `T11-H-09`) no equivalen a correr el paso 6 real en PostgreSQL.
-5. **Una sola IA revisora** (OpenCode con un modelo gratuito); no hubo una segunda revisión independiente. `[CONFIRMAR: nombre exacto del modelo; las cabeceras de las tandas usan dos grafías, «Croutou» y «Crouton»]`.
+5. **Una sola IA revisora** (OpenCode con un modelo gratuito); no hubo una segunda revisión independiente. En las cabeceras de las tandas el modelo figura como «Croutou Alpha Free» (01, 07 y 08) y «Crouton Alpha Free» (09, 10 y 11); no se pudo verificar cuál es el nombre exacto.
 6. **No se corrigió código a partir de la revisión** en esta etapa: ningún script de `main` fue modificado por este trabajo (`pre-review` sigue siendo la referencia).
 7. **Las decisiones se cargaron por lote** y no con un commit por hallazgo; la evidencia sí está separada por grupo.
 
