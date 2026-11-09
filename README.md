@@ -41,11 +41,11 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 
 | Unidad | Base | Motor |
 |---|---|---|
-| U4 | `copia_trabajo` (Parte 2) y `copia_fnbc` (Parte 1) | PostgreSQL 18 |
+| U4 | `copia_trabajo` (Parte 2) y `copia_fnbc` (Parte 1); `copia_u4` (migración y caminos de falla) | PostgreSQL 18 (`copia_trabajo`, `copia_fnbc` y las capturas `migracion_up.png` y `migracion_down.png`); PostgreSQL 17 (`copia_u4`, capturas `migracion_falla_*`) |
 | U5 | `copia_u5` | PostgreSQL 17.10 |
-| U6 | `foodstore`, `foodstore_restore_test` | PostgreSQL |
+| U6 | `foodstore`, `foodstore_restore_test` | PostgreSQL 17 (local, Mariano y Andrés) |
 | U7 | `foodstore_nosql` | MongoDB 9.0.4 (`mongosh` 2.14.0) |
-| U8 | `foodstore_u8` | PostgreSQL + SQLite 3.54.1 |
+| U8 | `foodstore_u8` | PostgreSQL 17.10 (Mariano; Andrés declara 17.11 en sus corridas del 05/11) + SQLite 3.54.1 |
 
 ## Cómo reproducir
 
