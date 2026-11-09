@@ -1,0 +1,194 @@
+﻿=== T02-H-09 :: tp_desnormalizacion_top_categorias.sql líneas 20-30
+--- unidad-4\tp_desnormalizacion_top_categorias.sql
+20: -- vigentes, 811 detalles vigentes, 5 categorías) y la consulta del
+21: -- enunciado se mide TAL CUAL, con CURRENT_DATE, sin sustituir fechas.
+22: -- Nota: la medición solo es reproducible el mismo día en que se hace el
+23: -- UPDATE (CURRENT_DATE cambia cada día).
+24: 
+25: UPDATE pedido SET fecha = CURRENT_DATE WHERE fecha = '2025-10-09';
+26: ANALYZE pedido;
+27: 
+28: 
+29: -- ============================================================
+30: -- 5.2 (a) — BASELINE: consulta original (4 tablas, sin desnormalizar)
+=== T02-H-09 (control de transacción) :: buscar /BEGIN|COMMIT|ROLLBACK/
+unidad-4\tp_desnormalizacion_top_categorias.sql:211: BEGIN;
+unidad-4\tp_desnormalizacion_top_categorias.sql:231: ROLLBACK;
+unidad-4\tp_desnormalizacion_top_categorias.sql:232: -- Después del ROLLBACK la auditoría vuelve a devolver 0 filas.
+=== T03-H-12 (encabezado) :: pruebas_falla.sql líneas 1-10
+--- unidad-4\migracion\pruebas_falla.sql
+1: -- =============================================================================
+2: -- unidad-4/migracion/pruebas_falla.sql  (GUIA PARA PGADMIN, no se corre entera)
+3: -- Reproduce los dos caminos de falla de up.sql. Se hizo el 08/11/2026 en la base
+4: -- copia_u4 (PostgreSQL 17, pgAdmin 4). Cada paso se ejecuta por separado.
+5: --
+6: -- Antes de empezar: copia_u4 con heredado/base_heredada/ (schema, objects, data).
+7: -- Query Tool: cada pestaña es una sesion distinta. Si up.sql falla, la transaccion
+8: -- queda abortada EN ESA PESTANA: se descarta cerrando la pestana y eligiendo
+9: -- "Rollback" en el cartel (o ejecutando ROLLBACK; en esa misma pestana).
+10: -- verificar_migracion.sql: para V1, seleccionar solo esa consulta y ejecutar.
+=== T03-H-12 :: pruebas_falla.sql líneas 24-30
+--- unidad-4\migracion\pruebas_falla.sql
+24: -- B1. Ejecutar setup_previo.sql completo. Ejecutar V1: debe dar 0 filas (base limpia).
+25: -- B2. En una pestana nueva, ejecutar esta unica linea (el responsable 801 queda en
+26: --     los depositos 30 y 31):
+27: INSERT INTO control_lote_almacen VALUES (502, 31, 801);
+28: -- B3. Ejecutar up.sql completo. Esperado: ERROR "Precondicion violada: hay
+29: --     responsables asignados a mas de un deposito (R -> D no se cumple)." (P0001).
+30: --                                          CAPTURA: capturas/migracion_falla_precondicion.png
+=== T04-H-02 :: roles.sql líneas 60-70
+--- unidad-5\sql\roles.sql
+60: -- ----------------------------------------------------------------------------
+61: DO $$
+62: BEGIN
+63:     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'admin_datos') THEN
+64:         CREATE ROLE admin_datos WITH LOGIN PASSWORD 'cambiar_en_produccion'
+65:             NOSUPERUSER NOCREATEDB NOCREATEROLE;
+66:     END IF;
+67:     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'app_web') THEN
+68:         CREATE ROLE app_web WITH LOGIN PASSWORD 'cambiar_en_produccion'
+69:             NOSUPERUSER NOCREATEDB NOCREATEROLE;
+70:     END IF;
+=== T04-H-03 :: roles.sql líneas 236-246
+--- unidad-5\sql\roles.sql
+236: --         Funciones: el EXECUTE para PUBLIC es el valor por omision GLOBAL de
+237: --         PostgreSQL, y un REVOKE "IN SCHEMA" no puede quitarlo; por eso este
+238: --         ALTER DEFAULT PRIVILEGES va SIN "IN SCHEMA".
+239: -- ----------------------------------------------------------------------------
+240: ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos IN SCHEMA public
+241:     REVOKE ALL ON TABLES FROM PUBLIC;
+242: ALTER DEFAULT PRIVILEGES FOR ROLE admin_datos
+243:     REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+244: 
+245: -- H4b (auditoria U5, 2026-11-07): las rutinas heredaban EXECUTE de PUBLIC,
+246: -- asi que app_web podia ejecutarlas sin que ningun GRANT lo autorizara.
+=== T06-H-02 :: programar_tareas.ps1 líneas 44-54
+--- unidad-6\programar_tareas.ps1
+44:     $principal = New-ScheduledTaskPrincipal -UserId $UsuarioTarea -LogonType Interactive -RunLevel Limited
+45:     Register-ScheduledTask -TaskName $Nombre -Action $accion -Trigger $Trigger -Principal $principal -Force | Out-Null
+46:     Write-Host "RESULTADO: OK - $Nombre registrada"
+47: }
+48: 
+49: $argumentosBackup = "-NoProfile -ExecutionPolicy Bypass -File `"$backup`""
+50: $argumentosMaintenance = "-NoProfile -ExecutionPolicy Bypass -Command `"& '$Psql' -w -U '$UsuarioPostgres' -d '$Base' -f '$maintenance'; exit `$LASTEXITCODE`""
+51: $argumentosRestore = "-NoProfile -ExecutionPolicy Bypass -File `"$restore`""
+52: 
+53: Registrar-Tarea -Nombre 'FoodStore-Respaldo-Diario' -Argumentos $argumentosBackup -Trigger (New-ScheduledTaskTrigger -Daily -At 2:00AM)
+54: Registrar-Tarea -Nombre 'FoodStore-Mantenimiento-Semanal' -Argumentos $argumentosMaintenance -Trigger (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Sunday -At 3:00AM)
+=== T06-H-02 (ON_ERROR_STOP en toda la U6) :: buscar /ON_ERROR_STOP/
+unidad-6\maintenance.sql:16: -- se detiene (ON_ERROR_STOP) y no hace nada mas.
+unidad-6\maintenance.sql:33: \set ON_ERROR_STOP on
+unidad-6\validar_integridad.sql:5: \set ON_ERROR_STOP on
+=== T07-H-01/02 :: crear_rol_respaldo.sql líneas 8-24
+--- unidad-6\crear_rol_respaldo.sql
+8: DO $$
+9: BEGIN
+10:     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operador_respaldo') THEN
+11:         CREATE ROLE operador_respaldo LOGIN NOINHERIT
+12:             NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+13:     END IF;
+14: END $$;
+15: 
+16: ALTER ROLE operador_respaldo LOGIN NOINHERIT
+17:     NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+18: 
+19: GRANT CONNECT ON DATABASE foodstore TO operador_respaldo;
+20: GRANT USAGE ON SCHEMA public TO operador_respaldo;
+21: GRANT SELECT ON ALL TABLES IN SCHEMA public TO operador_respaldo;
+22: GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO operador_respaldo;
+23: 
+24: -- Ajusta los objetos futuros del rol que ejecute este script. Si otro rol crea
+=== T07-H-01 (contraseña del rol) :: buscar /ALTER ROLE operador_respaldo|operador_respaldo.*(PASSWORD|contrase)|(PASSWORD|contrase).*operador_respaldo/
+unidad-6\backups\foodstore_globals_20261107_194217.sql:21: ALTER ROLE operador_respaldo WITH NOSUPERUSER NOINHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS;
+unidad-6\backups\foodstore_globals_20261107_194558.sql:21: ALTER ROLE operador_respaldo WITH NOSUPERUSER NOINHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS;
+unidad-6\backups\foodstore_globals_20261107_194611.sql:21: ALTER ROLE operador_respaldo WITH NOSUPERUSER NOINHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS;
+unidad-6\backups\foodstore_globals_20261107_195608.sql:21: ALTER ROLE operador_respaldo WITH NOSUPERUSER NOINHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS;
+unidad-6\BITACORA.md:34: | Rol de respaldo | `operador_respaldo` se creó con `LOGIN` y sin `SUPERUSER`, `CREATEDB`, `CREATEROLE`, `REPLICATION` ni `BYPASSRLS`. El primer login falló porque la entrada de `pgpass.conf` no coincidía con la contraseña; se corrigió con `\password operador_respaldo`, sin exponer la clave. | `evidencias/obj7_rol_respaldo_20261107.txt` |
+unidad-6\BITACORA.md:35: | Respaldo | `pg_dump` ejecutado como `operador_respaldo`, `pg_restore --list` correcto, dump de 10.667.028 bytes, respaldo global sin hashes de contraseña y SHA-256 para ambos. | `evidencias/obj7_backup_ok_20261107.txt` |
+unidad-6\crear_rol_respaldo.sql:3: -- No contiene ni define contrasenas. La clave de operador_respaldo se configura
+unidad-6\crear_rol_respaldo.sql:16: ALTER ROLE operador_respaldo LOGIN NOINHERIT
+unidad-6\SPEC_U6_ampliacion.md:19: | `backup_foodstore.ps1` | Ejecutar el dump de `foodstore` con `operador_respaldo`; generar y verificar el hash; generar un respaldo separado de objetos globales con `pg_dumpall --globals-only --no-role-passwords`. | Existen un `.dump`, su `.sha256`, un archivo de globales y su hash; el log registra cada validacion. |
+=== T08-H-06 :: pedidos_de_prueba.sql líneas 1-8
+--- unidad-7\modelo\pedidos_de_prueba.sql
+1: -- Pedidos de prueba opcionales para enriquecer las consultas b) y c)
+2: -- Se utiliza el procedimiento almacenado sp_crear_pedido según las reglas de negocio de Food Store.
+3: 
+4: CALL sp_crear_pedido(2, 'TARJETA', '[{"producto_id":1,"cantidad":1},{"producto_id":8,"cantidad":1}]'::jsonb);
+5: CALL sp_crear_pedido(3, 'EFECTIVO', '[{"producto_id":1,"cantidad":3},{"producto_id":7,"cantidad":1}]'::jsonb);
+=== T08-H-08 :: buscar /PGPASSWORD|psql/
+unidad-7\correr_correcciones_obj10.ps1:3: # $env:PGPASSWORD definido, y mongosh en el PATH. Los scripts auxiliares deben estar en unidad-7.
+unidad-7\correr_correcciones_obj10.ps1:7: [string]$PsqlExe = 'C:\Program Files\PostgreSQL\17\bin\psql.exe',
+unidad-7\correr_correcciones_obj10.ps1:35: $n = ((Ejecutar $PsqlExe ($pg + @('-t', '-A', '-c', 'SELECT count(*) FROM pedido WHERE eliminado = FALSE'))) -join '').Trim()
+unidad-7\correr_correcciones_obj10.ps1:37: $vPg = ((Ejecutar $PsqlExe ($pg + @('-t', '-A', '-c', 'SELECT version()'))) -join '').Trim()
+unidad-7\correr_correcciones_obj10.ps1:43: Ejecutar $PsqlExe ($pg + @('-t', '-A', '-v', 'ids=1,2,3,6,7,8', '-v', 'origen=ejemplo_regenerado',
+unidad-7\correr_correcciones_obj10.ps1:52: Ejecutar $PsqlExe ($pg + @('-t', '-A', '-v', 'limite=5000', '-f', 'modelo\exportar_pedidos_benchmark.sql',
+unidad-7\correr_correcciones_obj10.ps1:68: $p += Ejecutar $PsqlExe ($pg + @('-v', 'limite=5000', '-v', "producto=$Producto", '-f', 'medicion_repetida_postgresql.sql'))
+unidad-7\correr_correcciones_obj10.ps1:73: $r = Ejecutar $PsqlExe ($pg + @('-v', 'limite=5000', '-f', 'verificar_referencias_postgresql.sql'))
+=== T09-H-01 :: carga_benchmark_mongodb.js líneas 20-40
+--- unidad-7\carga_benchmark_mongodb.js
+20: const resultadoInsert = db.pedidos_benchmark.insertMany(docs);
+21: print('Insertados: ' + Object.keys(resultadoInsert.insertedIds).length);
+22: print('Documentos: ' + db.pedidos_benchmark.countDocuments());
+23: printjson(db.pedidos_benchmark.createIndex({ 'lineas.producto_id': 1 }));
+24: 
+25: // Coleccion auxiliar exclusiva del benchmark para contrastar el costo/modelo
+26: // de resolver categoria con $lookup frente a la categoria embebida por linea.
+27: const productos = db.pedidos_benchmark.aggregate([
+28:   { $unwind: '$lineas' },
+29:   { $group: {
+30:     _id: '$lineas.producto_id',
+31:     nombre: { $first: '$lineas.nombre' },
+32:     categoria_id: { $first: '$lineas.categoria_id' },
+33:     categoria_nombre: { $first: '$lineas.categoria_nombre' }
+34:   } }
+35: ]).toArray();
+36: db.productos_benchmark.insertMany(productos);
+37: print('Productos auxiliares: ' + db.productos_benchmark.countDocuments());
+38: 
+39: const productoObjetivo = db.pedidos_benchmark.aggregate([
+40:   { $unwind: '$lineas' },
+=== T09-H-01 (alcance en AGENTS.md) :: buscar /productos_benchmark|migraci|embeb/
+unidad-7\AGENTS.md:22: ## Alcance (regla principal): migración PARCIAL
+unidad-7\AGENTS.md:29: | Datos esenciales del cliente y del producto **embebidos** dentro de cada pedido | Los otros pedidos de la carga masiva (200.000) |
+unidad-7\AGENTS.md:58: | 1. Modelo documental y migración (consignas 1 a 3) | Subconjunto elegido con sus tablas y claves; esquema de la colección (campos, embebidos, arreglos, ids conservados); creación de la base y la colección; migración de ≥5 pedidos con `insertMany()`; **dos reglas de integridad** y justificación de lo embebido | 35 |
+unidad-7\AGENTS.md:67: ├── consultas_mongodb.js        creación, migración (insertMany) y consultas a) a d)
+unidad-7\AGENTS.md:95: 7. **La migración es parcial.** Solo pedidos y detalle, con cliente y producto embebidos. No se migra toda la
+unidad-7\AGENTS.md:102: 10. **Nunca se migra `contrasena`.** El cliente embebido lleva solo `usuario_id`, `nombre`, `apellido` y `mail`.
+unidad-7\AGENTS.md:187: | Modelo documental y correspondencia con Food Store; migración de datos | 35 |
+unidad-7\AGENTS.md:213: - `.kiro/steering/objects-and-patterns.md`: objetos heredados y patrones de modelado, migración y consulta.
+=== T09-H-02 :: exportar_pedidos_benchmark.sql líneas 28-42
+--- unidad-7\modelo\exportar_pedidos_benchmark.sql
+28:           'categoria_id', c.id, 'categoria_nombre', c.nombre,
+29:           'cantidad', d.cantidad, 'precio_unitario', d.precio_unitario::text, 'subtotal', d.subtotal::text
+30:         ) ORDER BY d.id)
+31:         FROM detalle_pedido d
+32:         JOIN producto pr ON pr.id = d.producto_id
+33:         JOIN categoria c ON c.id = pr.categoria_id
+34:         WHERE d.pedido_id = p.id AND d.eliminado = FALSE
+35:       ),
+36:       'origen', 'benchmark'
+37:     ) AS doc
+38:   FROM pedido p
+39:   JOIN muestra m ON m.id = p.id
+40:   JOIN usuario u ON u.id = p.usuario_id
+41: ) t;
+=== T09-H-03 :: verificar_benchmark_postgresql.sql líneas 26-36
+--- unidad-7\verificar_benchmark_postgresql.sql
+26:   SELECT d.producto_id
+27:   FROM detalle_pedido d JOIN muestra m ON m.id = d.pedido_id
+28:   WHERE d.eliminado = FALSE
+29: )
+30: SELECT 'REFERENCIAS_POSTGRES' AS seccion,
+31:        (SELECT count(*) FROM muestra m WHERE NOT EXISTS (SELECT 1 FROM usuario u WHERE u.id = m.usuario_id)) AS usuarios_inexistentes,
+32:        (SELECT count(*) FROM lineas l WHERE NOT EXISTS (SELECT 1 FROM producto p WHERE p.id = l.producto_id)) AS productos_inexistentes;
+33: 
+34: WITH muestra AS (
+35:   SELECT id FROM pedido WHERE eliminado = FALSE ORDER BY id LIMIT :limite
+36: )
+=== filas C- de hallazgos.md
+| C-01 | unidad-5/sql/ | `PUBLIC` con `EXECUTE` en rutinas viejas (OpenCode lo halló por su cuenta en T04-H-03) | Claude, no OpenCode | | | |
+| C-02 | unidad-6/restore_test.ps1 | La restauración pierde dueños y permisos | Claude, no OpenCode | | | |
+| C-03 | unidad-6/backup_foodstore.ps1 | El respaldo no verificaba su SHA-256 (corregido el 07/11) | Claude, no OpenCode | | | |
+| C-04 | unidad-6/ | Conteos comparados a mano | Claude, no OpenCode | | | |
+| C-05 | unidad-7/correr_correcciones_obj10.ps1 | El encabezado nombra `$env:PGPASSWORD` (va contra la regla de la U6); falta ver si el script lo usa (OpenCode lo halló por su cuenta en T08-H-08) | Claude, no OpenCode | 
+| C-06 | unidad-6/maintenance.sql | El «sin acción» original pudo deberse a estadísticas en cero tras `createdb -T` | Claude, no OpenCode | | | |

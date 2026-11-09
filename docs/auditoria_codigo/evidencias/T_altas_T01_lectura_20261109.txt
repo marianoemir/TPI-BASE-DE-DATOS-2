@@ -1,0 +1,200 @@
+﻿=== T01-H-01 :: schema.sql líneas 43-47
+--- heredado\base_heredada\schema.sql
+43:     nombre       VARCHAR(80) NOT NULL,
+44:     apellido     VARCHAR(80) NOT NULL,
+45:     mail         VARCHAR(120) NOT NULL UNIQUE,
+46:     celular      VARCHAR(30),
+47:     contrasena   VARCHAR(255) NOT NULL,
+=== T01-H-09 :: objects.sql líneas 58-67
+--- heredado\base_heredada\objects.sql
+58: RETURNS TRIGGER AS $$
+59: BEGIN
+60:     IF NEW.precio_unitario IS NULL THEN
+61:         SELECT precio INTO NEW.precio_unitario
+62:         FROM producto WHERE id = NEW.producto_id;
+63:     END IF;
+64: 
+65:     NEW.subtotal := NEW.cantidad * NEW.precio_unitario;
+66:     RETURN NEW;
+67: END;
+=== T01-H-11 :: objects.sql líneas 88-98
+--- heredado\base_heredada\objects.sql
+88: CREATE TRIGGER trg_total_ins
+89: AFTER INSERT ON detalle_pedido
+90: REFERENCING NEW TABLE AS afectados
+91: FOR EACH STATEMENT EXECUTE FUNCTION fn_recalcular_total();
+92: 
+93: CREATE TRIGGER trg_total_upd
+94: AFTER UPDATE ON detalle_pedido
+95: REFERENCING NEW TABLE AS afectados
+96: FOR EACH STATEMENT EXECUTE FUNCTION fn_recalcular_total();
+97: 
+98: -- Valida que un pedido CONFIRMADO no pueda volver a estado PENDIENTE
+=== T01-H-11 (triggers existentes) :: buscar /TRIGGER|AFTER |BEFORE /
+heredado\base_heredada\objects.sql:3: -- Vistas, función de total, triggers y procedimiento de pedido
+heredado\base_heredada\objects.sql:52: -- 3) TRIGGERS: subtotal y total automáticos
+heredado\base_heredada\objects.sql:58: RETURNS TRIGGER AS $$
+heredado\base_heredada\objects.sql:70: CREATE TRIGGER trg_subtotal
+heredado\base_heredada\objects.sql:71: BEFORE INSERT OR UPDATE ON detalle_pedido
+heredado\base_heredada\objects.sql:77: RETURNS TRIGGER AS $$
+heredado\base_heredada\objects.sql:86: -- Un trigger por evento (INSERT y UPDATE por separado):
+heredado\base_heredada\objects.sql:88: CREATE TRIGGER trg_total_ins
+heredado\base_heredada\objects.sql:89: AFTER INSERT ON detalle_pedido
+heredado\base_heredada\objects.sql:93: CREATE TRIGGER trg_total_upd
+heredado\base_heredada\objects.sql:94: AFTER UPDATE ON detalle_pedido
+heredado\base_heredada\objects.sql:100: RETURNS TRIGGER AS $$
+heredado\base_heredada\objects.sql:109: CREATE TRIGGER trg_validar_estado_pedido
+heredado\base_heredada\objects.sql:110: BEFORE UPDATE OF estado ON pedido
+=== T01-H-13 :: objects.sql líneas 118-143
+--- heredado\base_heredada\objects.sql
+118: CREATE OR REPLACE PROCEDURE sp_crear_pedido(
+119:     p_usuario_id BIGINT,
+120:     p_forma_pago forma_pago,
+121:     p_items JSONB  -- [{"producto_id":1,"cantidad":2}, ...]
+122: ) AS $$
+123: DECLARE
+124:     v_pedido_id     BIGINT;
+125:     v_item          JSONB;
+126:     v_producto_id   BIGINT;
+127:     v_cantidad      INTEGER;
+128:     v_stock         INTEGER;
+129:     v_disponible    BOOLEAN;
+130: BEGIN
+131:     -- El usuario debe existir y no estar eliminado
+132:     IF NOT EXISTS (SELECT 1 FROM usuario
+133:                    WHERE id = p_usuario_id AND eliminado = FALSE) THEN
+134:         RAISE EXCEPTION 'Usuario % inexistente o eliminado', p_usuario_id;
+135:     END IF;
+136: 
+137:     INSERT INTO pedido(usuario_id, forma_pago)
+138:     VALUES (p_usuario_id, p_forma_pago)
+139:     RETURNING id INTO v_pedido_id;
+140: 
+141:     FOR v_item IN SELECT * FROM jsonb_array_elements(p_items) LOOP
+142:         v_producto_id := (v_item->>'producto_id')::BIGINT;
+143:         v_cantidad    := (v_item->>'cantidad')::INTEGER;
+=== T01-H-20 :: materializadas.sql líneas 8-20
+--- heredado\base_heredada\materializadas.sql
+8:     SUM(dp.cantidad * dp.precio_unitario) AS total_facturado
+9: FROM categoria c
+10: JOIN producto pr ON pr.categoria_id = c.id
+11: JOIN detalle_pedido dp ON dp.producto_id = pr.id
+12: JOIN pedido p ON p.id = dp.pedido_id
+13: WHERE p.estado = 'CONFIRMADO' AND p.eliminado = FALSE
+14: GROUP BY c.id, c.nombre, DATE_TRUNC('month', p.fecha)
+15: ORDER BY mes DESC, total_facturado DESC
+16: WITH DATA;
+17: 
+18: -- ÍNDICE ÚNICO: idx_mv_facturacion_cat_mes_pk
+19: CREATE UNIQUE INDEX idx_mv_facturacion_cat_mes_pk
+20: ON mv_facturacion_categoria_mes (categoria_id, mes);
+=== T01-H-20 (columna eliminado) :: buscar /eliminado/
+heredado\base_heredada\schema.sql:18: eliminado    BOOLEAN NOT NULL DEFAULT FALSE,
+heredado\base_heredada\schema.sql:34: eliminado     BOOLEAN NOT NULL DEFAULT FALSE,
+heredado\base_heredada\schema.sql:49: eliminado    BOOLEAN NOT NULL DEFAULT FALSE,
+heredado\base_heredada\schema.sql:66: eliminado    BOOLEAN NOT NULL DEFAULT FALSE,
+heredado\base_heredada\schema.sql:80: eliminado        BOOLEAN NOT NULL DEFAULT FALSE,
+heredado\base_heredada\schema.sql:95: -- Índice parcial: solo productos no eliminados, para búsquedas por nombre
+heredado\base_heredada\schema.sql:96: CREATE INDEX idx_producto_nombre_vigente ON producto(nombre) WHERE eliminado = FALSE;
+=== T01-H-31 :: queries.sql líneas 159-187
+--- heredado\base_heredada\queries.sql
+159: SELECT pr.id, pr.nombre, SUM(dp.cantidad) AS unidades
+160: FROM detalle_pedido dp
+161: JOIN producto pr ON pr.id = dp.producto_id
+162: WHERE dp.eliminado = FALSE
+163: GROUP BY pr.id, pr.nombre
+164: ORDER BY unidades DESC
+165: LIMIT 5;
+166: 
+167: -- B) Facturación por categoría y por mes
+168: SELECT c.nombre AS categoria,
+169:        date_trunc('month', ped.fecha) AS mes,
+170:        SUM(dp.subtotal) AS facturado
+171: FROM detalle_pedido dp
+172: JOIN pedido ped ON ped.id = dp.pedido_id AND ped.eliminado = FALSE
+173: JOIN producto pr ON pr.id = dp.producto_id
+174: JOIN categoria c ON c.id = pr.categoria_id
+175: WHERE dp.eliminado = FALSE
+176: GROUP BY c.nombre, date_trunc('month', ped.fecha)
+177: ORDER BY mes, facturado DESC;
+178: 
+179: -- C) Ranking de usuarios por gasto acumulado (función de ventana)
+180: SELECT u.id, u.nombre || ' ' || u.apellido AS usuario,
+181:        SUM(ped.total) AS gasto,
+182:        RANK() OVER (ORDER BY SUM(ped.total) DESC) AS puesto
+183: FROM pedido ped
+184: JOIN usuario u ON u.id = ped.usuario_id
+185: WHERE ped.eliminado = FALSE
+186: GROUP BY u.id, u.nombre, u.apellido
+187: ORDER BY puesto;
+=== T01-H-33/34/35 :: transacciones.sql líneas 28-70
+--- heredado\base_heredada\transacciones.sql
+28: -- ============================================================
+29: 
+30: --En la seccion A
+31: BEGIN;
+32: SELECT stock FROM producto WHERE id = 7;
+33: 
+34: --Sin cerrar A, vamos a la seccion B
+35: BEGIN;
+36: UPDATE producto SET stock = stock - 5 WHERE id = 7;
+37: COMMIT;
+38: 
+39: --Volvemos a la seccion A
+40: SELECT stock FROM producto WHERE id = 7;
+41: COMMIT;
+42: 
+43: --Repetimos lo anterior pero poniendo antes en A:
+44: 
+45: SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+46: 
+47: BEGIN;
+48: SELECT stock FROM producto WHERE id = 7;
+49: 
+50: BEGIN;
+51: UPDATE producto SET stock = stock - 5 WHERE id = 7;
+52: COMMIT;
+53: 
+54: SELECT stock FROM producto WHERE id = 7;
+55: COMMIT;
+56: 
+57: -- ============================================================
+58: -- Escenario 4 — Bloqueo con FOR UPDATE (evitar sobreventa)
+59: -- ============================================================
+60: 
+61: SELECT id, stock FROM producto WHERE id = 3;
+62: 
+63: --En la seccion A
+64: BEGIN;
+65: CALL sp_crear_pedido(1, 'EFECTIVO', '[{"producto_id":3,"cantidad":8}]'::jsonb);
+66: --En la seccion B
+67: CALL sp_crear_pedido(2, 'EFECTIVO', '[{"producto_id":3,"cantidad":8}]'::jsonb);
+68: --En la seccion A
+69: COMMIT;
+70: 
+=== T01-H-41/42/43 :: carga_masiva.sql líneas 8-14
+--- heredado\base_heredada\carga_masiva.sql
+8: -- (correr esta línea en la terminal ANTES de seguir, no es parte del script SQL)
+9: 
+10: BEGIN;
+11: 
+12: -- ============================================================
+13: -- 1. Cargar 20.000 usuarios
+14: -- ============================================================
+=== T01-H-42 :: carga_masiva.sql líneas 64-68
+--- heredado\base_heredada\carga_masiva.sql
+64:         0.00 AS total,
+65:         (ARRAY['TARJETA', 'TRANSFERENCIA', 'EFECTIVO']::forma_pago[])[1 + (i % 3)] AS forma_pago,
+66:         ((i % 20000) + 1) AS usuario_id,
+67:         FALSE AS eliminado
+68:     FROM generate_series(1, 200000) AS i
+=== T01-H-43 :: carga_masiva.sql líneas 89-93
+--- heredado\base_heredada\carga_masiva.sql
+89:     SELECT
+90:         pn.id AS pedido_id,
+91:         ((pn.id * 7 + k) % 50000) + 1 AS producto_id,
+92:         1 + (k % 5) AS cantidad
+93:     FROM pedidos_nuevos pn
+=== T01-H-41 (control de transacción) :: buscar /BEGIN|COMMIT|ROLLBACK/
+heredado\base_heredada\carga_masiva.sql:10: BEGIN;
+heredado\base_heredada\carga_masiva.sql:114: COMMIT;
