@@ -51,7 +51,7 @@ Además, **H4b** (cuatro rutinas viejas con `EXECUTE` para `PUBLIC`) **no salió
 
 ### Redacción del informe
 
-Los textos de este informe y el documento `auditoria_roles_opencode.md` se redactaron con asistencia de Claude y se revisaron contra las evidencias del repositorio. `[COMPLETAR: lo mismo para los textos de U4, U6, U7 y code review, según declare cada autor]`
+Los textos de este informe y el documento `auditoria_roles_opencode.md` se redactaron con asistencia de Claude y se revisaron contra las evidencias del repositorio. Los textos de `u4.md` se redactaron con Claude (declarado en la DUIA de Facundo, 08/11/2026) y Mariano los corrigió con Claude ese día. `u6.md` lo amplió Mariano con Claude el 07/11/2026 sobre el texto de Andrés. De `u7.md` no consta con qué herramienta se redactó.
 
 ## 3. Limitaciones y trabajo futuro
 
@@ -66,7 +66,7 @@ Los textos de este informe y el documento `auditoria_roles_opencode.md` se redac
 - El marcador de contraseña `'cambiar_en_produccion'` es público.
 - El `REVOKE` de H3 solo quita membresías concedidas por `postgres`; no se probaron `GRANT OPTION` de otros otorgantes.
 - La prueba de H4b no ejercita una ruta donde `app_web` dispare las funciones con sus propios permisos.
-- Los roles no cubren los objetos de la U4. `[ACTUALIZAR si F hace T8]`
+- Los roles no cubren los objetos de la U4 (`control_lote`, `responsable_deposito`, `mv_ventas_categoria_dia`): la ampliación de los roles a esos objetos (T8) no se hizo.
 - `fn_autenticar` no bloquea por intentos fallidos; `log_statement='all'` deja claves en el log.
 
 **De la base SQLite (U8)**
@@ -75,11 +75,15 @@ Los textos de este informe y el documento `auditoria_roles_opencode.md` se redac
 - El semáforo evalúa cada borrador por separado: dos borradores que compiten por el mismo stock pueden quedar ambos aprobados en simulación (C8). Solo el servidor resuelve.
 - El semáforo valida la longitud del UUID, no su formato.
 
-**De los otros objetivos** `[COMPLETAR por cada autor: U4, U6, U7, code review]`
+**De los otros objetivos**
+- U4 (objetivos 1 a 3): la spec de la migración se actualizó después del código; no hubo pasada previa con `ROLLBACK`; la migración no preserva `{L,D} → R`; el paso «contraer» queda pendiente y mientras tanto hay dos fuentes de verdad; el `down.sql` repetido no tiene captura propia; la escala es de 3 filas. Las capturas del ciclo `up`/`down` son de PostgreSQL 18 y las de los caminos de falla, de PostgreSQL 17. Al 08/11/2026 no consta si el primer borrador de la Parte 1 lo hizo Gemini ni quién sacó las capturas del ciclo.
+- U6 (objetivo 7): las tareas se dispararon a mano con `Start-ScheduledTask`; ninguna se ejecutó por horario. El mantenimiento no deja log propio y corre como `postgres`; `pg_hba` está en `trust`; el RPO de la prueba no es real; las pruebas de Pester solo buscan texto en los scripts. La primera corrida de mantenimiento dio «sin acción» con estadísticas en cero (copia hecha con `createdb -T`); se repitió tras `ANALYZE`, y falta revisar si la entrega original tuvo la misma causa.
+- U7 (objetivo 10): los límites están en la fila 10 del `README.md` y en `unidad-7/evidencias/comparacion_medida.md`.
+- Code review (objetivo 13): `[ACTUALIZAR al cerrar T9]`
 
 **De los datos de ejemplo y las evidencias**
-- La base heredada del repositorio usa usuarios inventados. Las exportaciones de la U7 (`unidad-7/modelo/pedidos_export.json` y la salida guardada en `unidad-7/evidencias/mongo_migracion_y_consultas.txt`) vienen de una base anterior a esa limpieza y todavía conservan el nombre y el mail de un integrante en un usuario de ejemplo. Se regeneran desde la base actual. `[ACTUALIZAR cuando se regenere: o quitar este punto]`
-- Las evidencias de las U5 y U6 conservan rutas locales del equipo del autor (`C:\Users\...`). No se editaron, para no alterar lo que prueban.
+- La base heredada del repositorio usa usuarios inventados. Las exportaciones de la U7 (`unidad-7/modelo/pedidos_export.json` y la salida guardada en `unidad-7/evidencias/mongo_migracion_y_consultas.txt`) se regeneraron el 07/11/2026 sin el nombre real de un integrante (según `unidad-7/CONTEXTO_IA.md`). El `git grep` del 08/11/2026 no encuentra nombres de integrantes en esos dos archivos. Sí quedaba un resto en `unidad-7/AGENTS.md` (la fila del pedido 5 nombraba a un integrante como cliente), corregido el 08/11/2026.
+- Las evidencias de las U5, U6 y U7 conservan rutas locales (`C:\Users\...`) y nombres de equipo (`MarianoChirino`, `DESKTOP-ANDRES`) de los integrantes. No se editaron, para no alterar lo que prueban.
 
 **Del proceso**
 - Los PR de `m/obj-11`, `m/informe-u8` y `m/obj-06` se mergearon **sin revisión cruzada**, porque la revisión asignada no respondió. Queda pendiente una lectura posterior.
