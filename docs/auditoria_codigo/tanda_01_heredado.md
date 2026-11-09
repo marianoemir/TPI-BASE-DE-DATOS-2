@@ -1,8 +1,8 @@
 # Tanda 01 — heredado/base_heredada (corrida fallida)
 
 Herramienta: OpenCode (modo Plan)
-Modelo: <el que muestra OpenCode>
-Fecha y hora: <fecha, hh:mm>
+Modelo: <Croutou Alpha Free>
+Fecha y hora: <8/11/2026, 22:55>
 Archivos: ninguno (el marcador <LISTA DE ARCHIVOS DE LA TANDA> se envió sin reemplazar)
 Prompt: ver prompt_base.md
 
