@@ -14,6 +14,9 @@ Repo congelado: etiqueta `pre-review` (`351ddb9`), rama `review-final`.
 **Límites del proceso (declarar en `codereview.md`)**
 - Las tandas se corrieron en la misma sesión de OpenCode: las respuestas citan `AGENTS.md`, reglas del proyecto y archivos de tandas anteriores. No se le adelantaron hallazgos, pero tuvo contexto que no estaba en la lista de archivos.
 - La tanda 01 tuvo una corrida fallida previa (marcador sin reemplazar), guardada en `tanda_01_heredado.md`.
+- La tanda 05 se corrió en una sesión nueva, pero OpenCode igual citó `unidad-5/AGENTS.md` y sus reglas (el agente lo carga por su cuenta). No siguió el formato pedido: devolvió prosa por archivo, sin ids ni severidad. Las filas T05 las armó Mariano con Claude a partir de los puntos que la IA marcó como «Problemas»; los ids y la partición en filas no son de la IA, y la severidad queda como «no informada». Se descartó como hallazgo lo que la IA marcó como «Bien» y las duplicaciones entre archivos se agruparon en una sola fila.
+- Desde la tanda 06 el prompt lleva una línea final: «Devolvé exactamente el formato indicado: un id H-nn y una severidad por hallazgo, sin resumen por archivo.» La tanda 06 respondió en ese formato.
+- `T06-H-15` cita `backend_foodstore.ps1`, un nombre que no está en la lista: se toma como error de tipeo de la IA por `backup_foodstore.ps1`, a confirmar al reproducir.
 
 ## Tanda 01 — `heredado/base_heredada/` (`tanda_01_repeticion.md`)
 
@@ -133,6 +136,64 @@ Autoría: scripts de la U5 de Mariano (según la división de trabajo); confirma
 | T04-H-15 | verificacion_equivalencia.sql:30-31, 48-51 | `FULL JOIN` con `=` no compara `NULL` | baja | Mariano (U5) | | | |
 | T04-H-16 | verificacion_equivalencia.sql:6-52 | Muestra resultados pero no asevera (sin `RAISE EXCEPTION`) | baja | Mariano (U5) | | | |
 
+## Tanda 05 — `unidad-5/sql/` simulacro, auditoría y pruebas (`tanda_05_unidad5_pruebas.md`)
+
+Autoría: scripts de la U5 de Mariano (según la división de trabajo); confirmar archivo por archivo. Severidad no informada por la IA (ver límites del proceso).
+
+| ID | Archivo:línea | Resumen | Severidad (IA) | Autor | Decisión | Motivo | Prueba |
+|---|---|---|---|---|---|---|---|
+| T05-H-01 | simulacro_incidente.ps1:27-28 | `$PassSoporte='Sim-Soporte-2026'` es una clave inventada versionada; el SQL fija otra distinta (`simulacro_incidente.sql:39`, `ClaveSimulacro-2026`) | no informada | Mariano (U5) | | | |
+| T05-H-02 | simulacro_incidente.ps1:57; simulacro_incidente.sql:44-48 | La clave de `rol_soporte` viaja en la línea de comandos de `psql` (`-v`) y `CREATE ROLE … PASSWORD` la deja en texto claro en el log | no informada | Mariano (U5) | | | |
+| T05-H-03 | simulacro_incidente.ps1:81 | No valida `log_statement='all'`; solo deja un recordatorio y, si se olvida, la evidencia queda incompleta | no informada | Mariano (U5) | | | |
+| T05-H-04 | simulacro_incidente.ps1:107 | El Paso 3 exige `>= 20000` filas: depende de haber cargado `carga_masiva.sql` y reporta `REVISAR` aunque el mecanismo funcione | no informada | Mariano (U5) | | | |
+| T05-H-05 | simulacro_incidente.ps1:57-59 | `-f ('"{0}"' -f $sql)` es frágil con rutas con espacios en PowerShell 5 | no informada | Mariano (U5) | | | |
+| T05-H-06 | simulacro_incidente.sql (sin línea) | No tiene guard de base; todo el resguardo está en el `.ps1` y a mano se podría correr contra la plantilla | no informada | Mariano (U5) | | | |
+| T05-H-07 | simulacro_incidente.sql:106 | `DELETE FROM usuario` contra la regla de baja lógica, sin documentar la excepción de la limpieza del fixture | no informada | Mariano (U5) | | | |
+| T05-H-08 | auditoria_test.ps1:43-45 | `Marca()` interpola `$texto` dentro de `SELECT '$texto'`: seguro con las constantes actuales, no por construcción | no informada | Mariano (U5) | | | |
+| T05-H-09 | auditoria_test.ps1:51, 53-56 | Sin `$ErrorActionPreference='Stop'` ni chequeo de `LASTEXITCODE`: si falla el Paso 1 igual corre el Paso 2 | no informada | Mariano (U5) | | | |
+| T05-H-10 | auditoria_test.sql:26-40 | Corre como `postgres`, no como `app_web`, aunque el comentario dice lo contrario: la evidencia del log no prueba mínimo privilegio | no informada | Mariano (U5) | | | |
+| T05-H-11 | auditoria_test.sql / .ps1 (sin línea) | No advierte anonimizar el log; `fn_autenticar` con claves de prueba queda textual | no informada | Mariano (U5) | | | |
+| T05-H-12 | prueba_h1_correccion.ps1:4 | Sin guard de base ni `PGPASSWORD`; ruta `unidad-5\sql\roles.sql` hardcodeada que asume el directorio actual | no informada | Mariano (U5) | | | |
+| T05-H-13 | prueba_h1_correccion.ps1:6 | `Q()` mezcla `2>&1` en stdout: no distingue error de éxito | no informada | Mariano (U5) | | | |
+| T05-H-14 | prueba_h1_correccion.ps1:34 | No crea `unidad-5/evidencias/` si no existe; `WriteAllLines` falla | no informada | Mariano (U5) | | | |
+| T05-H-15 | prueba_h1_correccion.ps1:19 | Verifica con `has_schema_privilege` pero sin aserción programática; hay que leer `f`/`t` a ojo | no informada | Mariano (U5) | | | |
+| T05-H-16 | prueba_h2b_hash.ps1 (varias) | Mismas fragilidades que H1: ruta de PostgreSQL 17 hardcodeada, sin guard, sin password, ruta relativa | no informada | Mariano (U5) | | | |
+| T05-H-17 | prueba_h2b_hash.ps1:16 | `clave_historica_prueba` es otra clave versionada (descartable) | no informada | Mariano (U5) | | | |
+| T05-H-18 | prueba_h3_correccion.ps1 (varias) | Mismo patrón frágil que H1 (sin guard, rutas relativas, salida solo textual) | no informada | Mariano (U5) | | | |
+| T05-H-19 | prueba_h3_correccion.ps1:19 | La consulta de membresías filtra `LIKE 'rol_%'` y el «esperado: solo 3» no se puede verificar sin leer `roles.sql` | no informada | Mariano (U5) | | | |
+| T05-H-20 | prueba_h3_correccion.ps1:21 | `has_function_privilege` sobre `sp_crear_pedido` depende de si es `SECURITY DEFINER`; el script no lo asegura | no informada | Mariano (U5) | | | |
+| T05-H-21 | prueba_h3_h4b.sql:18-31 | Revoca todas las membresías grupo→grupo, no solo la de H3: el antes/después puede interpretarse mal | no informada | Mariano (U5) | | | |
+| T05-H-22 | prueba_h3_h4b.sql / correccion_h4b.sql / prueba_h4b_trigger.sql | Los nombres confunden el rol de cada archivo (diagnóstico, corrección y prueba) | no informada | Mariano (U5) | | | |
+| T05-H-23 | prueba_h4b_trigger.sql:5-6 | Exige un usuario y un producto con stock; en base vacía `:uid`/`:pid` quedan `NULL` y falla por dato, no por permiso | no informada | Mariano (U5) | | | |
+| T05-H-24 | prueba_h4b_trigger.sql:7, 10 | `SET LOCAL ROLE` + `RESET ROLE` dentro de la transacción: `current_user` posterior debe leerse con cuidado | no informada | Mariano (U5) | | | |
+| T05-H-25 | correccion_h4b.sql:5-6 | Revoca `EXECUTE` a `PUBLIC` sin `GRANT` compensatorio ni verificación posterior | no informada | Mariano (U5) | | | |
+| T05-H-26 | correccion_h4b.sql (alcance) | No cubre `sp_crear_pedido`, `fn_autenticar` ni `fn_resetear_password`: lista de rutinas incompleta | no informada | Mariano (U5) | | | |
+| T05-H-27 | correccion_h4b.sql (cita) | Cita `unidad-5/evidencias/h2b_h4b_prueba.txt` sin el prefijo `obj6_` que usan H1, H2b y H3: trazabilidad inconsistente | no informada | Mariano (U5) | | | |
+
+## Tanda 06 — `unidad-6/` scripts PowerShell (`tanda_06_unidad6_ps1.md`)
+
+Autoría: scripts de Andrés; correcciones de Mariano con Claude en el PR #13 (6 controles en `restore_test.ps1`, entre otras). Confirmar archivo por archivo. Andrés no fue consultado.
+
+| ID | Archivo:línea | Resumen | Severidad (IA) | Autor | Decisión | Motivo | Prueba |
+|---|---|---|---|---|---|---|---|
+| T06-H-01 | tests/ampliacion.Tests.ps1:27-33 | La prueba de orden usa `IndexOf('Verificar-Hash')`, que encuentra la definición de la función (`restore_test.ps1:45`) y no la llamada: pasa aunque se elimine la verificación previa a `createdb` | alta | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-02 | programar_tareas.ps1:50 | La tarea de mantenimiento no usa `-v ON_ERROR_STOP=1`: `psql -f` sigue tras errores SQL y sale con código 0, así que la tarea reporta éxito aunque el mantenimiento falle | alta | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-03 | backup_foodstore.ps1:123-139 | Si falla `pg_dumpall` o su hash tras mover `datosFinal`, el `catch` solo borra los `.parcial` y deja un `.dump` y `.sha256` huérfanos sin globales que la retención nunca limpia | media | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-04 | restore_test.ps1:136-158 | El «último respaldo» se elige ordenando alfabéticamente cualquier `*.dump` sin filtrar `foodstore_*.dump`: un archivo ajeno mayor lexicográficamente provoca error | media | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-05 | programar_tareas.ps1:14-15, 50 | `$Base` de mantenimiento no se valida como en respaldo y restauración: cambiar el parámetro corre `maintenance.sql` contra otra base | media | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-06 | programar_tareas.ps1:43-45 | `LogonType Interactive`: las tareas solo corren con sesión iniciada (límite ya declarado en el informe de la U6) | media | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-07 | tests/ampliacion.Tests.ps1:20-64 | Toda la suite son regex sobre el texto fuente: pasa con código comentado o muerto y no verifica invariantes reales (límite ya declarado: Pester solo busca texto) | media | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-08 | restore_test.ps1:290, 298, 335 | Sin `$ErrorActionPreference` global y tres llamadas nativas sin el bloque `Continue`/`$LASTEXITCODE` del resto: con `Stop` la redirección `2>&1` lanza antes del chequeo | media | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-09 | programar_tareas.ps1:50 | El `psql` de mantenimiento omite `-h` y `-p`, a diferencia de respaldo y restauración | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-10 | programar_tareas.ps1:49-51 | Las tres tareas usan `-ExecutionPolicy Bypass` sin `-NonInteractive` ni `-StartWhenAvailable`; un horario perdido no se recupera | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-11 | restore_test.ps1:41 | `Escribir-Log` usa `Add-Content -Path` en vez de `-LiteralPath`: rutas con `[`, `]` o `*` se interpretan como patrón | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-12 | restore_test.ps1:72, 85 | `Consultar-Psql` mezcla `stderr` con el resultado (`2>&1`): un aviso de `psql` contamina el escalar que se compara | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-13 | backup_foodstore.ps1:99-101 | `Remove-Item` de retención sin guarda de existencia: si falta un archivo, un respaldo exitoso se reporta como `ERROR` (salida 1) | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-14 | backup_foodstore.ps1:35, 112-123 | Marca de tiempo con granularidad de segundo: dos ejecuciones en el mismo segundo colisionan | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-15 | backend_foodstore.ps1:132 (sic) | El log solo registra la ruta final, sin tamaño ni hash (nombre de archivo a confirmar, ver límites) | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-16 | restore_test.ps1:355 | Exige exactamente 6 controles de integridad hardcodeados: cambiar `validar_integridad.sql` rompe el simulacro sin indicar la causa | baja | Andrés (+ Mariano, PR #13) | | | |
+| T06-H-17 | tests/ampliacion.Tests.ps1:12-63 | Sintaxis `Should Be`/`Should Match` (Pester 4), deprecada en Pester 5 a favor de `Should -Be` (el entorno usa Pester 3.4.0) | baja | Andrés (+ Mariano, PR #13) | | | |
+
 ## Totales (según la IA)
 
 | Tanda | Hallazgos | Alta | Media | Baja | Crítica |
@@ -141,7 +202,11 @@ Autoría: scripts de la U5 de Mariano (según la división de trabajo); confirma
 | 02 | 16 | 1 | 9 | 6 | 0 |
 | 03 | 14 | 1 | 4 | 9 | 0 |
 | 04 | 16 | 2 | 7 | 7 | 0 |
-| **Total** | **94** | **16** | **40** | **38** | **0** |
+| 05 | 27 | n/i | n/i | n/i | n/i |
+| 06 | 17 | 2 | 6 | 9 | 0 |
+| **Total** | **138** | **18** | **46** | **47** | — |
+
+n/i = no informada. Los totales por severidad cubren las tandas 01 a 04 y 06 (111 hallazgos); los 27 de la tanda 05 no traen severidad.
 
 ## Sección aparte — origen «Claude, no OpenCode»
 
