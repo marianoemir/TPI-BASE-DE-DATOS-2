@@ -157,6 +157,7 @@ El repositorio es público. Un correo y un apellido de un integrante estuvieron 
 - `codereview.md` se redactó con Claude.
 - Las filas «Claude, no OpenCode»: solo `C-05` tiene decisión; `C-01` a `C-04` y `C-06` no la tienen.
 - El merge de `review-final` a `main` (PR #24, `4313ac5`, 09/11) lo hizo Mariano sin revisión cruzada.
+- El merge de `m/cierre-codereview` a `main` (PR #25, `8d35f06`, 09/11) lo hizo Mariano sin revisión cruzada.
 
 ### 3. Evidencias del objetivo 13 con tratamiento especial
 - `T06-H-01_pester_sin_llamada.txt` es un `Start-Transcript` y trae usuario, equipo y ruta locales en la cabecera; se conserva sin editar.
