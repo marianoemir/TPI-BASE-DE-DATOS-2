@@ -105,10 +105,12 @@ Fuentes: `unidad-8/docs/DUIA.md`, `duia_*.md`, `bitacoras/`.
 | Andrés | Gemini | Redacción de 1.a, 3.a y 3.b; diagnóstico de errores en Windows | Aceptado tras verificación **según su declaración**; la revisión de Mariano mostró que esa verificación no detectó los errores |
 | Andrés | OpenCode / «GPT-5.6 Terra» (05/11) | Revisión A4 completa y contraste de 3.c | Resultados aceptados solo si salían del motor; **sin logs de la conversación** |
 | Facundo | OpenCode, agente Plan | Code review de los scripts (3.c) | Aceptados H01 y R1, descartados H36 y H04. **Modelo, proveedor, prompt, fecha y total de hallazgos: no constan**; no hay logs de sus comprobaciones |
+| Mariano | OpenCode, agente Plan (modelo gratuito: las cabeceras dicen «Croutou Alpha Free» o «Crouton Alpha Free»; no se pudo verificar cuál) | Code review de los scripts (objetivo 13, T9): 11 tandas en modo Plan, 196 hallazgos, respuestas crudas en `docs/auditoria_codigo/` | Decididos 42 (31 confirmados, 6 confirmados en parte, 2 parciales, 2 descartados y 1 descartado en lo central); 154 «No evaluado» por el plazo. Solo 14 con ejecución propia; el resto por lectura. Los autores de los scripts no fueron consultados |
+| Mariano | Claude | Asistente de T9: prompts por tanda, bloques de PowerShell, lectura de las salidas, filas T05 de `hallazgos.md`, borrador de `codereview.md` y candidatos «Claude, no OpenCode» (`C-01` a `C-09`) | Las decisiones sobre cada hallazgo las tomó Mariano. La clasificación entre ejecución propia y lectura la armó Claude y queda por confirmar por Mariano. `C-01` a `C-04` y `C-06` sin decisión; `C-07` a `C-09` sin cargar |
 
 **Declaración honesta de la fuente:** los scripts que funcionan en `movil_opencode/` son en su mayor parte reescrituras hechas con Claude a partir de los errores de la corrida 1; de OpenCode quedan la estructura general y algunas ideas de casos.
 
-## 7. Errores de la IA que cambiaron decisiones (para la defensa)
+## 7. Errores de la IA que cambiaron decisiones (para la evaluación)
 
 | Unidad | Qué afirmó o hizo la IA | Cómo se detectó |
 |---|---|---|
@@ -124,6 +126,10 @@ Fuentes: `unidad-8/docs/DUIA.md`, `duia_*.md`, `bitacoras/`.
 | U8 | `simulador_sync.py` que nunca habría evaluado nada | Lectura del código |
 | U8 | «5 tablas STRICT», «sintaxis revisada» | Ejecución: `strict = 0` en las cinco |
 | U8 | Cada `sqlite3` es un proceso nuevo y `foreign_keys` arranca en OFF | Evidencia 29 |
+| U6 | OpenCode dijo que `maintenance.sql` no corta ante un error SQL (`T06-H-02`) | `\set ON_ERROR_STOP on` en la línea 33; con un archivo de prueba, `psql -f` corta y sale con código 3. No se corrió el script real con un error forzado |
+| U6 | OpenCode señaló como falla que el rol de respaldo se crea sin contraseña (`T07-H-01`) | Es a propósito (línea 3 del script); `unidad-6/BITACORA.md` registra que se fijó con `\password` y que el respaldo corrió |
+| U6 | Recomendación de OpenCode sobre la sintaxis de Pester (`T06-H-17`) | El entorno tiene Pester 3.4.0, que usa `Should Be`; `Should -Be` es de Pester 4 en adelante (`T06-H-17_version_pester.txt`) |
+| U8 | Resumen de OpenCode sobre los formatos de fecha de `movil_opencode_v2/` (`T11-H-16`) | `creada_en` y `creado_en` usan el mismo formato y lo distinto es `evaluada_en` (`T11-H-16_formatos_fecha_v2.txt`) |
 
 **Lección común:** una afirmación de una IA no vale hasta ejecutarla; una prueba que pasa no prueba lo que se cree hasta verificar qué mide.
 
@@ -134,4 +140,4 @@ Fuentes: `unidad-8/docs/DUIA.md`, `duia_*.md`, `bitacoras/`.
 - Facundo, U8: modelo, proveedor, prompt, fecha y total de hallazgos de OpenCode; qué salió de OpenCode y qué de otra fuente.
 - Facundo, U7: salida guardada de su ejecución.
 - Andrés, U5: qué parte del recorte del log y de la guía de la Parte B cambió respecto de lo declarado.
-- Code review del objetivo 13 y migración del objetivo 2: sin registro hasta que se hagan.
+- Code review del objetivo 13: hecho por Mariano con OpenCode en modo Plan (11 tandas, 196 hallazgos, 42 decididas); los autores de los scripts no fueron consultados y el nombre exacto del modelo no se pudo verificar. Migración del objetivo 2: en `main` (PR #18); lo declarado de Facundo (Gemini, ejecución del primer borrador, autoría de las capturas `up`/`down`) sigue sin confirmar por él.
