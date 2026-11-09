@@ -4,7 +4,9 @@
 
 Food Store es una base de datos de un comercio de alimentos que se trabajó a lo largo de la cursada en cinco unidades: normalización (U4), seguridad (U5), mantenimiento y recuperación (U6), modelado documental (U7) y base local para una tablet (U8). Esta segunda entrega no agrega un sistema nuevo: **cierra y justifica** lo hecho, y prueba de forma verificable el cumplimiento de los 14 objetivos.
 
-Motores: PostgreSQL 16+ (PL/pgSQL), MongoDB y SQLite. Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. El repositorio integrador está organizado por unidad; el `README.md` de la raíz trae la tabla de los 14 objetivos con la ruta de cada evidencia. Link: `[COMPLETAR]`. Etiqueta: `[COMPLETAR]`.
+Motores: PostgreSQL 16+ (PL/pgSQL), MongoDB y SQLite. Equipo: Mariano Chirino, Andrés Fabre y Facundo Quiroga. El repositorio integrador está organizado por unidad; el `README.md` de la raíz trae la tabla de los 14 objetivos con la ruta de cada evidencia. Link: https://github.com/marianoemir/TPI-BASE-DE-DATOS-2. Etiqueta: `tp-final`.
+
+**Nota sobre el PDF de la U7.** `unidad-7/informe_u7.pdf` es la entrega original de la unidad (01/11/2026) y enlaza al repositorio `marianoemir/TP-Unidad7-BD2`. No incluye la medición de 5.000 pedidos, que está en `unidad-7/evidencias/comparacion_medida.md` y en la sección de la U7 de este informe. No se editó: se revisó página por página (texto, metadatos y capturas) y no contiene rutas locales ni nombres de equipo; solo los nombres de los integrantes y datos ficticios de `data.sql`.
 
 Criterio de lectura: **el informe justifica y el repositorio prueba**. Cada afirmación apunta a un archivo o a una salida guardada. Lo que no se pudo demostrar se dice como límite, no se omite.
 
