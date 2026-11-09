@@ -34,7 +34,7 @@ Entrega: jueves 12 de noviembre de 2026, 23:59. Informe en PDF: `docs/informe/` 
 | 10 | Comparación documental vs relacional | Cubierto con límites | `unidad-7/evidencias/comparacion_medida.md`, `unidad-7/evidencias/obj10_*_20261107.txt`, `unidad-7/SPEC_U7_medicion.md`, `docs/informe/u7.md` | Una sola máquina y una muestra de 5.000 pedidos; el producto más frecuente aparece en un solo pedido; en la repetición no se capturó el plan de PostgreSQL; tiempos no comparables 1 a 1 con `EXPLAIN ANALYZE` |
 | 11 | SQLite especificado en Kiro y generado con OpenCode | Cubierto con límites | `unidad-8/.kiro/specs/foodstore-tablet-sync/`, `unidad-8/movil_opencode/`, `unidad-8/movil_opencode_v2/`, `unidad-8/docs/comparacion_generado_vs_original.md` | Ninguna corrida de OpenCode produjo una base funcional sin correcciones |
 | 12 | Sincronización simulada con conflictos | Cubierto | `unidad-8/movil_opencode/semaforo.sql`, casos C1–C8 y F2, `unidad-8/evidencias/01` a `29` | El semáforo evalúa cada borrador por separado; solo el servidor resuelve la competencia por stock (C8) |
-| 13 | Code review final asistido por IA | En curso | `docs/auditoria_codigo/` `[COMPLETAR]` | Sin hallazgos completos hasta que termine la revisión |
+| 13 | Code review final asistido por IA | Cubierto con límites | `docs/informe/codereview.md`, `docs/auditoria_codigo/` (`hallazgos.md`, `tanda_*.md`, `evidencias/`) | 196 hallazgos; 42 decididos (35 altas o críticas; 14 con ejecución propia, el resto por lectura); 154 «No evaluado»; sin correcciones de código; sin revisión cruzada independiente |
 | 14 | Capa de datos completa en Git, lista para entrega | En curso | Este README, `docs/bitacora_ia.md`, `docs/informe/` | `[ACTUALIZAR al cerrar]` |
 
 ## Bases de datos usadas
