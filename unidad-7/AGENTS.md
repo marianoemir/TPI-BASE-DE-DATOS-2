@@ -138,7 +138,7 @@ La consigna aclara que los nombres del material son ilustrativos y que se usa la
 | 2 | Juan (2) | TARJETA | 4×6, 5×6, 8×2 | TERMINADO | Sí |
 | 3 | Lucía (3) | TRANSFERENCIA | 12×1, 10×1 | PENDIENTE | Sí |
 | 4 | Ana (1) | TARJETA | 2×1, 9×1 | PENDIENTE | **No** (`eliminado = TRUE`) |
-| 5 | Mariano (4) | EFECTIVO | 13×2, 3×1, 11×2 | PENDIENTE | Sí |
+| 5 | Carlos (4) | EFECTIVO | 13×2, 3×1, 11×2 | PENDIENTE | Sí |
 | 6 | Sofía (5) | EFECTIVO | 6×4 | CANCELADO | Sí |
 
 Con los pedidos 1, 2, 3, 5 y 6 se llega al mínimo de cinco. **Ningún producto se repite entre ellos**: una búsqueda
